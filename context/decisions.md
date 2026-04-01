@@ -20,7 +20,7 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 ### 2026-04-01 | Design system: Prism only
 - **Decision:** Use Prism Design System (PDS) exclusively — no custom or experimental token systems
 - **Reason:** An experiment folder was created to explore a 3-color minimal system; concluded PDS is the right foundation and experiment was archived
-- **Alternatives considered:** Custom 3-color token system (archived in /archive/experiment/)
+- **Alternatives considered:** Custom 3-color token system (archived in /archives/experiments/)
 
 ### 2026-04-01 | Dark theme token strategy
 - **Decision:** Dual-import pattern — `tokens.css` (PDS, never edited) + `tokens-dark.css` (Tier 2 overrides only)

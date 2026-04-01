@@ -29,7 +29,7 @@ type: project
 - `/tokens-dark.css` contains the mattress-builder dark-theme semantic overrides and must be imported after `/tokens.css`
 - `/assets/fonts/` contains six PP Neue Montreal font files used by the token layer and experiments
 - `/assets/logos/` contains imagine.io logo variants used by the archived prototype
-- `/archive/experiment/` contains an archived first-screen prototype plus an experimental design-system page kept for reference only
+- `/archives/experiments/` contains an archived first-screen prototype plus an experimental design-system page kept for reference only
 - `/assets/existing-screenshots/` contains the screenshot set used to document the current production builder behavior
 
 ---

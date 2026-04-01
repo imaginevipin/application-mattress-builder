@@ -24,7 +24,7 @@ type: project
 - Prism Design System tokens are initialized in `/tokens.css`
 - Dark-theme semantic overrides are initialized in `/tokens-dark.css`
 - Brand assets are stored in `/assets/fonts/` and `/assets/logos/`
-- Early UI exploration work is preserved in `/archive/experiment/` as reference, not as the active implementation
+- Early UI exploration work is preserved in `/archives/experiments/` as reference, not as the active implementation
 
 ## Who Uses It
 - Likely B2B: mattress manufacturers, brands, or retailers configuring products
