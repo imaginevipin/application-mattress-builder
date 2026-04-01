@@ -18,6 +18,14 @@ type: project
 - 3D viewport (WebGL/Three.js or similar renderer)
 - Single-page tool — no multi-page navigation
 
+## Progress Snapshot
+- Repository scaffolding is in place: product, system context, decisions, and task tracking files exist and are being used as persistent memory
+- Existing product understanding has been captured from 46 screenshots stored in `/assets/existing-screenshots/`
+- Prism Design System tokens are initialized in `/tokens.css`
+- Dark-theme semantic overrides are initialized in `/tokens-dark.css`
+- Brand assets are stored in `/assets/fonts/` and `/assets/logos/`
+- Early UI exploration work is preserved in `/archive/experiment/` as reference, not as the active implementation
+
 ## Who Uses It
 - Likely B2B: mattress manufacturers, brands, or retailers configuring products
 - Users can name mattresses, save to library, request quotes, create images
@@ -30,6 +38,11 @@ type: project
 ## Core Modes
 - External — configures the outer appearance (Size, Height, Top, Wall, Tape, Label, Handle, Bottom)
 - Internal — configures the internal build (foam/coil layers, exploded/cutaway views)
+
+## Current Implementation State
+- No active application stack or runtime has been initialized yet in the repository root
+- Current repository progress is discovery, design-token setup, and archived UI exploration
+- Next meaningful build step is to set up the actual app structure and start implementing the production shell with Prism dark-theme tokens
 
 ## File Operations
 - Save Project

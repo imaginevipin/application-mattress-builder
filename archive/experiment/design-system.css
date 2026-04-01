@@ -1,0 +1,36 @@
+/* ─────────────────────────────────────────────────────────
+   design-system.css
+   Only contains what Tailwind cannot express:
+   — @font-face declarations
+   — base resets
+   — custom scrollbar
+──────────────────────────────────────────────────────────── */
+
+@font-face { font-family: 'PP Neue Montreal'; src: url('../assets/fonts/PPNeueMontreal-Light.otf') format('opentype'); font-weight: 300; font-style: normal; }
+@font-face { font-family: 'PP Neue Montreal'; src: url('../assets/fonts/PPNeueMontreal-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; }
+@font-face { font-family: 'PP Neue Montreal'; src: url('../assets/fonts/PPNeueMontreal-Book.otf') format('opentype'); font-weight: 450; font-style: normal; }
+@font-face { font-family: 'PP Neue Montreal'; src: url('../assets/fonts/PPNeueMontreal-Medium.otf') format('opentype'); font-weight: 500; font-style: normal; }
+@font-face { font-family: 'PP Neue Montreal'; src: url('../assets/fonts/PPNeueMontreal-SemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; }
+@font-face { font-family: 'PP Neue Montreal'; src: url('../assets/fonts/PPNeueMontreal-Bold.otf') format('opentype'); font-weight: 700; font-style: normal; }
+
+html { scroll-behavior: smooth; }
+
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ── Toggle ──────────────────────────────────────────────────────
+   Parent-child state (.toggle.on > .toggle-knob) cannot be
+   expressed with Tailwind utility classes alone.
+──────────────────────────────────────────────────────────────── */
+.toggle { width:32px; height:18px; border-radius:9px; background:#363636; border:1px solid rgba(255,255,255,0.1); position:relative; transition:background 0.15s, border-color 0.15s; flex-shrink:0; }
+.toggle.on { background:#ec4e0b; border-color:#ec4e0b; }
+.toggle-knob { position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:white; transition:transform 0.15s; }
+.toggle.on .toggle-knob { transform:translateX(14px); }
+
+/* ── Icon item ───────────────────────────────────────────────────
+   .active state is toggled via JS — needs a CSS rule to target it.
+──────────────────────────────────────────────────────────────── */
+.icon-item { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:6px; border:1px solid rgba(255,255,255,0.07); color:rgba(255,255,255,0.38); cursor:pointer; transition:color 0.12s, background 0.12s, border-color 0.12s; }
+.icon-item:hover { color:rgba(255,255,255,0.65); border-color:rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); }
+.icon-item.active { color:#ec4e0b; background:rgba(236,78,11,0.08); border-color:rgba(236,78,11,0.3); }

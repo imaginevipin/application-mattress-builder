@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experimental Design System — Mattress Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
+<link rel="stylesheet" href="design-system.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="tailwind.config.js"></script>
+</head>
+
+<body class="bg-bg-base font-pp">
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<nav class="sticky top-0 z-50 flex items-center gap-6 px-6 h-12 bg-bg-deep border-b border-white/[7%]">
+  <div class="flex items-center gap-2 text-sm font-medium text-white">
+    Mattress Builder DS
+    <span class="text-[10px] font-semibold tracking-[0.1em] uppercase text-o-solid bg-o-solid/[8%] border border-o-solid/30 px-1.5 py-0.5 rounded">Experiment</span>
+  </div>
+  <div class="flex items-center gap-5 ml-auto">
+    <a class="text-sm text-white/65 hover:text-white transition-colors no-underline" href="#foundation">Foundation</a>
+    <a class="text-sm text-white/65 hover:text-white transition-colors no-underline" href="#surfaces">Surfaces</a>
+    <a class="text-sm text-white/65 hover:text-white transition-colors no-underline" href="#typography">Typography</a>
+    <a class="text-sm text-white/65 hover:text-white transition-colors no-underline" href="#components">Components</a>
+    <a class="text-sm text-white/65 hover:text-white transition-colors no-underline" href="#states">States</a>
+    <a class="text-sm text-white/65 hover:text-white transition-colors no-underline" href="#spacing">Spacing</a>
+  </div>
+</nav>
+
+<div class="max-w-4xl mx-auto px-8 pt-16 pb-24">
+
+  <!-- ── HERO ─────────────────────────────────────────────── -->
+  <div class="py-24 border-b border-white/[5%]">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-6">Experimental Design System — v0.1</div>
+    <h1 class="text-[72px] font-light text-white leading-none tracking-tight mb-6">Built on<br><span class="text-o-solid">three.</span></h1>
+    <p class="text-base text-white/65 max-w-lg leading-relaxed">
+      Every color, surface, text level, and state in this system
+      is derived from three source values:
+      <strong class="text-white font-medium">#141414</strong>,
+      <strong class="text-white font-medium">#ffffff</strong>, and
+      <strong class="text-o-solid font-medium">#ec4e0b</strong>.
+      No arbitrary additions.
+    </p>
+  </div>
+
+  <!-- ── FOUNDATION ───────────────────────────────────────── -->
+  <section id="foundation" class="py-16 border-b border-white/[5%]">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-3">01 — Foundation</div>
+    <h2 class="text-3xl font-light text-white mb-3 tracking-tight">The source colors</h2>
+    <p class="text-sm text-white/65 mb-8 max-w-lg">Three colors. Every token in the system traces directly back to one of these.</p>
+
+    <div class="grid grid-cols-3 gap-6">
+      <div class="flex flex-col gap-3">
+        <div class="h-32 rounded-lg flex items-end p-3 bg-bg-deep border border-white/10">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider bg-white/10 border border-white/20 text-white/65">Base</span>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-xs font-mono text-white/65">--src-dark</div>
+          <div class="text-sm font-medium text-white">#141414</div>
+          <div class="text-xs text-white/38">Backgrounds, surfaces, depth</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-3">
+        <div class="h-32 rounded-lg flex items-end p-3 bg-white border border-black/10">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider bg-black/[8%] border border-black/10 text-black/50">Text</span>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-xs font-mono text-white/65">--src-white</div>
+          <div class="text-sm font-medium text-white">#ffffff</div>
+          <div class="text-xs text-white/38">Text, icons, on-dark content</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-3">
+        <div class="h-32 rounded-lg flex items-end p-3 bg-o-solid">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider bg-white/20 text-white">Primary</span>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-xs font-mono text-white/65">--src-orange</div>
+          <div class="text-sm font-medium text-white">#ec4e0b</div>
+          <div class="text-xs text-white/38">Actions, selections, brand accent</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SURFACES ─────────────────────────────────────────── -->
+  <section id="surfaces" class="py-16 border-b border-white/[5%]">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-3">02 — Surfaces</div>
+    <h2 class="text-3xl font-light text-white mb-3 tracking-tight">6 elevations from dark</h2>
+    <p class="text-sm text-white/65 mb-8 max-w-lg">Each surface step adds ~8–10 lightness units to #141414, creating depth without new colors.</p>
+
+    <div class="grid grid-cols-6 gap-3 mb-10">
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-bg-deep"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--bg-deep</div>
+          <div class="text-xs text-white/38">#0a0a0a</div>
+          <div class="text-[10px] text-white/38">Topbar, deepest</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-bg-base border border-white/[5%]"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--bg-base</div>
+          <div class="text-xs text-white/38">#141414</div>
+          <div class="text-[10px] text-white/38">Page background</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-bg-raised"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--bg-raised</div>
+          <div class="text-xs text-white/38">#1c1c1c</div>
+          <div class="text-[10px] text-white/38">Panels, sidebar</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-bg-panel"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--bg-panel</div>
+          <div class="text-xs text-white/38">#222222</div>
+          <div class="text-[10px] text-white/38">Panel content areas</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-bg-card"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--bg-card</div>
+          <div class="text-xs text-white/38">#2c2c2c</div>
+          <div class="text-[10px] text-white/38">Cards, inputs</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-bg-hover"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--bg-hover</div>
+          <div class="text-xs text-white/38">#363636</div>
+          <div class="text-[10px] text-white/38">Hover states</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text scale -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Text — 4 opacity levels from white</div>
+    <div class="flex flex-col divide-y divide-white/[5%] mb-10">
+      <div class="py-4 flex flex-col gap-2">
+        <div class="text-xl text-white">The quick brown fox.</div>
+        <div class="flex gap-6">
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Token</div><div class="text-xs text-white/65">--t1</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Value</div><div class="text-xs text-white/65">#ffffff</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Use</div><div class="text-xs text-white/65">Primary</div></div>
+        </div>
+      </div>
+      <div class="py-4 flex flex-col gap-2">
+        <div class="text-xl text-white/65">The quick brown fox.</div>
+        <div class="flex gap-6">
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Token</div><div class="text-xs text-white/65">--t2</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Value</div><div class="text-xs text-white/65">65%</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Use</div><div class="text-xs text-white/65">Secondary</div></div>
+        </div>
+      </div>
+      <div class="py-4 flex flex-col gap-2">
+        <div class="text-xl text-white/38">The quick brown fox.</div>
+        <div class="flex gap-6">
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Token</div><div class="text-xs text-white/65">--t3</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Value</div><div class="text-xs text-white/65">38%</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Use</div><div class="text-xs text-white/65">Tertiary / captions</div></div>
+        </div>
+      </div>
+      <div class="py-4 flex flex-col gap-2">
+        <div class="text-xl text-white/18">The quick brown fox.</div>
+        <div class="flex gap-6">
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Token</div><div class="text-xs text-white/65">--t4</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Value</div><div class="text-xs text-white/65">18%</div></div>
+          <div class="flex flex-col gap-0.5"><div class="text-xxs uppercase tracking-wider text-white/38">Use</div><div class="text-xs text-white/65">Disabled / ghost</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orange spectrum -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Accent — 5 states from orange</div>
+    <div class="grid grid-cols-5 gap-3">
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-o-solid/8"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--o-tint</div>
+          <div class="text-xs text-white/38">8% opacity</div>
+          <div class="text-[10px] text-white/38">Selected bg</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-o-solid/18"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--o-dim</div>
+          <div class="text-xs text-white/38">18% opacity</div>
+          <div class="text-[10px] text-white/38">Hover accent bg</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-o-solid/38"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--o-glow</div>
+          <div class="text-xs text-white/38">38% opacity</div>
+          <div class="text-[10px] text-white/38">Shadows, glows</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-o-solid"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--o-solid</div>
+          <div class="text-xs text-white/38">#ec4e0b</div>
+          <div class="text-[10px] text-white/38">Buttons, borders</div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="h-14 rounded bg-o-deep"></div>
+        <div class="flex flex-col gap-0.5">
+          <div class="text-[11px] font-mono text-white/65">--o-deep</div>
+          <div class="text-xs text-white/38">#d14009</div>
+          <div class="text-[10px] text-white/38">Hover/pressed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TYPOGRAPHY ───────────────────────────────────────── -->
+  <section id="typography" class="py-16 border-b border-white/[5%]">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-3">03 — Typography</div>
+    <h2 class="text-3xl font-light text-white mb-3 tracking-tight">PP Neue Montreal</h2>
+    <p class="text-sm text-white/65 mb-8 max-w-lg">One typeface. Six weights. Used at different scales and opacities to create full hierarchy.</p>
+
+    <div class="flex flex-col divide-y divide-white/[5%]">
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">Display</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">60px / 300<br>−2px tracking</div>
+        </div>
+        <div class="overflow-hidden">
+          <span style="font-size:52px; font-weight:300; letter-spacing:-2px; color:white; line-height:1">Mattress</span>
+        </div>
+      </div>
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">H1</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">40px / 300<br>−1.5px tracking</div>
+        </div>
+        <div>
+          <span style="font-size:40px; font-weight:300; letter-spacing:-1.5px; color:white; line-height:1">King Size</span>
+        </div>
+      </div>
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">H2</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">28px / 400<br>−0.5px tracking</div>
+        </div>
+        <div>
+          <span style="font-size:28px; font-weight:400; letter-spacing:-0.5px; color:white; line-height:1">Box Pillow Top</span>
+        </div>
+      </div>
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">H3</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">20px / 500<br>0px tracking</div>
+        </div>
+        <div>
+          <span style="font-size:20px; font-weight:500; color:white; line-height:1">Diamond Quilt 1334</span>
+        </div>
+      </div>
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">Body</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">14px / 400<br>0px tracking</div>
+        </div>
+        <div>
+          <span style="font-size:14px; font-weight:400; color:rgba(255,255,255,0.65)">Configure your mattress from the ground up. Choose size, height, fabric, and finishing details.</span>
+        </div>
+      </div>
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">Small</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">12px / 500<br>+0.02em tracking</div>
+        </div>
+        <div>
+          <span style="font-size:12px; font-weight:500; color:rgba(255,255,255,0.65)">76" × 80" &nbsp;·&nbsp; King &nbsp;·&nbsp; Classic Tuft</span>
+        </div>
+      </div>
+      <div class="py-5 flex items-center gap-8">
+        <div class="w-36 flex-shrink-0">
+          <div class="text-xs font-medium text-white/65">Caption</div>
+          <div class="text-[11px] text-white/38 leading-relaxed mt-0.5">10px / 600<br>+0.12em tracking<br>uppercase</div>
+        </div>
+        <div>
+          <span style="font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.38)">SIZE &nbsp; / &nbsp; HEIGHT &nbsp; / &nbsp; TOP PANEL</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMPONENTS ───────────────────────────────────────── -->
+  <section id="components" class="py-16 border-b border-white/[5%]">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-3">04 — Components</div>
+    <h2 class="text-3xl font-light text-white mb-8 tracking-tight">UI elements</h2>
+
+    <!-- Buttons -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Buttons</div>
+    <div class="flex flex-wrap items-center gap-3 mb-3">
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-o-solid hover:bg-o-deep text-white text-sm font-medium transition-colors border border-transparent cursor-pointer">Add to library</button>
+      <button class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded bg-o-solid hover:bg-o-deep text-white text-base font-medium transition-colors border border-transparent cursor-pointer">Create Image</button>
+      <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-o-solid hover:bg-o-deep text-white text-xs font-medium transition-colors border border-transparent cursor-pointer">Save</button>
+    </div>
+    <div class="flex flex-wrap items-center gap-3 mb-3">
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-transparent hover:bg-bg-card text-white/65 hover:text-white text-sm font-medium transition-colors border border-white/20 hover:border-white/40 cursor-pointer">Request a prop</button>
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-bg-card hover:bg-bg-hover text-white/65 hover:text-white text-sm font-medium transition-colors border border-white/10 hover:border-white/20 cursor-pointer">Secondary</button>
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-transparent hover:bg-bg-card text-white/65 hover:text-white text-sm font-medium transition-colors border border-transparent cursor-pointer">Ghost</button>
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-transparent text-red-400 hover:text-red-300 text-sm font-medium transition-colors border border-red-500/40 hover:border-red-500 cursor-pointer">Delete</button>
+    </div>
+    <div class="flex flex-wrap items-center gap-3 mb-10">
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-o-solid text-white text-sm font-medium border border-transparent opacity-40 cursor-not-allowed" disabled>Disabled</button>
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-bg-card text-white/65 text-sm font-medium border border-white/10 opacity-40 cursor-not-allowed" disabled>Disabled</button>
+      <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-o-solid hover:bg-o-deep text-white text-sm font-medium transition-colors border border-transparent cursor-pointer">
+        <span class="material-symbols-outlined" style="font-size:15px">add</span>
+        Add Layer
+      </button>
+    </div>
+
+    <!-- Inputs -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Inputs</div>
+    <div class="grid grid-cols-2 gap-4 mb-10">
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-medium text-white/65">Mattress Name</label>
+        <input class="w-full px-3 py-2 rounded bg-bg-card border border-white/10 text-white text-sm placeholder:text-white/38 focus:outline-none focus:border-o-solid focus:bg-bg-panel transition-colors" type="text" placeholder="Enter mattress name">
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-medium text-white/65">Search</label>
+        <input class="w-full px-3 py-2 rounded bg-bg-card border border-white/10 text-white text-sm placeholder:text-white/38 focus:outline-none focus:border-o-solid focus:bg-bg-panel transition-colors" type="text" placeholder="Search patterns…">
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-medium text-white/65">Error state</label>
+        <input class="w-full px-3 py-2 rounded bg-red-500/[4%] border border-red-500/40 text-red-400/90 text-sm focus:outline-none focus:border-red-500 transition-colors" type="text" value="Invalid value">
+      </div>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-medium text-white/65">Success state</label>
+        <input class="w-full px-3 py-2 rounded bg-bg-card border border-green-500/40 text-white text-sm focus:outline-none transition-colors" type="text" value="King — saved">
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Cards</div>
+    <div class="grid grid-cols-3 gap-4 mb-10">
+      <div class="p-4 rounded-lg bg-bg-card border border-white/10 hover:border-white/20 cursor-pointer transition-all flex flex-col gap-2">
+        <div class="text-white/38"><span class="material-symbols-outlined" style="font-size:20px">straighten</span></div>
+        <div class="text-sm font-medium text-white">King</div>
+        <div class="text-xs text-white/65 leading-relaxed">76" × 80"<br>Standard king size</div>
+      </div>
+      <div class="p-4 rounded-lg bg-o-solid/8 border border-o-solid cursor-pointer transition-all flex flex-col gap-2">
+        <div class="text-o-solid"><span class="material-symbols-outlined" style="font-size:20px">straighten</span></div>
+        <div class="text-sm font-medium text-o-solid">Queen</div>
+        <div class="text-xs text-white/65 leading-relaxed">60" × 80"<br>Selected state</div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-card border border-white/10 cursor-not-allowed transition-all flex flex-col gap-2 opacity-40">
+        <div class="text-white/38"><span class="material-symbols-outlined" style="font-size:20px">straighten</span></div>
+        <div class="text-sm font-medium text-white">Twin XL</div>
+        <div class="text-xs text-white/65 leading-relaxed">38" × 80"<br>Disabled state</div>
+      </div>
+    </div>
+
+    <!-- Badges + Toggles -->
+    <div class="grid grid-cols-2 gap-10">
+      <div>
+        <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Badges</div>
+        <div class="flex flex-wrap gap-2">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider border bg-o-solid/8 border-o-solid/40 text-o-solid">Selected</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider border bg-white/10 border-white/20 text-white/65">Default</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider border bg-green-500/10 border-green-500/40 text-green-400">Saved</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider border bg-yellow-400/10 border-yellow-400/40 text-yellow-400">Pending</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider border bg-red-500/10 border-red-500/40 text-red-400">Error</span>
+        </div>
+      </div>
+      <div>
+        <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-4">Toggles</div>
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center justify-between cursor-pointer" onclick="this.querySelector('.toggle').classList.toggle('on')">
+            <span class="text-sm text-white/65">Mirror Top to Bottom</span>
+            <div class="toggle on"><div class="toggle-knob"></div></div>
+          </div>
+          <div class="flex items-center justify-between cursor-pointer" onclick="this.querySelector('.toggle').classList.toggle('on')">
+            <span class="text-sm text-white/65">Shadow on floor</span>
+            <div class="toggle"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATES ────────────────────────────────────────────── -->
+  <section id="states" class="py-16 border-b border-white/[5%]">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-3">05 — States</div>
+    <h2 class="text-3xl font-light text-white mb-3 tracking-tight">All interaction states</h2>
+    <p class="text-sm text-white/65 mb-8 max-w-lg">Every interactive element follows this consistent four-state model.</p>
+
+    <div class="grid grid-cols-4 gap-4">
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Default</div>
+        <div class="flex items-center justify-center">
+          <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-bg-card text-white/65 text-sm font-medium border border-white/10 pointer-events-none">Action</button>
+        </div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Hover</div>
+        <div class="flex items-center justify-center">
+          <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-bg-hover text-white text-sm font-medium border border-white/20 pointer-events-none">Action</button>
+        </div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Selected / Active</div>
+        <div class="flex items-center justify-center">
+          <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-o-solid/8 text-o-solid text-sm font-medium border border-o-solid pointer-events-none">Action</button>
+        </div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Disabled</div>
+        <div class="flex items-center justify-center">
+          <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-bg-card text-white/65 text-sm font-medium border border-white/10 opacity-40 cursor-not-allowed pointer-events-none" disabled>Action</button>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Input: Default</div>
+        <div class="flex items-center">
+          <input class="w-full px-3 py-2 rounded bg-bg-card border border-white/10 text-white/38 text-sm pointer-events-none" type="text" placeholder="Placeholder">
+        </div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Input: Focused</div>
+        <div class="flex items-center">
+          <input class="w-full px-3 py-2 rounded bg-bg-panel border border-o-solid text-white text-sm pointer-events-none" type="text" value="Focused">
+        </div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Input: Error</div>
+        <div class="flex items-center">
+          <input class="w-full px-3 py-2 rounded bg-red-500/[4%] border border-red-500/40 text-red-400/90 text-sm pointer-events-none" type="text" value="Invalid">
+        </div>
+      </div>
+      <div class="p-4 rounded-lg bg-bg-raised border border-white/[7%] flex flex-col gap-3">
+        <div class="text-xxs font-semibold tracking-wider uppercase text-white/38">Icon: States</div>
+        <div class="flex items-center gap-2">
+          <div class="icon-item"><span class="material-symbols-outlined">palette</span></div>
+          <div class="icon-item active"><span class="material-symbols-outlined">straighten</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SPACING ───────────────────────────────────────────── -->
+  <section id="spacing" class="py-16">
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mb-3">06 — Spacing</div>
+    <h2 class="text-3xl font-light text-white mb-3 tracking-tight">4px base grid</h2>
+    <p class="text-sm text-white/65 mb-8 max-w-lg">Every spatial value is a multiple of 4px. 10 steps cover all UI needs.</p>
+
+    <div class="grid grid-cols-5 gap-6">
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:4px; width:4px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp1</div>
+        <div class="text-xs text-white/38">4px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:8px; width:8px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp2</div>
+        <div class="text-xs text-white/38">8px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:12px; width:12px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp3</div>
+        <div class="text-xs text-white/38">12px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:16px; width:16px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp4</div>
+        <div class="text-xs text-white/38">16px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:20px; width:20px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp5</div>
+        <div class="text-xs text-white/38">20px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:24px; width:24px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp6</div>
+        <div class="text-xs text-white/38">24px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:32px; width:32px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp7</div>
+        <div class="text-xs text-white/38">32px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:40px; width:40px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp8</div>
+        <div class="text-xs text-white/38">40px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:48px; width:48px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp9</div>
+        <div class="text-xs text-white/38">48px</div>
+      </div>
+      <div class="flex flex-col items-start gap-1.5">
+        <div class="bg-o-solid/30 rounded" style="height:64px; width:64px"></div>
+        <div class="text-[11px] font-mono text-white/65">--sp10</div>
+        <div class="text-xs text-white/38">64px</div>
+      </div>
+    </div>
+
+    <!-- Border radius -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mt-12 mb-4">Border Radius</div>
+    <div class="flex flex-wrap gap-6">
+      <div class="flex flex-col items-center gap-2">
+        <div class="w-12 h-12 bg-bg-card border border-white/10" style="border-radius:0"></div>
+        <div class="text-xs text-white/38">0 — none</div>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div class="w-12 h-12 bg-bg-card border border-white/10 rounded-sm"></div>
+        <div class="text-xs text-white/38">4px — small</div>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div class="w-12 h-12 bg-bg-card border border-white/10 rounded-md"></div>
+        <div class="text-xs text-white/38">6px — default</div>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div class="w-12 h-12 bg-bg-card border border-white/10 rounded-lg"></div>
+        <div class="text-xs text-white/38">8px — card</div>
+      </div>
+      <div class="flex flex-col items-center gap-2">
+        <div class="w-12 h-12 bg-bg-card border border-white/10 rounded-xl"></div>
+        <div class="text-xs text-white/38">12px — large</div>
+      </div>
+    </div>
+
+    <!-- Icon library -->
+    <div class="text-xxs font-semibold tracking-[0.12em] uppercase text-white/38 mt-12 mb-4">Icon Library — Material Symbols Outlined</div>
+    <div class="flex flex-wrap gap-2 mb-3">
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">straighten</span></div>
+      <div class="icon-item active" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">height</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">flip_to_front</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">texture</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">border_all</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">sell</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">drag_handle</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">flip_to_back</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">palette</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">image</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">photo_camera</span></div>
+      <div class="icon-item" onclick="this.classList.toggle('active')"><span class="material-symbols-outlined">layers</span></div>
+    </div>
+    <p class="text-[11px] text-white/18">wght: 300 · opsz: 24 · Click to toggle active state</p>
+  </section>
+
+  <div class="py-12 text-center text-xs text-white/18">
+    Experimental Design System · Mattress Builder · imagine.io · 2026
+  </div>
+
+</div>
+
+<script src="design-system.js"></script>
+</body>
+</html>

@@ -22,7 +22,8 @@ type: project
 ## Setup
 
 - [ ] Set up project stack and folder structure — priority: high — complexity: medium
-- [ ] Initialize Prism tokens (tokens.css + fonts + logos) — priority: high — complexity: simple
+- [ ] Create production application shell using Prism dark-theme tokens — priority: high — complexity: medium
+- [ ] Decide whether archived experiment should be mined into the production shell or kept as reference only — priority: medium — complexity: simple
 
 ## Features (to be scoped after discovery)
 

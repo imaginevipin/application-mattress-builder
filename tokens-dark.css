@@ -1,0 +1,82 @@
+/* ─────────────────────────────────────────────────────────
+   tokens-dark.css — Mattress Builder dark-theme overrides
+   Import AFTER tokens.css to override Tier 2 semantic aliases.
+   Tier 1 brand primitives are never touched.
+
+   Usage:
+     <link rel="stylesheet" href="tokens.css">
+     <link rel="stylesheet" href="tokens-dark.css">
+
+   Strategy:
+   — Surface/text/border defaults flip from light → dark using
+     Tier 1 primitives already in the scale.
+   — Solid semantic colors (primary, error, info, warning, success)
+     are unchanged — they work on both themes.
+   — Subtle variants flip from the top of the scale (pastels)
+     to the bottom (deep tints).
+   — Disabled states shift darker to stay legible but muted.
+──────────────────────────────────────────────────────────── */
+
+:root {
+
+  /* ── Text ───────────────────────────────────────────────── */
+
+  --text-default-heading:        #ffffff;   /* white         */
+  --text-default-body:           #cccccc;   /* → grey-200    */
+  --text-default-caption:        #b2b2b2;   /* → grey-300    */
+  --text-default-placeholder:    #666666;   /* → grey-600    */
+
+  --text-disabled-default:       #4d4d4d;   /* → grey-700    */
+  --text-disabled-on-color:      #666666;   /* → grey-600    */
+
+
+  /* ── Surface ────────────────────────────────────────────── */
+
+  /* Base page surfaces */
+  --surface-default:             #141414;   /* → dark        */
+  --surface-page:                #141414;   /* → dark        */
+  --surface-page-secondary:      #1a1a1a;   /* → grey-900    */
+  --surface-default-secondary:   #1a1a1a;   /* → grey-900    */
+
+  /* Subtle semantic surfaces: pastels → deep tints */
+  --surface-primary-default-subtle:           #2f1002;   /* → papaya-900  */
+  --surface-primary-default-subtle-hover:     #5e1f04;   /* → papaya-800  */
+  --surface-error-default-subtle:             #2f020b;   /* → red-900     */
+  --surface-error-default-subtle-hover:       #5e0416;   /* → red-800     */
+  --surface-information-default-subtle:       #02222f;   /* → blue-900    */
+  --surface-information-default-subtle-hover: #04435e;   /* → blue-800    */
+  --surface-warning-default-subtle:           #2f2602;   /* → yellow-900  */
+  --surface-warning-default-subtle-hover:     #5e4c04;   /* → yellow-800  */
+  --surface-success-default-subtle:           #00240f;   /* → green-900   */
+  --surface-success-default-subtle-hover:     #00491e;   /* → green-800   */
+
+  --surface-disabled-disabled:   #333333;   /* → grey-800    */
+
+
+  /* ── Border ─────────────────────────────────────────────── */
+
+  /* Base borders */
+  --border-default:              #1a1a1a;   /* → grey-900    */
+  --border-default-secondary:    #333333;   /* → grey-800    */
+
+  /* Subtle semantic borders: pastels → deep tints */
+  --border-primary-default-subtle:            #2f1002;   /* → papaya-900  */
+  --border-primary-default-subtle-hover:      #5e1f04;   /* → papaya-800  */
+  --border-error-default-subtle:              #2f020b;   /* → red-900     */
+  --border-error-default-subtle-hover:        #5e0416;   /* → red-800     */
+  --border-information-default-subtle:        #02222f;   /* → blue-900    */
+  --border-information-default-subtle-hover:  #04435e;   /* → blue-800    */
+  --border-warning-default-subtle:            #2f2602;   /* → yellow-900  */
+  --border-warning-default-subtle-hover:      #5e4c04;   /* → yellow-800  */
+  --border-success-default-subtle:            #00240f;   /* → green-900   */
+  --border-success-default-subtle-hover:      #00491e;   /* → green-800   */
+
+  --border-disabled-disabled:    #333333;   /* → grey-800    */
+
+
+  /* ── Icons ──────────────────────────────────────────────── */
+
+  --icons-disabled-default:      #4d4d4d;   /* → grey-700    */
+  --icons-disabled-on-color:     #666666;   /* → grey-600    */
+
+}

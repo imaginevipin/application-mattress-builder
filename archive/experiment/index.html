@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mattress Builder — Size</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
+<link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+<!-- ── TOPBAR ─────────────────────────────────────────────── -->
+<header class="topbar">
+
+  <div class="topbar-logo">
+    <img src="../assets/logos/Horizontal Light.png" alt="imagine.io"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+    <span style="display:none; font-size:13px; font-weight:600; color:var(--t2); letter-spacing:0.02em;">imagine.io</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- File menu -->
+  <div class="dropdown-wrap" id="wrap-file">
+    <button class="topbar-pill" id="btn-file" onclick="toggle('file')">
+      File <span class="chevron">▾</span>
+    </button>
+    <div class="dropdown-menu" id="menu-file">
+      <div class="dropdown-item">Save Project</div>
+      <div class="dropdown-item">Save as New</div>
+      <div class="dropdown-item">Sort Project</div>
+      <div class="dropdown-item">Download PDF</div>
+    </div>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" onclick="setMode(this)">External</button>
+    <button class="mode-btn" onclick="setMode(this)">Internal</button>
+  </div>
+
+  <!-- Project name -->
+  <div class="topbar-name" id="project-name">New Mattress_4</div>
+
+  <!-- Actions -->
+  <div class="topbar-actions">
+    <button class="btn btn-outline">Request a prop</button>
+    <button class="btn btn-ghost">Create Image</button>
+    <button class="btn btn-primary">Add to library</button>
+  </div>
+
+</header>
+
+<!-- ── WORKSPACE ──────────────────────────────────────────── -->
+<div class="workspace">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="s-icon active" data-section="size" data-tip="Size" onclick="setSection(this)">
+      <span class="material-symbols-outlined">straighten</span>
+      <span class="s-label">Size</span>
+    </div>
+    <div class="s-icon" data-section="height" data-tip="Height" onclick="setSection(this)">
+      <span class="material-symbols-outlined">height</span>
+      <span class="s-label">Height</span>
+    </div>
+    <div class="s-icon" data-section="top" data-tip="Top" onclick="setSection(this)">
+      <span class="material-symbols-outlined">flip_to_front</span>
+      <span class="s-label">Top</span>
+    </div>
+    <div class="s-icon" data-section="wall" data-tip="Wall" onclick="setSection(this)">
+      <span class="material-symbols-outlined">texture</span>
+      <span class="s-label">Wall</span>
+    </div>
+    <div class="s-icon" data-section="tape" data-tip="Tape" onclick="setSection(this)">
+      <span class="material-symbols-outlined">border_all</span>
+      <span class="s-label">Tape</span>
+    </div>
+    <div class="s-icon" data-section="label" data-tip="Label" onclick="setSection(this)">
+      <span class="material-symbols-outlined">sell</span>
+      <span class="s-label">Label</span>
+    </div>
+    <div class="s-icon" data-section="handle" data-tip="Handle" onclick="setSection(this)">
+      <span class="material-symbols-outlined">drag_handle</span>
+      <span class="s-label">Handle</span>
+    </div>
+    <div class="s-icon" data-section="bottom" data-tip="Bottom" onclick="setSection(this)">
+      <span class="material-symbols-outlined">flip_to_back</span>
+      <span class="s-label">Bottom</span>
+    </div>
+    <div class="sidebar-gap"></div>
+    <div class="s-icon" data-section="style" data-tip="Style" onclick="setSection(this)">
+      <span class="material-symbols-outlined">palette</span>
+      <span class="s-label">Style</span>
+    </div>
+    <div class="s-icon" data-section="images" data-tip="Images" onclick="setSection(this)">
+      <span class="material-symbols-outlined">image</span>
+      <span class="s-label">Images</span>
+    </div>
+    <div class="s-icon" data-section="cameras" data-tip="Cameras" onclick="setSection(this)">
+      <span class="material-symbols-outlined">photo_camera</span>
+      <span class="s-label">Camera</span>
+    </div>
+  </nav>
+
+  <!-- PANEL -->
+  <aside class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Size</span>
+    </div>
+    <div class="panel-search">
+      <div class="search-wrap">
+        <span class="material-symbols-outlined">search</span>
+        <input type="text" placeholder="Search size" id="size-search" oninput="filterSizes(this.value)">
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="size-grid" id="size-grid"></div>
+    </div>
+  </aside>
+
+  <!-- VIEWPORT -->
+  <main class="viewport" id="viewport" onclick="closeAll()">
+    <div class="vp-floor"></div>
+
+    <div class="mattress-wrap" id="mattress-wrap">
+      <!-- 3D MATTRESS SVG -->
+      <svg class="mattress-svg" id="mattress-svg"
+           viewBox="140 160 530 260"
+           width="560" height="280"
+           xmlns="http://www.w3.org/2000/svg"
+           style="overflow:visible">
+        <defs>
+          <clipPath id="clip-top">
+            <polygon points="180,240 520,240 600,185 260,185"/>
+          </clipPath>
+          <clipPath id="clip-front">
+            <rect x="180" y="240" width="340" height="115"/>
+          </clipPath>
+          <radialGradient id="grad-shadow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="rgba(0,0,0,0.55)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <linearGradient id="grad-top" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,0.18)"/>
+            <stop offset="70%"  stop-color="rgba(255,255,255,0.04)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0.1)"/>
+          </linearGradient>
+          <linearGradient id="grad-front" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%"   stop-color="rgba(255,255,255,0.06)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0.25)"/>
+          </linearGradient>
+          <filter id="sel-glow" x="-15%" y="-15%" width="130%" height="130%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Ground shadow -->
+        <ellipse cx="360" cy="378" rx="210" ry="20" fill="url(#grad-shadow)"/>
+
+        <!-- Right side face -->
+        <polygon points="520,240 600,185 600,300 520,355" fill="#1e1a16"/>
+        <line x1="520" y1="240" x2="600" y2="185" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+
+        <!-- Front face -->
+        <rect x="180" y="240" width="340" height="115" fill="#3e3a34"/>
+        <g clip-path="url(#clip-front)">
+          <line x1="180" y1="277" x2="520" y2="277" stroke="rgba(255,255,255,0.055)" stroke-width="1"/>
+          <line x1="180" y1="316" x2="520" y2="316" stroke="rgba(255,255,255,0.055)" stroke-width="1"/>
+          <line x1="350" y1="240" x2="350" y2="355" stroke="rgba(255,255,255,0.025)" stroke-width="0.8"/>
+          <rect x="180" y="240" width="340" height="115" fill="url(#grad-front)"/>
+        </g>
+
+        <!-- Top face -->
+        <polygon points="180,240 520,240 600,185 260,185" fill="#ccc8c0"/>
+        <g clip-path="url(#clip-top)">
+          <line x1="100" y1="226" x2="700" y2="226" stroke="rgba(0,0,0,0.10)" stroke-width="0.8"/>
+          <line x1="100" y1="212" x2="700" y2="212" stroke="rgba(0,0,0,0.10)" stroke-width="0.8"/>
+          <line x1="100" y1="198" x2="700" y2="198" stroke="rgba(0,0,0,0.10)" stroke-width="0.8"/>
+          <line x1="248" y1="240" x2="328" y2="185" stroke="rgba(0,0,0,0.07)" stroke-width="0.8"/>
+          <line x1="316" y1="240" x2="396" y2="185" stroke="rgba(0,0,0,0.07)" stroke-width="0.8"/>
+          <line x1="384" y1="240" x2="464" y2="185" stroke="rgba(0,0,0,0.07)" stroke-width="0.8"/>
+          <line x1="452" y1="240" x2="532" y2="185" stroke="rgba(0,0,0,0.07)" stroke-width="0.8"/>
+          <polygon points="180,240 520,240 600,185 260,185" fill="url(#grad-top)"/>
+        </g>
+
+        <!-- Tufts -->
+        <g opacity="0.75">
+          <circle cx="290" cy="224" r="2.5" fill="#a09890"/>
+          <circle cx="358" cy="221" r="2.5" fill="#a09890"/>
+          <circle cx="426" cy="218" r="2.5" fill="#a09890"/>
+          <circle cx="494" cy="215" r="2.5" fill="#a09890"/>
+          <circle cx="308" cy="210" r="2.5" fill="#a09890"/>
+          <circle cx="376" cy="207" r="2.5" fill="#a09890"/>
+          <circle cx="444" cy="204" r="2.5" fill="#a09890"/>
+          <circle cx="512" cy="201" r="2"   fill="#a09890"/>
+          <circle cx="326" cy="196" r="2"   fill="#a09890"/>
+          <circle cx="394" cy="193" r="2"   fill="#a09890"/>
+          <circle cx="462" cy="190" r="2"   fill="#a09890"/>
+        </g>
+
+        <!-- Edge highlights -->
+        <line x1="180" y1="240" x2="520" y2="240" stroke="rgba(255,255,255,0.14)" stroke-width="1.5"/>
+        <line x1="180" y1="240" x2="260" y2="185" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+        <!-- Brand label -->
+        <rect x="296" y="263" width="88" height="24" rx="2"
+              fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.09)" stroke-width="0.5"/>
+        <text x="340" y="279"
+              fill="rgba(255,255,255,0.18)"
+              font-family="PP Neue Montreal, system-ui"
+              font-size="8.5" font-weight="450"
+              text-anchor="middle" letter-spacing="2">imagine</text>
+
+        <!-- Bottom tape -->
+        <rect x="180" y="350" width="340" height="5" rx="1" fill="rgba(0,0,0,0.5)"/>
+        <line x1="180" y1="353" x2="520" y2="353" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+
+        <!-- Selection outline -->
+        <g filter="url(#sel-glow)" id="sel-outline">
+          <rect x="180" y="240" width="340" height="115"
+                fill="none" stroke="#ec4e0b" stroke-width="1.4" opacity="0.65"
+                stroke-dasharray="1200" stroke-dashoffset="0">
+            <animate attributeName="stroke-dashoffset" from="1200" to="0" dur="0.7s" begin="0s" fill="freeze"/>
+          </rect>
+          <polygon points="180,240 520,240 600,185 260,185"
+                   fill="none" stroke="#ec4e0b" stroke-width="1.4" opacity="0.65"
+                   stroke-dasharray="1200" stroke-dashoffset="0">
+            <animate attributeName="stroke-dashoffset" from="1200" to="0" dur="0.7s" begin="0.05s" fill="freeze"/>
+          </polygon>
+          <polygon points="520,240 600,185 600,300 520,355"
+                   fill="none" stroke="#ec4e0b" stroke-width="1.4" opacity="0.65"
+                   stroke-dasharray="600" stroke-dashoffset="0">
+            <animate attributeName="stroke-dashoffset" from="600" to="0" dur="0.7s" begin="0.08s" fill="freeze"/>
+          </polygon>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Viewport label -->
+    <div class="vp-label" id="vp-label">King &nbsp;—&nbsp; 76" × 80"</div>
+
+    <!-- Rotate hint -->
+    <div class="vp-hint">
+      <span class="material-symbols-outlined">360</span>
+      <span>Drag to orbit</span>
+    </div>
+  </main>
+
+</div><!-- workspace -->
+
+<script src="index.js"></script>
+</body>
+</html>
