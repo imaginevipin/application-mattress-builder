@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mattress Builder — imagine.io</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="tokens-dark.css">
+  <link rel="stylesheet" href="app.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ── Top Bar ──────────────────────────────────────────── -->
+    <header class="topbar">
+
+      <div class="topbar-left">
+        <button class="btn-file" id="fileMenuBtn">
+          <span class="material-symbols-outlined">folder_open</span>
+          File
+          <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
+        </button>
+
+        <div class="mode-toggle" role="group" aria-label="Configuration mode">
+          <button class="mode-btn is-active" data-mode="external">External</button>
+          <button class="mode-btn" data-mode="internal">Internal</button>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <input
+          class="mattress-name"
+          type="text"
+          value="New Mattress_4"
+          spellcheck="false"
+          aria-label="Mattress name"
+        >
+      </div>
+
+      <div class="topbar-right">
+        <button class="btn-action">Request a prop</button>
+        <button class="btn-action btn-action--primary">
+          <span class="material-symbols-outlined">add_photo_alternate</span>
+          Create Image
+        </button>
+        <button class="btn-action">
+          <span class="material-symbols-outlined">library_add</span>
+          Add to library
+        </button>
+      </div>
+
+    </header>
+
+    <!-- ── App Body ─────────────────────────────────────────── -->
+    <div class="app-body">
+
+      <!-- Icon Strip ──────────────────────────────────────── -->
+      <nav class="icon-strip" aria-label="Section navigation">
+
+        <!-- External-only sections -->
+        <div class="nav-group" id="navExternal">
+          <button class="nav-item is-active" data-section="size">
+            <span class="material-symbols-outlined">straighten</span>
+            <span class="nav-label">Size</span>
+          </button>
+          <button class="nav-item" data-section="height">
+            <span class="material-symbols-outlined">height</span>
+            <span class="nav-label">Height</span>
+          </button>
+          <button class="nav-item" data-section="top">
+            <span class="material-symbols-outlined">vertical_align_top</span>
+            <span class="nav-label">Top</span>
+          </button>
+          <button class="nav-item" data-section="wall">
+            <span class="material-symbols-outlined">texture</span>
+            <span class="nav-label">Wall</span>
+          </button>
+          <button class="nav-item" data-section="tape">
+            <span class="material-symbols-outlined">horizontal_rule</span>
+            <span class="nav-label">Tape</span>
+          </button>
+          <button class="nav-item" data-section="label">
+            <span class="material-symbols-outlined">label</span>
+            <span class="nav-label">Label</span>
+          </button>
+          <button class="nav-item" data-section="handle">
+            <span class="material-symbols-outlined">drag_handle</span>
+            <span class="nav-label">Handle</span>
+          </button>
+          <button class="nav-item" data-section="bottom">
+            <span class="material-symbols-outlined">vertical_align_bottom</span>
+            <span class="nav-label">Bottom</span>
+          </button>
+        </div>
+
+        <!-- Internal-only sections -->
+        <div class="nav-group nav-group--hidden" id="navInternal">
+          <button class="nav-item" data-section="layers">
+            <span class="material-symbols-outlined">layers</span>
+            <span class="nav-label">Layers</span>
+          </button>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <!-- Shared sections (both modes) -->
+        <div class="nav-group" id="navShared">
+          <button class="nav-item" data-section="style">
+            <span class="material-symbols-outlined">palette</span>
+            <span class="nav-label">Style</span>
+          </button>
+          <button class="nav-item" data-section="images">
+            <span class="material-symbols-outlined">image</span>
+            <span class="nav-label">Images</span>
+          </button>
+          <button class="nav-item" data-section="cameras">
+            <span class="material-symbols-outlined">photo_camera</span>
+            <span class="nav-label">Cameras</span>
+          </button>
+        </div>
+
+      </nav>
+
+      <!-- Context Panel ──────────────────────────────────── -->
+      <aside class="context-panel" id="contextPanel">
+
+        <!-- Size ──── -->
+        <div class="panel" id="panel-size">
+          <div class="panel-header">
+            <p class="panel-title">Size</p>
+          </div>
+          <div class="panel-search">
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="sizeSearch" type="text" placeholder="Search size" autocomplete="off">
+          </div>
+          <div class="panel-body">
+            <div class="size-grid" id="sizeGrid"></div>
+          </div>
+        </div>
+
+        <!-- Height ── -->
+        <div class="panel panel--empty" id="panel-height" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Height</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Height configuration</p>
+          </div>
+        </div>
+
+        <!-- Top ───── -->
+        <div class="panel panel--empty" id="panel-top" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Top</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Top configuration</p>
+          </div>
+        </div>
+
+        <!-- Wall ──── -->
+        <div class="panel panel--empty" id="panel-wall" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Wall</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Wall configuration</p>
+          </div>
+        </div>
+
+        <!-- Tape ──── -->
+        <div class="panel panel--empty" id="panel-tape" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Tape</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Tape configuration</p>
+          </div>
+        </div>
+
+        <!-- Label ─── -->
+        <div class="panel panel--empty" id="panel-label" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Label</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Label configuration</p>
+          </div>
+        </div>
+
+        <!-- Handle ── -->
+        <div class="panel panel--empty" id="panel-handle" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Handle</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Handle configuration</p>
+          </div>
+        </div>
+
+        <!-- Bottom ── -->
+        <div class="panel panel--empty" id="panel-bottom" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Bottom</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Bottom configuration</p>
+          </div>
+        </div>
+
+        <!-- Layers (Internal) ── -->
+        <div class="panel panel--empty" id="panel-layers" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Layers</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Layer stack configuration</p>
+          </div>
+        </div>
+
+        <!-- Style ─── -->
+        <div class="panel panel--empty" id="panel-style" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Style</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Textures, materials &amp; colors</p>
+          </div>
+        </div>
+
+        <!-- Images ── -->
+        <div class="panel panel--empty" id="panel-images" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Images</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Previews &amp; renders</p>
+          </div>
+        </div>
+
+        <!-- Cameras ─ -->
+        <div class="panel panel--empty" id="panel-cameras" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Cameras</p>
+          </div>
+          <div class="panel-body">
+            <p class="panel-empty-label">Camera angle presets</p>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- 3D Viewport ─────────────────────────────────────── -->
+      <main class="viewport" id="viewport">
+        <div class="viewport-label" id="viewportLabel">King · Smooth Bottom</div>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script type="module" src="viewport.js"></script>
+</body>
+</html>
