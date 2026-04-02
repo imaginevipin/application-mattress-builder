@@ -28,6 +28,20 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **What changes in dark:** surface-default/page → `#141414`, text-default-* → white/grey scale, subtle semantic surfaces/borders flip from top of scale (pastels) to bottom (deep tints), disabled tokens shift darker
 - **What does not change:** All solid semantic colors (primary, error, info, warning, success) — they work on both themes
 
+### 2026-04-02 | Tech stack: vanilla + Three.js, no framework
+- **Decision:** Plain HTML/CSS/JS with Three.js r160 via CDN importmap — no build tool, no framework
+- **Reason:** Fastest path to a working 3D configurator shell; avoids toolchain overhead for a single-page tool
+- **Alternatives considered:** React + Vite, plain HTML without Three.js
+
+### 2026-04-02 | Typography cap: ≤ 18px across the entire UI
+- **Decision:** No H1–H3 token sizes used anywhere; all UI text uses body (16px), small (14px), caption (12px), or nav labels (10px)
+- **Reason:** Tool UI requires dense, compact information display — large headings don't suit the panel-driven layout
+
+### 2026-04-02 | Three.js viewport with OrbitControls
+- **Decision:** Replace CSS 3D fake with a real Three.js WebGL scene (orbit/zoom/pan)
+- **Reason:** The viewport needs to feel like a real 3D environment (Unity-style), not a CSS trick
+- **Notes:** Geometry is parametric — rebuilds from inch dimensions on every size change
+
 ### 2026-04-01 | Discovery assets and experiments are retained in-repo
 - **Decision:** Keep screenshot research, brand assets, and the archived experiment inside the repository instead of treating them as temporary local files
 - **Reason:** The project contract requires meaningful progress to live in files; these artifacts explain how current system understanding and early UI direction were derived

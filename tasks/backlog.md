@@ -21,13 +21,14 @@ type: project
 
 ## Setup
 
-- [ ] Set up project stack and folder structure — priority: high — complexity: medium
-- [ ] Create production application shell using Prism dark-theme tokens — priority: high — complexity: medium
-- [ ] Decide whether archived experiment should be mined into the production shell or kept as reference only — priority: medium — complexity: simple
+- [x] Set up project stack and folder structure — done: 2026-04-02
+- [x] Create production application shell using Prism dark-theme tokens — done: 2026-04-02
+- [x] Archived experiment kept as reference only — done: 2026-04-02
 
-## Features (to be scoped after discovery)
+## Features
 
-- [ ] Size & Height selection — priority: high — complexity: medium
+- [x] Size panel — done: 2026-04-02 — 9 sizes, proportional CSS rects, live search, orange active footer, Three.js geometry rebuilds on selection
+- [ ] Height panel — priority: high — complexity: medium — next up
 - [ ] External configuration panels (Top, Wall, Tape, Label, Handle, Bottom) — priority: high — complexity: complex
 - [ ] Style system (Textures, Materials, Colors, Properties) — priority: high — complexity: complex
 - [ ] Internal layers panel (Layers, Exploded/Cutaway view) — priority: high — complexity: complex

@@ -40,9 +40,13 @@ type: project
 - Internal — configures the internal build (foam/coil layers, exploded/cutaway views)
 
 ## Current Implementation State
-- No active application stack or runtime has been initialized yet in the repository root
-- Current repository progress is discovery, design-token setup, and archived UI exploration
-- Next meaningful build step is to set up the actual app structure and start implementing the production shell with Prism dark-theme tokens
+- Screen 1 is live: `index.html` + `app.css` + `app.js` + `viewport.js` committed and pushed (commit 48d25f2)
+- App shell: topbar (File, External/Internal toggle, mattress name, action buttons), icon strip, context panel, Three.js viewport
+- Size panel: 9 sizes, proportional rects, live search, active state; Three.js mattress geometry rebuilds on size change
+- All other section panels wired with placeholder empty states
+- Tech stack: vanilla HTML/CSS/JS + Three.js r160 (via CDN importmap) + Prism dark-theme tokens
+- Typography rule: all text ≤ 18px (body/small/caption scale only, no H1–H3)
+- Next: Height panel
 
 ## File Operations
 - Save Project
