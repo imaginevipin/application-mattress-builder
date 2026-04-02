@@ -24,7 +24,7 @@
   --text-default-heading:        #ffffff;   /* white         */
   --text-default-body:           #cccccc;   /* → grey-200    */
   --text-default-caption:        #b2b2b2;   /* → grey-300    */
-  --text-default-placeholder:    #666666;   /* → grey-600    */
+  --text-default-placeholder:    #999999;   /* → grey-400 — min 4.5:1 on #141414 */
 
   --text-disabled-default:       #4d4d4d;   /* → grey-700    */
   --text-disabled-on-color:      #666666;   /* → grey-600    */
@@ -37,6 +37,9 @@
   --surface-page:                #141414;   /* → dark        */
   --surface-page-secondary:      #1a1a1a;   /* → grey-900    */
   --surface-default-secondary:   #1a1a1a;   /* → grey-900    */
+
+  /* App-specific: panel + active nav item layer (sits above page, below cards) */
+  --surface-panel:               #222222;
 
   /* Subtle semantic surfaces: pastels → deep tints */
   --surface-primary-default-subtle:           #2f1002;   /* → papaya-900  */

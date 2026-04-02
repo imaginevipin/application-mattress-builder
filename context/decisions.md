@@ -46,3 +46,23 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **Decision:** Keep screenshot research, brand assets, and the archived experiment inside the repository instead of treating them as temporary local files
 - **Reason:** The project contract requires meaningful progress to live in files; these artifacts explain how current system understanding and early UI direction were derived
 - **Alternatives considered:** Keep assets local-only or delete the experiment after documenting conclusions
+
+### 2026-04-02 | Screen 1 builder shell remains framework-free and panel-driven
+- **Decision:** Keep the active implementation in plain `index.html` + `app.css` + `app.js` + `viewport.js`, expanding the shell incrementally instead of introducing components/build tooling mid-stream
+- **Reason:** The team already has a working interactive shell with a live Three.js scene and persistent context files; staying in the same structure keeps handoff simple and reduces integration risk
+- **Alternatives considered:** Pause to migrate the UI shell into a component framework before feature buildout
+
+### 2026-04-02 | Size and Height panels share the same panel pattern
+- **Decision:** Option panels should follow a consistent structure: search row + 2-column card grid + live viewport update on selection
+- **Reason:** Screenshot research and current UI work show the builder benefits from repeatable panel scaffolding instead of section-specific one-offs
+- **Alternatives considered:** Special-case the Height panel without search or use a different list/slider control
+
+### 2026-04-02 | Inputs should read as neutral dark surfaces, not primary-accent controls
+- **Decision:** Text inputs use restrained dark styling and only reveal stronger affordance on hover/focus; the mattress title behaves more like editable heading text than a permanent form field
+- **Reason:** Strong orange input states made the shell feel noisy and visually competed with selected option cards
+- **Alternatives considered:** Keep orange focus/border treatment on search fields and title field
+
+### 2026-04-02 | File menu actions are lightweight browser-native behaviors first
+- **Decision:** Implement `Save Project`, `Save as New`, `Quit Project`, and `Download Pdf` using `localStorage`, reset logic, and printable summary output
+- **Reason:** This gives the shell credible project actions immediately without blocking on backend/storage/export infrastructure
+- **Alternatives considered:** Leave File menu visual-only until a full persistence/export backend exists

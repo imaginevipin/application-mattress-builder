@@ -9,26 +9,28 @@ type: project
 ## Layout
 ```
 ┌─────────────────────────────────────────────────┐
-│  [File ▾]  [External/Internal ▾]   New Mattress_4   [Request a prop] [Create Image] [Add to library]  │
+│ [logo] [File ▾] [External/Internal] New Mattress_4 [Request Prop] [Add to library] [Create Image] │
 ├──┬──────────────────┬────────────────────────────┤
 │  │                  │                            │
 │ Icons  Context      │     3D Viewport            │
 │  │    Panel         │                            │
 │  │    (dynamic)     │                            │
-│  │                  │   [label: King Smooth Bottom] │
+│  │                  │   [label: King · 10" Profile] │
 └──┴──────────────────┴────────────────────────────┘
 ```
 
 - Left icon strip: section selector
 - Context panel: changes based on selected section
 - 3D viewport: live mattress preview, orbitable/zoomable
-- Bottom of canvas: label showing currently selected component name
+- Bottom of canvas: label showing selected size + height profile
+- File button opens an anchored dropdown menu with project actions
+- Mattress name is editable, but visually styled like a title until hover/focus
 
 ## Repository State
 - `/tokens.css` contains the base Prism Design System token layer, typography, spacing, and border aliases
 - `/tokens-dark.css` contains the mattress-builder dark-theme semantic overrides and must be imported after `/tokens.css`
 - `/assets/fonts/` contains six PP Neue Montreal font files used by the token layer and experiments
-- `/assets/logos/` contains imagine.io logo variants used by the archived prototype
+- `/assets/logos/` contains imagine.io logo variants reused by the active top bar
 - `/archives/experiments/` contains an archived first-screen prototype plus an experimental design-system page kept for reference only
 - `/assets/existing-screenshots/` contains the screenshot set used to document the current production builder behavior
 
@@ -43,7 +45,7 @@ Sidebar sections (top to bottom):
 | Icon | Section  | What it controls |
 |------|----------|-----------------|
 | Size | Size | Mattress dimensions (King, Queen, Twin, Twin XL, Full/Double, California King, Small Double, etc.) |
-| Height | Height | Mattress height in inches (4"–7"+, with layer count variants) |
+| Height | Height | Mattress height/profile selection via searchable preset cards (currently 6", 8", 10", 12", 14", 16") |
 | Top | Top | Pillow top type, quilting pattern (top + gusset), tufts |
 | Wall | Wall | Side/gusset quilting pattern and properties |
 | Tape | Tape | Border tape type and position |
@@ -68,6 +70,19 @@ Sidebar sections:
 ---
 
 ## Section Details
+
+### Size
+- Searchable 2-column card grid
+- Current implementation uses 9 preset sizes
+- Each card shows a proportional plan-view rectangle plus a one-line name/dimension footer
+- Selection updates the Three.js mattress width/depth in real time
+
+### Height
+- Searchable 2-column card grid mirroring the Size panel pattern
+- Current implementation uses 6 presets: Slim 6", Low 8", Classic 10", Plush 12", Tall 14", Ultra 16"
+- Each card shows a simplified side-profile block visualization
+- Selection updates the Three.js mattress thickness in real time
+- Height search matches both names and inch values
 
 ### Top
 - Types: Box Pillow Top, Smooth Top (others likely exist)
@@ -158,3 +173,11 @@ Sidebar sections:
 - Mattress name input
 - Model slot counter (e.g. "10 Models Available: 397")
 - Save button
+
+---
+
+## Current UI Decisions Reflected in Code
+- Search inputs use a neutral dark-surface treatment rather than a strong primary-color focus state
+- Panel cards use orange primarily for selected states, with restrained use elsewhere
+- Card labels are compact, single-line, medium-weight names with inline dimensions
+- The builder currently favors consistent panel scaffolding: search row + 2-column option grid where applicable

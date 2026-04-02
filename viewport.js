@@ -22,6 +22,8 @@ const SIZES = {
 };
 
 const IN = 1 / 12; // 1 Three.js unit = 12 inches
+let currentSizeId = 'king';
+let currentHeightInches = 10;
 
 
 // ── Scene ────────────────────────────────────────────────
@@ -29,8 +31,8 @@ const IN = 1 / 12; // 1 Three.js unit = 12 inches
 const container = document.getElementById('viewport');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x141414);
-scene.fog = new THREE.Fog(0x141414, 22, 38);
+scene.background = new THREE.Color(0x1c1c1c);
+scene.fog = new THREE.Fog(0x1c1c1c, 22, 38);
 
 
 // ── Camera ───────────────────────────────────────────────
@@ -46,7 +48,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.4;
 container.prepend(renderer.domElement);
 
 
@@ -65,11 +67,11 @@ controls.update();
 // ── Lighting ─────────────────────────────────────────────
 
 // Ambient — soft fill
-const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+const ambient = new THREE.AmbientLight(0xffffff, 0.9);
 scene.add(ambient);
 
 // Key light — upper left front
-const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
 keyLight.position.set(7, 12, 9);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
@@ -83,12 +85,12 @@ keyLight.shadow.bias = -0.0008;
 scene.add(keyLight);
 
 // Fill light — right side, cool
-const fillLight = new THREE.DirectionalLight(0xd0e0ff, 0.35);
+const fillLight = new THREE.DirectionalLight(0xd0e0ff, 0.6);
 fillLight.position.set(-6, 5, -4);
 scene.add(fillLight);
 
 // Rim light — behind, adds edge separation from bg
-const rimLight = new THREE.DirectionalLight(0xffffff, 0.18);
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.35);
 rimLight.position.set(0, 3, -10);
 scene.add(rimLight);
 
@@ -97,14 +99,14 @@ scene.add(rimLight);
 
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(40, 40),
-  new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 1, metalness: 0 })
+  new THREE.MeshStandardMaterial({ color: 0x191919, roughness: 1, metalness: 0 })
 );
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
 scene.add(floor);
 
 // Grid — subtle, Unity-style
-const grid = new THREE.GridHelper(30, 30, 0x282828, 0x1e1e1e);
+const grid = new THREE.GridHelper(30, 30, 0x323232, 0x272727);
 grid.position.y = 0.001;
 scene.add(grid);
 
@@ -116,30 +118,33 @@ scene.add(mattressGroup);
 
 // Shared materials
 const bodyMat = new THREE.MeshStandardMaterial({
-  color: 0x282828,
+  color: 0x484848,
   roughness: 0.88,
   metalness: 0.04,
 });
 
 const topMat = new THREE.MeshStandardMaterial({
-  color: 0x303030,
+  color: 0x585858,
   roughness: 0.70,
   metalness: 0.0,
 });
 
 const sideMat = new THREE.MeshStandardMaterial({
-  color: 0x222222,
+  color: 0x3c3c3c,
   roughness: 0.90,
   metalness: 0.02,
 });
 
 const tapeMat = new THREE.MeshStandardMaterial({
-  color: 0x3a3a3a,
+  color: 0x606060,
   roughness: 0.75,
   metalness: 0.0,
 });
 
-function buildMattress(sizeId) {
+function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInches) {
+  currentSizeId = sizeId;
+  currentHeightInches = heightInches;
+
   // Dispose and clear previous geometry
   mattressGroup.traverse(obj => {
     if (obj.isMesh) obj.geometry.dispose();
@@ -149,7 +154,7 @@ function buildMattress(sizeId) {
   const s = SIZES[sizeId] || SIZES['queen'];
   const w = s.w * IN;   // width  (head-to-foot axis)
   const d = s.d * IN;   // depth  (side-to-side axis)
-  const h = 10 * IN;    // height (~10 inches)
+  const h = heightInches * IN;
 
   // Main body
   const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bodyMat);
@@ -228,7 +233,8 @@ buildMattress('king');
 
 // ── Public API (called from app.js on size change) ───────
 
-window.viewportSetSize = (sizeId) => buildMattress(sizeId);
+window.viewportSetSize = (sizeId) => buildMattress(sizeId, currentHeightInches);
+window.viewportSetHeight = (heightInches) => buildMattress(currentSizeId, heightInches);
 
 
 // ── Resize ───────────────────────────────────────────────

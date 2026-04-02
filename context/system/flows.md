@@ -8,8 +8,8 @@ type: project
 
 ## Primary Flow: Configure a Mattress (External)
 
-1. **Size** — pick mattress dimensions (King, Queen, Twin, etc.)
-2. **Height** — pick overall height in inches
+1. **Size** — search or browse mattress dimensions (King, Queen, Twin, etc.) and select one
+2. **Height** — search or browse overall height presets and select one
 3. **Top** — choose top type (Box Pillow / Smooth), set quilting patterns, add tufts
 4. **Wall** — choose side quilting pattern, adjust scale/position
 5. **Tape** — add border tape, set type and position
@@ -20,6 +20,10 @@ type: project
 10. **Images / Cameras** — capture previews, manage camera angles
 
 > Flow is non-linear. User can jump to any section at any time via sidebar icons.
+
+Current implemented state:
+- Size and Height are live and update the 3D viewport immediately
+- Remaining sections are navigable but still placeholder panels
 
 ---
 
@@ -48,6 +52,10 @@ type: project
 4. Result appears in Images → Previews tab
 5. Preview thumbnail is clickable — opens full image with filename shown
 
+Current implemented state:
+- Button exists in top bar
+- Output flow is not built yet
+
 ---
 
 ## Output Flow: Add to Library
@@ -57,6 +65,23 @@ type: project
 3. Enter mattress name
 4. Click Save
 5. Mattress saved to team library (slot count decremented)
+
+Current implemented state:
+- Button exists in top bar
+- Modal flow is not built yet
+
+---
+
+## Project File Menu Flow
+
+1. Click `File` in the top bar
+2. Dropdown opens under the File button
+3. Choose one action:
+   - `Save Project` — stores current builder state in `localStorage`
+   - `Save as New` — stores a timestamped copy in `localStorage`
+   - `Quit Project` — resets builder state to defaults
+   - `Download Pdf` — opens a printable project summary for export
+4. Toast feedback appears in the bottom-right corner
 
 ---
 

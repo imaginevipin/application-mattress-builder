@@ -25,6 +25,7 @@ type: project
 - Dark-theme semantic overrides are initialized in `/tokens-dark.css`
 - Brand assets are stored in `/assets/fonts/` and `/assets/logos/`
 - Early UI exploration work is preserved in `/archives/experiments/` as reference, not as the active implementation
+- Active builder implementation now includes a refined top bar, accessible shell polish, live Size + Height panels, and lightweight file-menu actions
 
 ## Who Uses It
 - Likely B2B: mattress manufacturers, brands, or retailers configuring products
@@ -41,17 +42,21 @@ type: project
 
 ## Current Implementation State
 - Screen 1 is live: `index.html` + `app.css` + `app.js` + `viewport.js` committed and pushed (commit 48d25f2)
-- App shell: topbar (File, External/Internal toggle, mattress name, action buttons), icon strip, context panel, Three.js viewport
-- Size panel: 9 sizes, proportional rects, live search, active state; Three.js mattress geometry rebuilds on size change
-- All other section panels wired with placeholder empty states
+- App shell: topbar with imagine.io logo mark, File dropdown, External/Internal toggle, editable mattress title, action buttons, icon strip, context panel, Three.js viewport
+- Accessibility/readability pass applied: placeholder contrast, keyboard focus states, ARIA state/labels, live viewport label, quieter input styling
+- Size panel: 9 sizes, proportional rects, live search, tuned card sizing/typography, active state; Three.js mattress geometry rebuilds on size change
+- Height panel: 6 preset profiles, live search, 2-column card grid, active selection state; Three.js mattress thickness rebuilds on height change
+- File operations shell is implemented in-browser: Save Project, Save as New, Quit Project, Download PDF summary
+- Remaining external/internal sections are still wired as placeholders
 - Tech stack: vanilla HTML/CSS/JS + Three.js r160 (via CDN importmap) + Prism dark-theme tokens
 - Typography rule: all text ≤ 18px (body/small/caption scale only, no H1–H3)
-- Next: Height panel
+- Next: Top panel and remaining external configuration flows
 
 ## File Operations
-- Save Project
-- Save as New
-- Download PDF
+- Save Project — stores current builder state in `localStorage`
+- Save as New — stores a timestamped copy in `localStorage`
+- Quit Project — resets current builder state to defaults
+- Download PDF — opens a printable project summary for export
 
 ## Open Questions
 - Is the rebuild a full rewrite or a redesign of the existing tool?

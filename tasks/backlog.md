@@ -28,11 +28,11 @@ type: project
 ## Features
 
 - [x] Size panel — done: 2026-04-02 — 9 sizes, proportional CSS rects, live search, orange active footer, Three.js geometry rebuilds on selection
-- [ ] Height panel — priority: high — complexity: medium — next up
+- [x] Height panel — done: 2026-04-02 — searchable preset cards, active state, viewport label updates, Three.js mattress thickness rebuilds
 - [ ] External configuration panels (Top, Wall, Tape, Label, Handle, Bottom) — priority: high — complexity: complex
 - [ ] Style system (Textures, Materials, Colors, Properties) — priority: high — complexity: complex
 - [ ] Internal layers panel (Layers, Exploded/Cutaway view) — priority: high — complexity: complex
 - [ ] Create Image modal + output — priority: medium — complexity: medium
 - [ ] Add to Library modal — priority: medium — complexity: medium
 - [ ] Camera management — priority: medium — complexity: medium
-- [ ] File operations (Save, Save as New, Download PDF) — priority: medium — complexity: medium
+- [x] File operations shell (Save, Save as New, Quit, Download PDF summary) — done: 2026-04-02 — implemented browser-native project actions via dropdown menu, localStorage, reset state, printable summary

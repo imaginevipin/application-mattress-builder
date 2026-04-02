@@ -24,15 +24,39 @@
     <header class="topbar">
 
       <div class="topbar-left">
-        <button class="btn-file" id="fileMenuBtn">
-          <span class="material-symbols-outlined">folder_open</span>
-          File
-          <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
-        </button>
+        <div class="brand-mark" role="img" aria-label="imagine.io logo">
+          <img src="assets/logos/Logo Mark.png" alt="" class="brand-mark__img">
+        </div>
+
+        <div class="file-menu">
+          <button class="btn-file" id="fileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fileMenu">
+            File
+            <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
+          </button>
+
+          <div class="file-menu__panel" id="fileMenu" role="menu" aria-labelledby="fileMenuBtn" hidden>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="save">
+              <span class="material-symbols-outlined">save</span>
+              <span>Save Project</span>
+            </button>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="save-as-new">
+              <span class="material-symbols-outlined">add_circle</span>
+              <span>Save as New</span>
+            </button>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="quit">
+              <span class="material-symbols-outlined">power_settings_new</span>
+              <span>Quit Project</span>
+            </button>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="download-pdf">
+              <span class="material-symbols-outlined">picture_as_pdf</span>
+              <span>Download Pdf</span>
+            </button>
+          </div>
+        </div>
 
         <div class="mode-toggle" role="group" aria-label="Configuration mode">
-          <button class="mode-btn is-active" data-mode="external">External</button>
-          <button class="mode-btn" data-mode="internal">Internal</button>
+          <button class="mode-btn is-active" data-mode="external" aria-pressed="true">External</button>
+          <button class="mode-btn" data-mode="internal" aria-pressed="false">Internal</button>
         </div>
       </div>
 
@@ -47,15 +71,13 @@
       </div>
 
       <div class="topbar-right">
-        <button class="btn-action">Request a prop</button>
-        <button class="btn-action btn-action--primary">
-          <span class="material-symbols-outlined">add_photo_alternate</span>
-          Create Image
+        <button class="btn-action">
+          Request Prop
         </button>
         <button class="btn-action">
-          <span class="material-symbols-outlined">library_add</span>
           Add to library
         </button>
+        <button class="btn-action btn-action--primary">Create Image</button>
       </div>
 
     </header>
@@ -68,7 +90,7 @@
 
         <!-- External-only sections -->
         <div class="nav-group" id="navExternal">
-          <button class="nav-item is-active" data-section="size">
+          <button class="nav-item is-active" data-section="size" aria-current="page">
             <span class="material-symbols-outlined">straighten</span>
             <span class="nav-label">Size</span>
           </button>
@@ -139,6 +161,7 @@
             <p class="panel-title">Size</p>
           </div>
           <div class="panel-search">
+            <label class="sr-only" for="sizeSearch">Search mattress sizes</label>
             <span class="material-symbols-outlined panel-search-icon">search</span>
             <input class="panel-search-input" id="sizeSearch" type="text" placeholder="Search size" autocomplete="off">
           </div>
@@ -148,12 +171,17 @@
         </div>
 
         <!-- Height ── -->
-        <div class="panel panel--empty" id="panel-height" hidden>
+        <div class="panel" id="panel-height" hidden>
           <div class="panel-header">
             <p class="panel-title">Height</p>
           </div>
+          <div class="panel-search">
+            <label class="sr-only" for="heightSearch">Search mattress heights</label>
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="heightSearch" type="text" placeholder="Search height" autocomplete="off">
+          </div>
           <div class="panel-body">
-            <p class="panel-empty-label">Height configuration</p>
+            <div class="height-grid" id="heightGrid"></div>
           </div>
         </div>
 
@@ -260,12 +288,14 @@
       </aside>
 
       <!-- 3D Viewport ─────────────────────────────────────── -->
-      <main class="viewport" id="viewport">
-        <div class="viewport-label" id="viewportLabel">King · Smooth Bottom</div>
+      <main class="viewport" id="viewport" aria-label="3D mattress preview">
+        <div class="viewport-label" id="viewportLabel" aria-live="polite">King · Smooth Bottom</div>
       </main>
 
     </div>
   </div>
+
+  <div class="app-toast" id="appToast" aria-live="polite" hidden></div>
 
   <script src="app.js"></script>
   <script type="module" src="viewport.js"></script>
