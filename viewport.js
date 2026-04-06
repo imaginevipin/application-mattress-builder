@@ -24,6 +24,12 @@ const SIZES = {
 const IN = 1 / 12; // 1 Three.js unit = 12 inches
 let currentSizeId = 'king';
 let currentHeightInches = 10;
+let currentMode = 'external';
+let internalView = { exploded: true, explodedGap: 0.3, innerBuild: false, cutaway: false };
+let currentLayers = [
+  { id: 'pocket-coil', color: '#aeb8cb', thickness: 4.794, visible: true, frontCut: 0.1, sideCut: 0.1 },
+  { id: 'hole-punch', color: '#94c876', thickness: 1.503, visible: true, frontCut: 0.1, sideCut: 0.1 },
+];
 
 
 // ── Scene ────────────────────────────────────────────────
@@ -43,12 +49,13 @@ camera.position.set(5.5, 3.8, 8);
 
 // ── Renderer ─────────────────────────────────────────────
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.4;
+renderer.setClearAlpha(1);
 container.prepend(renderer.domElement);
 
 
@@ -116,6 +123,11 @@ scene.add(grid);
 const mattressGroup = new THREE.Group();
 scene.add(mattressGroup);
 
+const shellGroup = new THREE.Group();
+const internalGroup = new THREE.Group();
+mattressGroup.add(shellGroup);
+mattressGroup.add(internalGroup);
+
 // Shared materials
 const bodyMat = new THREE.MeshStandardMaterial({
   color: 0x484848,
@@ -141,87 +153,162 @@ const tapeMat = new THREE.MeshStandardMaterial({
   metalness: 0.0,
 });
 
+function createLayerMaterial(color) {
+  return new THREE.MeshStandardMaterial({
+    color: new THREE.Color(color),
+    roughness: 0.78,
+    metalness: 0.02,
+  });
+}
+
 function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInches) {
   currentSizeId = sizeId;
   currentHeightInches = heightInches;
 
   // Dispose and clear previous geometry
   mattressGroup.traverse(obj => {
-    if (obj.isMesh) obj.geometry.dispose();
+    if (obj.isMesh) {
+      obj.geometry.dispose();
+      if (obj.material && ![bodyMat, topMat, sideMat, tapeMat].includes(obj.material)) {
+        obj.material.dispose();
+      }
+    }
   });
-  mattressGroup.clear();
+  shellGroup.clear();
+  internalGroup.clear();
 
   const s = SIZES[sizeId] || SIZES['queen'];
   const w = s.w * IN;   // width  (head-to-foot axis)
   const d = s.d * IN;   // depth  (side-to-side axis)
   const h = heightInches * IN;
+  const visibleLayers = currentLayers.filter(layer => layer.visible !== false);
+  const workingLayers = visibleLayers.length ? visibleLayers : currentLayers;
+  const shellOffsetX = currentMode === 'internal' && internalView.cutaway ? -(w * 0.18) : 0;
+  const shellWidth = currentMode === 'internal' && internalView.cutaway ? w * 0.64 : w;
+  const shellTopWidth = Math.max(shellWidth - 0.08, 0.24);
+  const shellDepth = currentMode === 'internal' && internalView.cutaway ? d * 0.82 : d;
+  const shellTopDepth = Math.max(shellDepth - 0.08, 0.24);
+  const topLift = currentMode === 'internal' && !internalView.cutaway
+    ? 0.55 + (internalView.exploded ? internalView.explodedGap * 0.9 : 0)
+    : 0;
+  const trayHeight = currentMode === 'internal' ? 0.18 : h;
 
   // Main body
-  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bodyMat);
-  body.position.y = h / 2;
+  const body = new THREE.Mesh(new THREE.BoxGeometry(shellWidth, trayHeight, shellDepth), bodyMat);
+  body.position.y = currentMode === 'internal' ? trayHeight / 2 : h / 2;
+  body.position.x = shellOffsetX;
   body.castShadow = true;
   body.receiveShadow = true;
-  mattressGroup.add(body);
+  if (currentMode === 'external') {
+    body.material = bodyMat;
+  } else {
+    body.material = bodyMat.clone();
+    body.material.transparent = internalView.cutaway;
+    body.material.opacity = internalView.cutaway ? 0.28 : 1;
+  }
+  shellGroup.add(body);
 
   // Top quilting panel — inset, slightly raised
   const topPanel = new THREE.Mesh(
-    new THREE.BoxGeometry(w - 0.08, 0.04, d - 0.08),
+    new THREE.BoxGeometry(shellTopWidth, 0.04, shellTopDepth),
     topMat
   );
-  topPanel.position.y = h + 0.02;
+  topPanel.position.y = currentMode === 'internal' ? h + topLift : h + 0.02;
+  topPanel.position.x = shellOffsetX;
   topPanel.castShadow = false;
-  mattressGroup.add(topPanel);
+  if (currentMode === 'internal') {
+    topPanel.material = topMat.clone();
+    topPanel.material.transparent = internalView.cutaway;
+    topPanel.material.opacity = internalView.cutaway ? 0.4 : 1;
+  }
+  shellGroup.add(topPanel);
 
   // Side wall panels (front, back, left, right) — slightly darker inset
-  const wallH = h * 0.5;
+  const wallH = currentMode === 'internal' ? 0.16 : h * 0.5;
 
   const frontWall = new THREE.Mesh(
-    new THREE.BoxGeometry(w - 0.02, wallH, 0.02),
+    new THREE.BoxGeometry(Math.max(shellWidth - 0.02, 0.22), wallH, 0.02),
     sideMat
   );
-  frontWall.position.set(0, wallH / 2 + h * 0.25, d / 2 + 0.005);
-  mattressGroup.add(frontWall);
+  frontWall.position.set(shellOffsetX, currentMode === 'internal' ? wallH / 2 + 0.02 : wallH / 2 + h * 0.25, shellDepth / 2 + 0.005);
+  shellGroup.add(frontWall);
 
   const backWall = frontWall.clone();
-  backWall.position.set(0, wallH / 2 + h * 0.25, -(d / 2 + 0.005));
-  mattressGroup.add(backWall);
+  backWall.position.set(shellOffsetX, wallH / 2 + h * 0.25, -(shellDepth / 2 + 0.005));
+  if (!internalView.cutaway) shellGroup.add(backWall);
 
   const leftWall = new THREE.Mesh(
-    new THREE.BoxGeometry(0.02, wallH, d - 0.02),
+    new THREE.BoxGeometry(0.02, wallH, Math.max(shellDepth - 0.02, 0.22)),
     sideMat
   );
-  leftWall.position.set(-(w / 2 + 0.005), wallH / 2 + h * 0.25, 0);
-  mattressGroup.add(leftWall);
+  leftWall.position.set(shellOffsetX - (shellWidth / 2 + 0.005), wallH / 2 + h * 0.25, 0);
+  shellGroup.add(leftWall);
 
   const rightWall = leftWall.clone();
-  rightWall.position.set(w / 2 + 0.005, wallH / 2 + h * 0.25, 0);
-  mattressGroup.add(rightWall);
+  rightWall.position.set(shellOffsetX + shellWidth / 2 + 0.005, currentMode === 'internal' ? wallH / 2 + 0.02 : wallH / 2 + h * 0.25, 0);
+  if (!internalView.cutaway) shellGroup.add(rightWall);
 
   // Tape border — runs along the top edge perimeter
   const tapeH = 0.05;
   const tapeD = 0.055;
 
   const tapeF = new THREE.Mesh(
-    new THREE.BoxGeometry(w + tapeD, tapeH, tapeD),
+    new THREE.BoxGeometry(shellWidth + tapeD, tapeH, tapeD),
     tapeMat
   );
-  tapeF.position.set(0, h - tapeH / 2, d / 2);
-  mattressGroup.add(tapeF);
+  tapeF.position.set(shellOffsetX, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, shellDepth / 2);
+  if (currentMode === 'external') shellGroup.add(tapeF);
 
   const tapeB = tapeF.clone();
-  tapeB.position.set(0, h - tapeH / 2, -d / 2);
-  mattressGroup.add(tapeB);
+  tapeB.position.set(shellOffsetX, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, -shellDepth / 2);
+  if (!internalView.cutaway && currentMode === 'external') shellGroup.add(tapeB);
 
   const tapeL = new THREE.Mesh(
-    new THREE.BoxGeometry(tapeD, tapeH, d + tapeD),
+    new THREE.BoxGeometry(tapeD, tapeH, shellDepth + tapeD),
     tapeMat
   );
-  tapeL.position.set(-w / 2, h - tapeH / 2, 0);
-  mattressGroup.add(tapeL);
+  tapeL.position.set(shellOffsetX - shellWidth / 2, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, 0);
+  if (currentMode === 'external') shellGroup.add(tapeL);
 
   const tapeR = tapeL.clone();
-  tapeR.position.set(w / 2, h - tapeH / 2, 0);
-  mattressGroup.add(tapeR);
+  tapeR.position.set(shellOffsetX + shellWidth / 2, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, 0);
+  if (!internalView.cutaway && currentMode === 'external') shellGroup.add(tapeR);
+
+  // Internal layers — normalized to selected mattress height
+  const totalThickness = workingLayers.reduce((sum, layer) => sum + Math.max(Number(layer.thickness) || 0.5, 0.5), 0) || 1;
+  const explodedGap = currentMode === 'internal' && internalView.exploded && !internalView.cutaway
+    ? Math.max(internalView.explodedGap * 0.32, 0) : (currentMode === 'internal' && internalView.innerBuild && !internalView.cutaway ? 0.08 : 0);
+  const usableHeight = currentMode === 'internal'
+    ? Math.max(h - explodedGap * Math.max(workingLayers.length - 1, 0), 0.25)
+    : h - explodedGap * Math.max(workingLayers.length - 1, 0);
+  let yCursor = currentMode === 'internal' ? trayHeight + 0.04 : 0;
+
+  workingLayers.forEach((layer, index) => {
+    const normalizedHeight = Math.max((Math.max(Number(layer.thickness) || 0.5, 0.5) / totalThickness) * usableHeight, 0.035);
+    const cutFront = internalView.cutaway ? Number(layer.frontCut || 0) : 0;
+    const cutSide = internalView.cutaway ? Number(layer.sideCut || 0) : 0;
+    const layerMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(
+        Math.max(w * (internalView.cutaway ? 0.82 - cutSide * 0.18 : 0.92), 0.16),
+        normalizedHeight,
+        Math.max(d * (internalView.cutaway ? 0.82 - cutFront * 0.18 : 0.92), 0.16)
+      ),
+      createLayerMaterial(layer.color || '#808080')
+    );
+
+    layerMesh.position.y = yCursor + normalizedHeight / 2;
+    if (currentMode === 'internal' && internalView.cutaway) {
+      layerMesh.position.x = w * (0.12 + cutSide * 0.03);
+      layerMesh.position.z = d * (0.02 + cutFront * 0.03);
+    }
+
+    layerMesh.castShadow = index === workingLayers.length - 1;
+    layerMesh.receiveShadow = true;
+    internalGroup.add(layerMesh);
+    yCursor += normalizedHeight + explodedGap;
+  });
+
+  internalGroup.visible = currentMode === 'internal';
 
   // Center the group so mattress sits on y=0
   mattressGroup.position.set(0, 0, 0);
@@ -235,6 +322,74 @@ buildMattress('king');
 
 window.viewportSetSize = (sizeId) => buildMattress(sizeId, currentHeightInches);
 window.viewportSetHeight = (heightInches) => buildMattress(currentSizeId, heightInches);
+window.viewportGetCamera = () => ({
+  position: [camera.position.x, camera.position.y, camera.position.z],
+  target: [controls.target.x, controls.target.y, controls.target.z],
+});
+window.viewportSetCamera = (snapshot) => {
+  if (!snapshot) return;
+  camera.position.set(...snapshot.position);
+  controls.target.set(...snapshot.target);
+  controls.update();
+  renderer.render(scene, camera);
+};
+window.viewportCapture = async ({ width, height, transparent = false } = {}) => {
+  const prevBg = scene.background;
+  const prevAlpha = renderer.getClearAlpha();
+  const prevSize = new THREE.Vector2();
+  renderer.getSize(prevSize);
+  const prevAspect = camera.aspect;
+  const nextWidth = width || prevSize.x;
+  const nextHeight = height || prevSize.y;
+
+  if (transparent) {
+    scene.background = null;
+    renderer.setClearAlpha(0);
+  }
+
+  renderer.setSize(nextWidth, nextHeight, false);
+  camera.aspect = nextWidth / nextHeight;
+  camera.updateProjectionMatrix();
+  controls.update();
+  renderer.render(scene, camera);
+
+  const dataUrl = renderer.domElement.toDataURL(transparent ? 'image/png' : 'image/jpeg', 0.92);
+
+  if (transparent) {
+    scene.background = prevBg;
+    renderer.setClearAlpha(prevAlpha);
+  }
+
+  renderer.setSize(prevSize.x, prevSize.y, false);
+  camera.aspect = prevAspect;
+  camera.updateProjectionMatrix();
+  controls.update();
+  renderer.render(scene, camera);
+
+  return {
+    dataUrl,
+    width: nextWidth,
+    height: nextHeight,
+  };
+};
+window.viewportSyncState = ({ mode, layers, nextView }) => {
+  if (mode) currentMode = mode;
+  if (Array.isArray(layers) && layers.length) currentLayers = layers.map(layer => ({ ...layer }));
+  if (nextView) internalView = { ...internalView, ...nextView };
+  buildMattress(currentSizeId, currentHeightInches);
+};
+window.viewportSetMode = (mode) => {
+  currentMode = mode;
+  buildMattress(currentSizeId, currentHeightInches);
+};
+window.viewportSetLayers = (layers) => {
+  currentLayers = Array.isArray(layers) && layers.length ? layers.map(layer => ({ ...layer })) : currentLayers;
+  buildMattress(currentSizeId, currentHeightInches);
+};
+window.viewportSetInternalView = (nextView) => {
+  internalView = { ...internalView, ...nextView };
+  buildMattress(currentSizeId, currentHeightInches);
+};
 
 
 // ── Resize ───────────────────────────────────────────────

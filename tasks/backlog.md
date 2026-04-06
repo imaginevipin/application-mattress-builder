@@ -36,8 +36,8 @@ type: project
 - [x] Handle panel — done: 2026-04-06 (refactored to type-section-header pattern: 2026-04-06)
 - [x] Bottom panel — done: 2026-04-06
 - [x] Style panel (Textures, Materials, Colors, Properties) — done: 2026-04-06
-- [ ] Internal layers panel (Layers, Exploded/Cutaway view) — priority: high — complexity: complex
-- [ ] Create Image modal + output — priority: medium — complexity: medium
-- [ ] Add to Library modal — priority: medium — complexity: medium
-- [ ] Camera management — priority: medium — complexity: medium
+- [x] Internal layers panel (Layers, Exploded/Cutaway view) — done: 2026-04-06
+- [x] Create Image modal + output — done: 2026-04-06
+- [x] Add to Library modal — done: 2026-04-06
+- [x] Camera management — done: 2026-04-06
 - [x] File operations shell (Save, Save as New, Quit, Download PDF summary) — done: 2026-04-02 — implemented browser-native project actions via dropdown menu, localStorage, reset state, printable summary

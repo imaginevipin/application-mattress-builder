@@ -71,13 +71,13 @@
       </div>
 
       <div class="topbar-right">
-        <button class="btn-action">
+        <button class="btn-action" id="requestPropBtn">
           Request Prop
         </button>
-        <button class="btn-action">
+        <button class="btn-action" id="addToLibraryBtn">
           Add to library
         </button>
-        <button class="btn-action btn-action--primary">Create Image</button>
+        <button class="btn-action btn-action--primary" id="createImageBtn">Create Image</button>
       </div>
 
     </header>
@@ -129,6 +129,10 @@
           <button class="nav-item" data-section="layers">
             <span class="material-symbols-outlined">layers</span>
             <span class="nav-label">Layers</span>
+          </button>
+          <button class="nav-item" data-section="layouts">
+            <span class="material-symbols-outlined">dashboard_customize</span>
+            <span class="nav-label">Layouts</span>
           </button>
         </div>
 
@@ -987,12 +991,64 @@
         </div>
 
         <!-- Layers (Internal) ── -->
-        <div class="panel panel--empty" id="panel-layers" hidden>
+        <div class="panel" id="panel-layers" hidden>
           <div class="panel-header">
             <p class="panel-title">Layers</p>
           </div>
-          <div class="panel-body">
-            <p class="panel-empty-label">Layer stack configuration</p>
+          <div class="layers-stack" id="layersStack"></div>
+          <div class="panel-cta-bar panel-cta-bar--foot">
+            <button class="btn-panel-cta" id="layersAddBtn">Add new layer</button>
+          </div>
+        </div>
+
+        <!-- Layouts (Internal) ── -->
+        <div class="panel" id="panel-layouts" hidden>
+          <div class="panel-header">
+            <p class="panel-title">View customization</p>
+          </div>
+
+          <div class="layouts-stack">
+            <section class="layout-card" id="layoutExplodedCard">
+              <button class="layout-card__header" id="layoutExplodedToggle" aria-expanded="true">
+                <span class="layout-card__title-wrap">
+                  <span class="material-symbols-outlined">layers</span>
+                  <span class="layout-card__title">Exploded</span>
+                </span>
+                <span class="material-symbols-outlined layout-card__chevron" id="layoutExplodedChevron">expand_less</span>
+              </button>
+              <div class="layout-card__body" id="layoutExplodedBody">
+                <div class="layout-slider-row">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="layersExplodedGap">Gap between layers</label>
+                    <span class="form-slider-val" id="layersExplodedGapVal">0.3</span>
+                  </div>
+                  <input class="form-range" id="layersExplodedGap" type="range" min="0" max="1" step="0.05" value="0.3">
+                </div>
+              </div>
+            </section>
+
+            <button class="layout-card layout-card--button" id="layersInnerBuildBtn" aria-pressed="true">
+              <span class="layout-card__title-wrap">
+                <span class="material-symbols-outlined">table_rows_narrow</span>
+                <span class="layout-card__title">Inner Build</span>
+              </span>
+            </button>
+
+            <section class="layout-card" id="layoutCutawayCard">
+              <button class="layout-card__header" id="layoutCutawayToggle" aria-expanded="false">
+                <span class="layout-card__title-wrap">
+                  <span class="material-symbols-outlined">crop</span>
+                  <span class="layout-card__title">Cutaway View</span>
+                </span>
+                <span class="layout-card__header-actions">
+                  <span class="layout-mini-toggle${''}" id="layoutFrontIcon"></span>
+                  <span class="layout-mini-toggle is-active" id="layoutSideIcon"></span>
+                </span>
+              </button>
+              <div class="layout-card__body" id="layoutCutawayBody" hidden>
+                <div class="layout-cutaway-list" id="layoutCutawayList"></div>
+              </div>
+            </section>
           </div>
         </div>
 
@@ -1181,22 +1237,37 @@
         </div>
 
         <!-- Images ── -->
-        <div class="panel panel--empty" id="panel-images" hidden>
-          <div class="panel-header">
-            <p class="panel-title">Images</p>
+        <div class="panel" id="panel-images" hidden>
+          <div class="style-tabs" role="tablist">
+            <button class="style-tab is-active" id="imagesTabPreviews" data-images-tab="previews" role="tab" aria-selected="true">Previews</button>
+            <button class="style-tab" id="imagesTabRenders" data-images-tab="renders" role="tab" aria-selected="false">Renders</button>
           </div>
-          <div class="panel-body">
-            <p class="panel-empty-label">Previews &amp; renders</p>
+          <div class="panel-body panel-body--flush">
+            <div class="images-list" id="imagesList"></div>
           </div>
         </div>
 
         <!-- Cameras ─ -->
-        <div class="panel panel--empty" id="panel-cameras" hidden>
-          <div class="panel-header">
+        <div class="panel" id="panel-cameras" hidden>
+          <div class="panel-header panel-header--visible">
             <p class="panel-title">Cameras</p>
           </div>
-          <div class="panel-body">
-            <p class="panel-empty-label">Camera angle presets</p>
+          <div class="panel-cta-bar">
+            <button class="btn-panel-cta" id="cameraAddCurrentBtn">Add Current View</button>
+          </div>
+          <div class="panel-cta-bar panel-cta-bar--inner">
+            <button class="btn-panel-cta btn-panel-cta--outline" id="cameraImportBtn">
+              <span class="material-symbols-outlined">upload</span>
+              Import Camera Presets
+            </button>
+          </div>
+          <div class="panel-search">
+            <label class="sr-only" for="cameraSearch">Search cameras</label>
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="cameraSearch" type="text" placeholder="Search camera" autocomplete="off">
+          </div>
+          <div class="panel-body panel-body--flush">
+            <div class="camera-list" id="cameraList"></div>
           </div>
         </div>
 
@@ -1207,6 +1278,128 @@
         <div class="viewport-label" id="viewportLabel" aria-live="polite">King · 10" Profile</div>
       </main>
 
+    </div>
+  </div>
+
+  <div class="app-modal" id="createImageModal" hidden>
+    <div class="app-modal__backdrop" data-close-modal="create-image"></div>
+    <div class="app-modal__dialog app-modal__dialog--dark app-modal__dialog--wide">
+      <button class="app-modal__close" id="createImageCloseBtn" aria-label="Close create image modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="create-image-modal">
+        <div class="create-image-modal__top">
+          <button class="create-image-mode is-active" id="createModePreviewBtn" data-image-mode="preview">
+            <span class="create-image-mode__check"></span>
+            Preview
+          </button>
+          <button class="create-image-mode" id="createModeHighResBtn" data-image-mode="highres">
+            <span class="create-image-mode__check"></span>
+            High Resolution
+          </button>
+          <span class="material-symbols-outlined create-image-modal__crown">crown</span>
+        </div>
+
+        <div class="create-image-modal__body">
+          <div class="create-image-cameras">
+            <label class="create-image-selectall">
+              <input type="checkbox" id="createImageSelectAll">
+              <span>Select all (<span id="createImageCameraCount">1</span> camera)</span>
+            </label>
+            <div class="create-image-camera-list" id="createImageCameraList"></div>
+          </div>
+
+          <div class="create-image-settings">
+            <div class="create-image-resolution" id="createImageResolutionBtns">
+              <button class="create-image-res-btn is-active" data-resolution="1080p">1080p</button>
+              <button class="create-image-res-btn" data-resolution="1440p">1440p</button>
+              <button class="create-image-res-btn" data-resolution="4k">4k</button>
+            </div>
+
+            <div class="create-image-dims">
+              <div class="form-field">
+                <label class="form-field-label" for="createImageWidth">Width (px)</label>
+                <input class="form-input" id="createImageWidth" type="number" min="320" step="1" value="1500">
+              </div>
+              <div class="form-field">
+                <label class="form-field-label" for="createImageHeight">Height (px)</label>
+                <input class="form-input" id="createImageHeight" type="number" min="240" step="1" value="843">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-field-label" for="createImageFilename">File name</label>
+              <div class="create-image-file-row">
+                <input class="form-input" id="createImageFilename" type="text" value="New Mattress_4-image1">
+                <select class="form-select create-image-format" id="createImageFormat">
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="create-image-options">
+              <label class="toggle-row create-image-option">
+                <span class="toggle-label">Transparent Bg</span>
+                <span class="toggle-switch">
+                  <input class="toggle-input" id="createImageTransparentBg" type="checkbox">
+                  <span class="toggle-track"></span>
+                </span>
+              </label>
+              <label class="toggle-row create-image-option">
+                <span class="toggle-label">Shadow on floor</span>
+                <span class="toggle-switch">
+                  <input class="toggle-input" id="createImageShadowFloor" type="checkbox" checked>
+                  <span class="toggle-track"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-panel-cta create-image-submit" id="createImageSubmitBtn">Create Image</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-modal" id="libraryModal" hidden>
+    <div class="app-modal__backdrop" data-close-modal="library"></div>
+    <div class="app-modal__dialog app-modal__dialog--light">
+      <button class="app-modal__close app-modal__close--light" id="libraryCloseBtn" aria-label="Close add to library modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="library-modal">
+        <h2 class="library-modal__title">Add mattress to your library</h2>
+        <div class="library-modal__preview-wrap">
+          <img class="library-modal__preview" id="libraryPreviewImage" alt="Mattress preview">
+        </div>
+        <div class="form-field">
+          <label class="form-field-label library-modal__label" for="libraryMattressName">Mattress name</label>
+          <input class="form-input library-modal__input" id="libraryMattressName" type="text" placeholder="Enter mattress name">
+        </div>
+        <div class="library-modal__footer">
+          <p class="library-modal__availability">
+            <span class="material-symbols-outlined">help</span>
+            <span class="library-modal__availability-label">Models Available</span>
+            <span class="library-modal__availability-count" id="libraryAvailableCount">397</span>
+          </p>
+          <button class="btn-panel-cta library-modal__save" id="librarySaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-viewer" id="imageViewer" hidden>
+    <aside class="app-viewer__rail">
+      <div class="app-viewer__rail-head" id="imageViewerMeta"></div>
+      <div class="app-viewer__thumbs" id="imageViewerThumbs"></div>
+    </aside>
+    <div class="app-viewer__stage">
+      <button class="app-viewer__close" id="imageViewerCloseBtn" aria-label="Close image viewer">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <img class="app-viewer__image" id="imageViewerImage" alt="Generated mattress image">
+      <div class="app-viewer__caption" id="imageViewerCaption"></div>
     </div>
   </div>
 

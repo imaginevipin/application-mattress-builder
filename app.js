@@ -128,8 +128,63 @@ const PATTERNS = [
   { id: 'scallop',  name: 'Scalloped Mesh',     css: 'ptn-scallop'  },
 ];
 
+const LAYER_TEMPLATES = [
+  { id: 'pocket-coil',     name: 'Edge-To-Edge Pocket Coil', cssName: 'Pocket Coil', color: '#aeb8cb', thickness: 4.794 },
+  { id: 'hole-punch',      name: 'Hole Punch Foam Layer',    cssName: 'Foam Layer',  color: '#94c876', thickness: 1.503 },
+  { id: 'convoluted-1',    name: 'Convoluted Foam 1',        cssName: 'Convoluted',  color: '#c9d1df', thickness: 1.125 },
+  { id: 'convoluted-2',    name: 'Convoluted Foam 2',        cssName: 'Convoluted',  color: '#b9c3d3', thickness: 1.125 },
+  { id: 'fiber-batting',   name: 'Fiber Batting',            cssName: 'Fiber',       color: '#ddd8cf', thickness: 0.9   },
+  { id: 'foam-slab',       name: 'Foam Slab',                cssName: 'Foam Slab',   color: '#7eb26d', thickness: 2.0   },
+];
 
-const DEFAULT_STATE = {
+let layerUid = 0;
+let imageUid = 0;
+let cameraUid = 0;
+
+const IMAGE_RESOLUTION_PRESETS = {
+  '1080p': { width: 1500, height: 843 },
+  '1440p': { width: 1920, height: 1080 },
+  '4k':    { width: 3840, height: 2160 },
+};
+
+function createLayerFromTemplate(templateId) {
+  const template = LAYER_TEMPLATES.find(item => item.id === templateId) || LAYER_TEMPLATES[0];
+  layerUid += 1;
+
+  return {
+    id: `layer-${layerUid}`,
+    materialId: template.id,
+    name: template.name,
+    cssName: template.cssName,
+    color: template.color,
+    thickness: template.thickness,
+    visible: true,
+    locked: false,
+    frontCut: 0.1,
+    sideCut: 0.1,
+  };
+}
+
+function createCameraRecord(name, snapshot = null, isCurrent = false) {
+  cameraUid += 1;
+  return {
+    id: isCurrent ? 'current-camera' : `camera-${cameraUid}`,
+    name,
+    snapshot,
+    isCurrent,
+    resolution: '1500 × 843',
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function createDefaultLayers() {
+  return [
+    createLayerFromTemplate('pocket-coil'),
+    createLayerFromTemplate('hole-punch'),
+  ];
+}
+
+const BASE_STATE = {
   mode: 'external',
   section: 'size',
   size: 'king',
@@ -199,7 +254,45 @@ const DEFAULT_STATE = {
   wallTypePickerQuery: '',
   wallSectionCollapsed: false,
   wallTuftCollapsed: false,
+  // Internal layers panel
+  layersExpandedId: null,
+  layersExploded: true,
+  layersExplodedOpen: true,
+  layersExplodedGap: 0.3,
+  layersInnerBuild: false,
+  layersCutaway: false,
+  layersCutawayOpen: false,
+  // Images / cameras / output
+  imagesTab: 'previews',
+  createImageMode: 'preview',
+  createImageResolution: '1080p',
+  createImageWidth: 1500,
+  createImageHeight: 843,
+  createImageFormat: 'jpg',
+  createImageTransparentBg: false,
+  createImageShadowFloor: true,
+  cameraQuery: '',
+  libraryAvailableCount: 397,
 };
+
+function createDefaultState() {
+  const layers = createDefaultLayers();
+  const defaultCamera = createCameraRecord('Current Camera', null, true);
+  return {
+    ...BASE_STATE,
+    styleColorSwatches: [],
+    layers,
+    layersExpandedId: layers[0] ? layers[0].id : null,
+    createImageFilename: 'New Mattress_4-image1',
+    createImageSelectedCameraIds: [defaultCamera.id],
+    previewImages: [],
+    renderImages: [],
+    cameras: [defaultCamera],
+    activeCameraId: defaultCamera.id,
+    viewerImageId: null,
+    viewerTab: 'previews',
+  };
+}
 
 // Uniform scale: all rects on the same px-per-inch ratio so sizes are comparable
 // Largest dimension is Cal King 84" tall → maps to RECT_MAX_H px
@@ -207,8 +300,36 @@ const PX_PER_INCH = 72 / 84; // ~0.857 px/inch
 const HEIGHT_PX_PER_INCH = 64 / 16;
 
 
-let state = { ...DEFAULT_STATE };
+let state = createDefaultState();
 let toastTimeout = null;
+
+function getMattressName() {
+  const input = document.querySelector('.mattress-name');
+  return input ? (input.value.trim() || 'Untitled Mattress') : 'Untitled Mattress';
+}
+
+function slugifyName(value) {
+  return value.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') || 'mattress-image';
+}
+
+function relativeTimeLabel(dateIso) {
+  const diff = Math.max(0, Date.now() - new Date(dateIso).getTime());
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins === 1) return '1 minute ago';
+  if (mins < 60) return `${mins} minutes ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours === 1) return '1 hour ago';
+  return `${hours} hours ago`;
+}
+
+function allImagesForViewer(tab = state.viewerTab) {
+  return tab === 'renders' ? state.renderImages : state.previewImages;
+}
+
+function getImageById(id, tab = state.viewerTab) {
+  return allImagesForViewer(tab).find(image => image.id === id) || null;
+}
 
 
 // ── Size panel ───────────────────────────────────────────
@@ -351,6 +472,7 @@ function renderHeightGrid() {
       renderHeightGrid();
       updateViewportLabel();
       if (window.viewportSetHeight) window.viewportSetHeight(Number(state.height));
+      syncViewportLayers();
     });
   });
 }
@@ -360,7 +482,41 @@ function updateViewportLabel() {
   if (!label) return;
   const size = SIZES.find(s => s.id === state.size);
   const height = HEIGHTS.find(option => option.id === state.height);
-  if (size && height) label.textContent = `${size.name} · ${height.inches}" Profile`;
+  if (!size || !height) return;
+
+  if (state.mode === 'internal') {
+    label.textContent = `${size.name} · ${state.layers.length} Layers · ${height.inches}" Profile`;
+    return;
+  }
+
+  label.textContent = `${size.name} · ${height.inches}" Profile`;
+}
+
+function syncViewportLayers() {
+  if (window.viewportSyncState) {
+    window.viewportSyncState({
+      mode: state.mode,
+      layers: state.layers,
+      nextView: {
+        exploded: state.layersExploded,
+        explodedGap: state.layersExplodedGap,
+        innerBuild: state.layersInnerBuild,
+        cutaway: state.layersCutaway,
+      },
+    });
+    return;
+  }
+
+  if (window.viewportSetLayers) window.viewportSetLayers(state.layers);
+  if (window.viewportSetInternalView) {
+    window.viewportSetInternalView({
+      exploded: state.layersExploded,
+      explodedGap: state.layersExplodedGap,
+      innerBuild: state.layersInnerBuild,
+      cutaway: state.layersCutaway,
+    });
+  }
+  if (window.viewportSetMode) window.viewportSetMode(state.mode);
 }
 
 function syncModeButtons() {
@@ -385,10 +541,8 @@ function showToast(message) {
 }
 
 function getProjectPayload() {
-  const nameInput = document.querySelector('.mattress-name');
-
   return {
-    name: nameInput ? nameInput.value.trim() || 'Untitled Mattress' : 'Untitled Mattress',
+    name: getMattressName(),
     savedAt: new Date().toISOString(),
     state: { ...state },
   };
@@ -408,7 +562,7 @@ function saveProjectAsNew() {
 }
 
 function quitProject() {
-  state = { ...DEFAULT_STATE };
+  state = createDefaultState();
   syncModeButtons();
   syncSizeSearchInput();
   syncHeightSearchInput();
@@ -428,8 +582,16 @@ function quitProject() {
   renderHandleMain();
   openBottomView('bottomMainView');
   renderBottomMain();
+  renderLayersPanel();
+  renderLayoutsPanel();
+  renderImagesPanel();
+  renderCamerasPanel();
+  closeCreateImageModal();
+  closeLibraryModal();
+  closeImageViewer();
   if (window.viewportSetSize) window.viewportSetSize(state.size);
   if (window.viewportSetHeight) window.viewportSetHeight(Number(state.height));
+  syncViewportLayers();
   showToast('Project reset to defaults');
 }
 
@@ -1667,6 +1829,271 @@ function initBottomPanel() {
 }
 
 
+// ── Internal layers panel ───────────────────────────────
+
+function getLayerTemplateById(templateId) {
+  return LAYER_TEMPLATES.find(item => item.id === templateId) || LAYER_TEMPLATES[0];
+}
+
+function getLayerTotalThickness() {
+  return state.layers.reduce((sum, layer) => sum + Number(layer.thickness || 0), 0);
+}
+
+function moveLayer(fromIndex, toIndex) {
+  if (toIndex < 0 || toIndex >= state.layers.length || fromIndex === toIndex) return;
+  const [layer] = state.layers.splice(fromIndex, 1);
+  state.layers.splice(toIndex, 0, layer);
+}
+
+function getExpandedLayer() {
+  return state.layers.find(layer => layer.id === state.layersExpandedId) || state.layers[0] || null;
+}
+
+function renderLayersPanel() {
+  const stack = document.getElementById('layersStack');
+  if (!stack) return;
+
+  if (!state.layers.length) {
+    stack.innerHTML = `<div class="layers-empty">No layers in this stack. Add a layer to begin building the internal construction.</div>`;
+    updateViewportLabel();
+    syncViewportLayers();
+    return;
+  }
+
+  stack.innerHTML = state.layers.map((layer, index) => `
+    <article class="layer-card${state.layersExpandedId === layer.id ? '' : ' is-collapsed'}" data-layer-id="${layer.id}">
+      <div class="layer-card__header">
+        <button class="layer-card__toggle" type="button" data-layer-toggle="${layer.id}">
+          <span class="layer-card__preview" style="--layer-accent:${layer.color}"></span>
+          <div class="layer-card__text">
+            <span class="layer-card__title">${layer.name}</span>
+          </div>
+        </button>
+        <span class="layer-card__value">${Number(layer.thickness).toFixed(3)} (in)</span>
+      </div>
+
+      <div class="layer-card__actions-row">
+        <div class="layer-card__action-group">
+          <button class="layer-card__mini-btn" type="button" data-action="move-up" ${index === 0 ? 'disabled' : ''} aria-label="Move layer up">
+            <span class="material-symbols-outlined">swap_vert</span>
+          </button>
+          <button class="layer-card__mini-btn" type="button" data-action="visibility" aria-label="Toggle visibility">
+            <span class="material-symbols-outlined">${layer.visible ? 'visibility' : 'visibility_off'}</span>
+          </button>
+          <button class="layer-card__mini-btn" type="button" data-action="lock" aria-label="Toggle lock">
+            <span class="material-symbols-outlined">${layer.locked ? 'lock' : 'lock_open'}</span>
+          </button>
+          <button class="layer-card__mini-btn" type="button" data-action="delete" aria-label="Delete layer">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+        <div class="layer-chip">${layer.cssName}</div>
+      </div>
+
+      <div class="form-slider-field">
+        <div class="layer-card__header-line">
+          <label class="form-field-label" for="layerThicknessRange-${layer.id}">Height</label>
+          <span class="layer-card__value" id="layerThicknessVal-${layer.id}">${Number(layer.thickness).toFixed(3)} (in)</span>
+        </div>
+        <input class="form-range layer-thickness-range" id="layerThicknessRange-${layer.id}" data-layer-id="${layer.id}" type="range" min="0.5" max="8" step="0.001" value="${Number(layer.thickness)}">
+      </div>
+    </article>
+  `).join('');
+
+  stack.querySelectorAll('.layer-thickness-range').forEach(updateSliderFill);
+  updateViewportLabel();
+  syncViewportLayers();
+}
+
+function renderLayoutsPanel() {
+  const explodedCard = document.getElementById('layoutExplodedCard');
+  const explodedBody = document.getElementById('layoutExplodedBody');
+  const explodedChevron = document.getElementById('layoutExplodedChevron');
+  const explodedGap = document.getElementById('layersExplodedGap');
+  const explodedGapVal = document.getElementById('layersExplodedGapVal');
+  const innerBuildBtn = document.getElementById('layersInnerBuildBtn');
+  const cutawayCard = document.getElementById('layoutCutawayCard');
+  const cutawayBody = document.getElementById('layoutCutawayBody');
+  const cutawayList = document.getElementById('layoutCutawayList');
+
+  if (explodedCard) explodedCard.classList.toggle('is-active', state.layersExploded);
+  if (explodedBody) explodedBody.hidden = !state.layersExplodedOpen;
+  if (explodedChevron) explodedChevron.textContent = state.layersExplodedOpen ? 'expand_less' : 'expand_more';
+  if (explodedGap) {
+    explodedGap.value = String(state.layersExplodedGap);
+    updateSliderFill(explodedGap);
+  }
+  if (explodedGapVal) explodedGapVal.textContent = state.layersExplodedGap.toFixed(1);
+
+  if (innerBuildBtn) {
+    innerBuildBtn.classList.toggle('is-active', state.layersInnerBuild);
+    innerBuildBtn.setAttribute('aria-pressed', String(state.layersInnerBuild));
+  }
+
+  if (cutawayCard) cutawayCard.classList.toggle('is-active', state.layersCutaway);
+  if (cutawayBody) cutawayBody.hidden = !state.layersCutawayOpen;
+
+  if (cutawayList) {
+    const visible = state.layers.filter(layer => layer.visible).slice(0, 2);
+    cutawayList.innerHTML = visible.map(layer => `
+      <div class="layout-cutaway-group">
+        <span class="layout-cutaway-name">${layer.name}</span>
+        <div class="form-slider-field">
+          <div class="form-slider-header">
+            <label class="form-field-label" for="layerFrontCut-${layer.id}">Front Cut Angle</label>
+            <span class="form-slider-val" id="layerFrontCutVal-${layer.id}">${Number(layer.frontCut).toFixed(1)}</span>
+          </div>
+          <input class="form-range layer-front-cut-range" id="layerFrontCut-${layer.id}" data-layer-id="${layer.id}" type="range" min="0" max="1" step="0.1" value="${Number(layer.frontCut)}">
+        </div>
+        <div class="form-slider-field">
+          <div class="form-slider-header">
+            <label class="form-field-label" for="layerSideCut-${layer.id}">Side Cut Angle</label>
+            <span class="form-slider-val" id="layerSideCutVal-${layer.id}">${Number(layer.sideCut).toFixed(1)}</span>
+          </div>
+          <input class="form-range layer-side-cut-range" id="layerSideCut-${layer.id}" data-layer-id="${layer.id}" type="range" min="0" max="1" step="0.1" value="${Number(layer.sideCut)}">
+        </div>
+      </div>
+    `).join('');
+
+    cutawayList.querySelectorAll('.layer-front-cut-range, .layer-side-cut-range').forEach(updateSliderFill);
+  }
+
+  syncViewportLayers();
+}
+
+function initLayersPanel() {
+  const addBtn = document.getElementById('layersAddBtn');
+  const stack = document.getElementById('layersStack');
+  const explodedToggle = document.getElementById('layoutExplodedToggle');
+  const explodedGap = document.getElementById('layersExplodedGap');
+  const innerBuildBtn = document.getElementById('layersInnerBuildBtn');
+  const cutawayToggle = document.getElementById('layoutCutawayToggle');
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const template = LAYER_TEMPLATES[(state.layers.length) % LAYER_TEMPLATES.length];
+      const nextLayer = createLayerFromTemplate(template.id);
+      state.layers.push(nextLayer);
+      state.layersExpandedId = nextLayer.id;
+      renderLayersPanel();
+      renderLayoutsPanel();
+      showToast('Added a new layer');
+    });
+  }
+
+  if (explodedToggle) {
+    explodedToggle.addEventListener('click', () => {
+      state.layersExploded = true;
+      state.layersExplodedOpen = !state.layersExplodedOpen;
+      renderLayoutsPanel();
+    });
+  }
+
+  if (explodedGap) {
+    explodedGap.addEventListener('input', () => {
+      state.layersExplodedGap = Number(explodedGap.value);
+      state.layersExploded = state.layersExplodedGap > 0;
+      renderLayoutsPanel();
+    });
+  }
+
+  if (innerBuildBtn) {
+    innerBuildBtn.addEventListener('click', () => {
+      state.layersInnerBuild = !state.layersInnerBuild;
+      renderLayoutsPanel();
+    });
+  }
+
+  if (cutawayToggle) {
+    cutawayToggle.addEventListener('click', () => {
+      const nextOpen = !state.layersCutawayOpen;
+      state.layersCutawayOpen = nextOpen;
+      state.layersCutaway = nextOpen;
+      renderLayoutsPanel();
+    });
+  }
+
+  if (stack) {
+    stack.addEventListener('click', event => {
+      const toggleBtn = event.target.closest('[data-layer-toggle]');
+      if (toggleBtn) {
+        state.layersExpandedId = toggleBtn.dataset.layerToggle;
+        renderLayersPanel();
+        return;
+      }
+
+      const actionBtn = event.target.closest('[data-action]');
+      if (!actionBtn) return;
+
+      const card = actionBtn.closest('[data-layer-id]');
+      if (!card) return;
+      const layerId = card.dataset.layerId;
+      const index = state.layers.findIndex(layer => layer.id === layerId);
+      if (index === -1) return;
+
+      const action = actionBtn.dataset.action;
+      if (action === 'move-up') moveLayer(index, index - 1);
+      if (action === 'visibility') state.layers[index].visible = !state.layers[index].visible;
+      if (action === 'lock') state.layers[index].locked = !state.layers[index].locked;
+      if (action === 'delete' && state.layers.length > 1) {
+        state.layers.splice(index, 1);
+        if (state.layersExpandedId === layerId) {
+          state.layersExpandedId = state.layers[0] ? state.layers[0].id : null;
+        }
+      } else if (action === 'delete') {
+        showToast('At least one internal layer is required');
+        return;
+      }
+
+      renderLayersPanel();
+      renderLayoutsPanel();
+    });
+
+    stack.addEventListener('input', event => {
+      const layerId = event.target.dataset.layerId;
+      if (!layerId) return;
+      const layer = state.layers.find(item => item.id === layerId);
+      if (!layer) return;
+
+      if (event.target.classList.contains('layer-thickness-range')) {
+        layer.thickness = Number(event.target.value);
+        const valueEl = document.getElementById(`layerThicknessVal-${layer.id}`);
+        if (valueEl) valueEl.textContent = `${Number(layer.thickness).toFixed(3)} (in)`;
+        updateSliderFill(event.target);
+      }
+      updateViewportLabel();
+      syncViewportLayers();
+    });
+  }
+
+  document.addEventListener('input', event => {
+    const layerId = event.target.dataset.layerId;
+    if (!layerId) return;
+    const layer = state.layers.find(item => item.id === layerId);
+    if (!layer) return;
+
+    if (event.target.classList.contains('layer-front-cut-range')) {
+      layer.frontCut = Number(event.target.value);
+      const valEl = document.getElementById(`layerFrontCutVal-${layer.id}`);
+      if (valEl) valEl.textContent = layer.frontCut.toFixed(1);
+      updateSliderFill(event.target);
+      syncViewportLayers();
+    }
+
+    if (event.target.classList.contains('layer-side-cut-range')) {
+      layer.sideCut = Number(event.target.value);
+      const valEl = document.getElementById(`layerSideCutVal-${layer.id}`);
+      if (valEl) valEl.textContent = layer.sideCut.toFixed(1);
+      updateSliderFill(event.target);
+      syncViewportLayers();
+    }
+  });
+
+  renderLayersPanel();
+  renderLayoutsPanel();
+}
+
+
 // ── Style panel ──────────────────────────────────────────
 
 // ── Color picker helpers ──────────────────────────────
@@ -2078,6 +2505,505 @@ function initStylePanel() {
 }
 
 
+// ── Images / Cameras / Output ───────────────────────────
+
+function setImagesTab(tab) {
+  state.imagesTab = tab;
+  const previewsTab = document.getElementById('imagesTabPreviews');
+  const rendersTab = document.getElementById('imagesTabRenders');
+
+  if (previewsTab) {
+    const active = tab === 'previews';
+    previewsTab.classList.toggle('is-active', active);
+    previewsTab.setAttribute('aria-selected', String(active));
+  }
+
+  if (rendersTab) {
+    const active = tab === 'renders';
+    rendersTab.classList.toggle('is-active', active);
+    rendersTab.setAttribute('aria-selected', String(active));
+  }
+
+  renderImagesPanel();
+}
+
+function renderImagesPanel() {
+  const list = document.getElementById('imagesList');
+  if (!list) return;
+
+  if (state.imagesTab === 'previews') {
+    if (!state.previewImages.length) {
+      list.innerHTML = `<p class="images-empty">No previews created yet</p>`;
+      return;
+    }
+
+    list.innerHTML = state.previewImages.map(image => `
+      <button class="image-card" data-image-id="${image.id}" data-image-tab="previews">
+        <img class="image-card__thumb" src="${image.dataUrl}" alt="${image.name}">
+        <div class="image-card__body">
+          <span class="image-card__name">${image.name}</span>
+          <div class="image-card__meta">
+            <span>${relativeTimeLabel(image.createdAt)}</span>
+            <span>Status: 0/1</span>
+          </div>
+        </div>
+      </button>
+    `).join('');
+    return;
+  }
+
+  if (!state.renderImages.length) {
+    list.innerHTML = `<p class="images-empty">No renders produced yet</p>`;
+    return;
+  }
+
+  list.innerHTML = `
+    <div class="render-list">
+      ${state.renderImages.map(image => `
+        <button class="render-item" data-image-id="${image.id}" data-image-tab="renders" ${image.status !== 'completed' ? 'disabled' : ''}>
+          <div class="render-item__head">
+            <span class="render-item__name">${image.name}</span>
+            <span class="render-item__status">${image.status}</span>
+          </div>
+          <div class="render-item__meta">${image.cameraName} · ${image.width} × ${image.height}</div>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderCamerasPanel() {
+  const list = document.getElementById('cameraList');
+  const searchInput = document.getElementById('cameraSearch');
+  if (!list) return;
+
+  if (searchInput && document.activeElement !== searchInput) {
+    searchInput.value = state.cameraQuery;
+  }
+
+  const query = (state.cameraQuery || '').toLowerCase().trim();
+  const visible = query
+    ? state.cameras.filter(camera => camera.name.toLowerCase().includes(query))
+    : state.cameras;
+
+  if (!visible.length) {
+    list.innerHTML = `<p class="camera-empty">No cameras match "${query}"</p>`;
+    return;
+  }
+
+  list.innerHTML = visible.map(camera => `
+    <button class="camera-card${camera.id === state.activeCameraId ? ' is-active' : ''}" data-camera-id="${camera.id}">
+      <span class="camera-card__name">${camera.name}</span>
+      <span class="camera-card__meta">${camera.resolution}</span>
+    </button>
+  `).join('');
+}
+
+function syncCreateImageModal() {
+  const modal = document.getElementById('createImageModal');
+  if (!modal || modal.hidden) return;
+
+  const previewBtn = document.getElementById('createModePreviewBtn');
+  const highResBtn = document.getElementById('createModeHighResBtn');
+  const widthInput = document.getElementById('createImageWidth');
+  const heightInput = document.getElementById('createImageHeight');
+  const filenameInput = document.getElementById('createImageFilename');
+  const formatSelect = document.getElementById('createImageFormat');
+  const transparentToggle = document.getElementById('createImageTransparentBg');
+  const shadowToggle = document.getElementById('createImageShadowFloor');
+  const cameraList = document.getElementById('createImageCameraList');
+  const selectAll = document.getElementById('createImageSelectAll');
+  const cameraCount = document.getElementById('createImageCameraCount');
+
+  if (previewBtn) previewBtn.classList.toggle('is-active', state.createImageMode === 'preview');
+  if (highResBtn) highResBtn.classList.toggle('is-active', state.createImageMode === 'highres');
+  if (widthInput) widthInput.value = String(state.createImageWidth);
+  if (heightInput) heightInput.value = String(state.createImageHeight);
+  if (filenameInput) filenameInput.value = state.createImageFilename;
+  if (formatSelect) formatSelect.value = state.createImageFormat;
+  if (transparentToggle) transparentToggle.checked = state.createImageTransparentBg;
+  if (shadowToggle) shadowToggle.checked = state.createImageShadowFloor;
+  if (cameraCount) cameraCount.textContent = String(state.cameras.length);
+
+  document.querySelectorAll('.create-image-res-btn').forEach(button => {
+    button.classList.toggle('is-active', button.dataset.resolution === state.createImageResolution);
+  });
+
+  if (cameraList) {
+    cameraList.innerHTML = state.cameras.map(camera => `
+      <label class="create-image-camera-item">
+        <input type="checkbox" data-create-camera-id="${camera.id}" ${state.createImageSelectedCameraIds.includes(camera.id) ? 'checked' : ''}>
+        <span>${camera.name}</span>
+        <span class="create-image-camera-item__meta">${camera.resolution}</span>
+      </label>
+    `).join('');
+  }
+
+  if (selectAll) {
+    selectAll.checked = state.createImageSelectedCameraIds.length === state.cameras.length;
+  }
+}
+
+async function openCreateImageModal() {
+  const modal = document.getElementById('createImageModal');
+  if (!modal) return;
+
+  const totalCount = state.previewImages.length + state.renderImages.length + 1;
+  state.createImageFilename = `${slugifyName(getMattressName())}-image${totalCount}`;
+  if (!state.createImageSelectedCameraIds.length) {
+    state.createImageSelectedCameraIds = state.cameras.map(camera => camera.id);
+  }
+
+  modal.hidden = false;
+  syncCreateImageModal();
+}
+
+function closeCreateImageModal() {
+  const modal = document.getElementById('createImageModal');
+  if (modal) modal.hidden = true;
+}
+
+async function openLibraryModal() {
+  const modal = document.getElementById('libraryModal');
+  const preview = document.getElementById('libraryPreviewImage');
+  const nameInput = document.getElementById('libraryMattressName');
+  const countEl = document.getElementById('libraryAvailableCount');
+  if (!modal || !preview || !nameInput || !countEl) return;
+
+  const capture = window.viewportCapture
+    ? await window.viewportCapture({ width: 960, height: 640, transparent: false })
+    : { dataUrl: '' };
+
+  preview.src = capture.dataUrl || '';
+  nameInput.value = getMattressName();
+  countEl.textContent = String(state.libraryAvailableCount);
+  modal.hidden = false;
+}
+
+function closeLibraryModal() {
+  const modal = document.getElementById('libraryModal');
+  if (modal) modal.hidden = true;
+}
+
+function openImageViewer(imageId, tab) {
+  state.viewerImageId = imageId;
+  state.viewerTab = tab;
+  renderImageViewer();
+}
+
+function closeImageViewer() {
+  const viewer = document.getElementById('imageViewer');
+  state.viewerImageId = null;
+  if (viewer) viewer.hidden = true;
+}
+
+function renderImageViewer() {
+  const viewer = document.getElementById('imageViewer');
+  const imageEl = document.getElementById('imageViewerImage');
+  const caption = document.getElementById('imageViewerCaption');
+  const thumbs = document.getElementById('imageViewerThumbs');
+  const meta = document.getElementById('imageViewerMeta');
+  if (!viewer || !imageEl || !caption || !thumbs || !meta) return;
+
+  const images = allImagesForViewer(state.viewerTab);
+  const active = getImageById(state.viewerImageId, state.viewerTab);
+  if (!active) {
+    viewer.hidden = true;
+    return;
+  }
+
+  viewer.hidden = false;
+  imageEl.src = active.dataUrl;
+  caption.textContent = `${active.name}.${active.format} (${active.width}*${active.height})`;
+  meta.innerHTML = `
+    <strong>${active.name}</strong><br>
+    <span>${active.cameraName} · ${relativeTimeLabel(active.createdAt)}</span>
+  `;
+
+  thumbs.innerHTML = images.map(image => `
+    <button class="app-viewer__thumb${image.id === active.id ? ' is-active' : ''}" data-image-id="${image.id}" data-image-tab="${state.viewerTab}">
+      ${state.viewerTab === 'renders' ? `<span class="app-viewer__thumb-badge">${image.status || 'completed'}</span>` : ''}
+      <img src="${image.dataUrl}" alt="${image.name}">
+      <span class="app-viewer__thumb-label">${image.cameraName}</span>
+    </button>
+  `).join('');
+}
+
+function cloneCameraSnapshot(snapshot) {
+  return snapshot
+    ? {
+        position: [...snapshot.position],
+        target: [...snapshot.target],
+      }
+    : null;
+}
+
+async function captureImageForCamera(camera, options) {
+  const restoreSnapshot = window.viewportGetCamera ? cloneCameraSnapshot(window.viewportGetCamera()) : null;
+  if (!camera.isCurrent && camera.snapshot && window.viewportSetCamera) {
+    window.viewportSetCamera(camera.snapshot);
+  }
+
+  const capture = window.viewportCapture
+    ? await window.viewportCapture({
+        width: options.width,
+        height: options.height,
+        transparent: options.transparent,
+      })
+    : { dataUrl: '' };
+
+  if (restoreSnapshot && window.viewportSetCamera) {
+    window.viewportSetCamera(restoreSnapshot);
+  }
+
+  imageUid += 1;
+  return {
+    id: `image-${imageUid}`,
+    name: options.baseName,
+    cameraId: camera.id,
+    cameraName: camera.name,
+    width: options.width,
+    height: options.height,
+    format: options.format,
+    createdAt: new Date().toISOString(),
+    dataUrl: capture.dataUrl || '',
+  };
+}
+
+async function handleCreateImageSubmit() {
+  const selected = state.cameras.filter(camera => state.createImageSelectedCameraIds.includes(camera.id));
+  if (!selected.length) {
+    showToast('Select at least one camera to create an image');
+    return;
+  }
+
+  const options = {
+    width: state.createImageWidth,
+    height: state.createImageHeight,
+    format: state.createImageFormat,
+    transparent: state.createImageTransparentBg,
+    baseName: state.createImageFilename,
+  };
+
+  const createdImages = [];
+  for (const camera of selected) {
+    const image = await captureImageForCamera(camera, options);
+    createdImages.push(image);
+  }
+
+  if (state.createImageMode === 'preview') {
+    state.previewImages.unshift(...createdImages);
+    setImagesTab('previews');
+  } else {
+    const queued = createdImages.map(image => ({ ...image, status: 'queued' }));
+    state.renderImages.unshift(...queued);
+    setImagesTab('renders');
+    window.setTimeout(() => {
+      state.renderImages = state.renderImages.map(image => image.status === 'queued'
+        ? { ...image, status: 'completed' }
+        : image);
+      renderImagesPanel();
+      renderImageViewer();
+    }, 1200);
+  }
+
+  closeCreateImageModal();
+  setSection('images');
+  renderImagesPanel();
+  showToast(state.createImageMode === 'preview' ? 'Preview image created' : 'High resolution render queued');
+}
+
+function addCurrentCamera() {
+  const snapshot = window.viewportGetCamera ? window.viewportGetCamera() : null;
+  const next = createCameraRecord(`Camera ${state.cameras.filter(camera => !camera.isCurrent).length + 1}`, snapshot, false);
+  state.cameras.push(next);
+  state.activeCameraId = next.id;
+  renderCamerasPanel();
+  syncCreateImageModal();
+  showToast(`${next.name} saved`);
+}
+
+function importCameraPresets() {
+  const base = window.viewportGetCamera ? window.viewportGetCamera() : null;
+  if (!base) return;
+
+  const presets = [
+    { name: 'Camera 1', offset: [1.3, 0.6, 0.2] },
+    { name: 'Camera 2', offset: [-1.1, 0.8, 1.2] },
+    { name: 'Camera 3', offset: [0.4, 1.2, -1.5] },
+  ];
+
+  presets.forEach((preset, index) => {
+    const snapshot = {
+      position: [
+        base.position[0] + preset.offset[0],
+        base.position[1] + preset.offset[1],
+        base.position[2] + preset.offset[2],
+      ],
+      target: [...base.target],
+    };
+    state.cameras.push(createCameraRecord(preset.name, snapshot, false));
+    if (index === 0) state.activeCameraId = state.cameras[state.cameras.length - 1].id;
+  });
+
+  renderCamerasPanel();
+  syncCreateImageModal();
+  showToast('Imported 3 camera presets');
+}
+
+function initOutputFeatures() {
+  const createBtn = document.getElementById('createImageBtn');
+  const libraryBtn = document.getElementById('addToLibraryBtn');
+  const styleLibraryBtn = document.getElementById('styleSaveLibraryBtn');
+  const requestBtn = document.getElementById('requestPropBtn');
+  const cameraAddBtn = document.getElementById('cameraAddCurrentBtn');
+  const cameraImportBtn = document.getElementById('cameraImportBtn');
+  const cameraSearch = document.getElementById('cameraSearch');
+  const imageTabs = document.querySelectorAll('[data-images-tab]');
+  const imagesList = document.getElementById('imagesList');
+  const cameraList = document.getElementById('cameraList');
+  const createCloseBtn = document.getElementById('createImageCloseBtn');
+  const libraryCloseBtn = document.getElementById('libraryCloseBtn');
+  const imageViewerCloseBtn = document.getElementById('imageViewerCloseBtn');
+  const createSubmitBtn = document.getElementById('createImageSubmitBtn');
+  const createSelectAll = document.getElementById('createImageSelectAll');
+  const widthInput = document.getElementById('createImageWidth');
+  const heightInput = document.getElementById('createImageHeight');
+  const filenameInput = document.getElementById('createImageFilename');
+  const formatSelect = document.getElementById('createImageFormat');
+  const transparentToggle = document.getElementById('createImageTransparentBg');
+  const shadowToggle = document.getElementById('createImageShadowFloor');
+  const librarySaveBtn = document.getElementById('librarySaveBtn');
+  const libraryNameInput = document.getElementById('libraryMattressName');
+
+  if (createBtn) createBtn.addEventListener('click', openCreateImageModal);
+  if (libraryBtn) libraryBtn.addEventListener('click', openLibraryModal);
+  if (styleLibraryBtn) styleLibraryBtn.addEventListener('click', openLibraryModal);
+  if (requestBtn) requestBtn.addEventListener('click', () => showToast('Request Prop flow is still pending product definition'));
+  if (cameraAddBtn) cameraAddBtn.addEventListener('click', addCurrentCamera);
+  if (cameraImportBtn) cameraImportBtn.addEventListener('click', importCameraPresets);
+  if (createCloseBtn) createCloseBtn.addEventListener('click', closeCreateImageModal);
+  if (libraryCloseBtn) libraryCloseBtn.addEventListener('click', closeLibraryModal);
+  if (imageViewerCloseBtn) imageViewerCloseBtn.addEventListener('click', closeImageViewer);
+  if (createSubmitBtn) createSubmitBtn.addEventListener('click', handleCreateImageSubmit);
+
+  imageTabs.forEach(tab => {
+    tab.addEventListener('click', () => setImagesTab(tab.dataset.imagesTab));
+  });
+
+  if (imagesList) {
+    imagesList.addEventListener('click', event => {
+      const card = event.target.closest('[data-image-id]');
+      if (!card || card.disabled) return;
+      openImageViewer(card.dataset.imageId, card.dataset.imageTab);
+    });
+  }
+
+  if (cameraList) {
+    cameraList.addEventListener('click', event => {
+      const card = event.target.closest('[data-camera-id]');
+      if (!card) return;
+      const camera = state.cameras.find(item => item.id === card.dataset.cameraId);
+      if (!camera) return;
+      state.activeCameraId = camera.id;
+      renderCamerasPanel();
+      if (!camera.isCurrent && camera.snapshot && window.viewportSetCamera) {
+        window.viewportSetCamera(camera.snapshot);
+      }
+    });
+  }
+
+  if (cameraSearch) {
+    cameraSearch.addEventListener('input', () => {
+      state.cameraQuery = cameraSearch.value;
+      renderCamerasPanel();
+    });
+  }
+
+  document.querySelectorAll('.create-image-mode').forEach(button => {
+    button.addEventListener('click', () => {
+      state.createImageMode = button.dataset.imageMode;
+      syncCreateImageModal();
+    });
+  });
+
+  document.querySelectorAll('.create-image-res-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      state.createImageResolution = button.dataset.resolution;
+      const preset = IMAGE_RESOLUTION_PRESETS[state.createImageResolution];
+      state.createImageWidth = preset.width;
+      state.createImageHeight = preset.height;
+      syncCreateImageModal();
+    });
+  });
+
+  if (createSelectAll) {
+    createSelectAll.addEventListener('change', () => {
+      state.createImageSelectedCameraIds = createSelectAll.checked
+        ? state.cameras.map(camera => camera.id)
+        : [];
+      syncCreateImageModal();
+    });
+  }
+
+  document.addEventListener('change', event => {
+    if (event.target.matches('[data-create-camera-id]')) {
+      const id = event.target.dataset.createCameraId;
+      if (event.target.checked) {
+        if (!state.createImageSelectedCameraIds.includes(id)) state.createImageSelectedCameraIds.push(id);
+      } else {
+        state.createImageSelectedCameraIds = state.createImageSelectedCameraIds.filter(item => item !== id);
+      }
+      syncCreateImageModal();
+    }
+  });
+
+  if (widthInput) widthInput.addEventListener('input', () => { state.createImageWidth = Number(widthInput.value) || 1500; });
+  if (heightInput) heightInput.addEventListener('input', () => { state.createImageHeight = Number(heightInput.value) || 843; });
+  if (filenameInput) filenameInput.addEventListener('input', () => { state.createImageFilename = filenameInput.value.trim() || 'mattress-image'; });
+  if (formatSelect) formatSelect.addEventListener('change', () => { state.createImageFormat = formatSelect.value; });
+  if (transparentToggle) transparentToggle.addEventListener('change', () => { state.createImageTransparentBg = transparentToggle.checked; });
+  if (shadowToggle) shadowToggle.addEventListener('change', () => { state.createImageShadowFloor = shadowToggle.checked; });
+
+  if (librarySaveBtn && libraryNameInput) {
+    librarySaveBtn.addEventListener('click', () => {
+      const name = libraryNameInput.value.trim() || getMattressName();
+      state.libraryAvailableCount = Math.max(0, state.libraryAvailableCount - 1);
+      const countEl = document.getElementById('libraryAvailableCount');
+      if (countEl) countEl.textContent = String(state.libraryAvailableCount);
+      closeLibraryModal();
+      showToast(`Saved ${name} to library`);
+    });
+  }
+
+  document.querySelectorAll('[data-close-modal]').forEach(backdrop => {
+    backdrop.addEventListener('click', () => {
+      if (backdrop.dataset.closeModal === 'create-image') closeCreateImageModal();
+      if (backdrop.dataset.closeModal === 'library') closeLibraryModal();
+    });
+  });
+
+  const viewerThumbs = document.getElementById('imageViewerThumbs');
+  if (viewerThumbs) {
+    viewerThumbs.addEventListener('click', event => {
+      const button = event.target.closest('[data-image-id]');
+      if (!button) return;
+      openImageViewer(button.dataset.imageId, button.dataset.imageTab);
+    });
+  }
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    closeCreateImageModal();
+    closeLibraryModal();
+    closeImageViewer();
+  });
+
+  renderImagesPanel();
+  renderCamerasPanel();
+}
+
+
 // ── Navigation ───────────────────────────────────────────
 
 function setSection(section) {
@@ -2123,6 +3049,9 @@ function setMode(mode) {
     navInternal.classList.remove('nav-group--hidden');
     setSection('layers');
   }
+
+  updateViewportLabel();
+  syncViewportLayers();
 }
 
 function initModeToggle() {
@@ -2156,6 +3085,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initLabelPanel();
   initHandlePanel();
   initBottomPanel();
+  initLayersPanel();
   initStylePanel();
+  initOutputFeatures();
   updateViewportLabel();
+  syncViewportLayers();
 });
