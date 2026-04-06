@@ -29,8 +29,13 @@ type: project
 
 - [x] Size panel — done: 2026-04-02 — 9 sizes, proportional CSS rects, live search, orange active footer, Three.js geometry rebuilds on selection
 - [x] Height panel — done: 2026-04-02 — searchable preset cards, active state, viewport label updates, Three.js mattress thickness rebuilds
-- [ ] External configuration panels (Top, Wall, Tape, Label, Handle, Bottom) — priority: high — complexity: complex
-- [ ] Style system (Textures, Materials, Colors, Properties) — priority: high — complexity: complex
+- [x] Top panel — done: 2026-04-04 — Add Top CTA, type selector, quilting pattern swatches with drill-down picker, tufts config form; shared UI primitives established in app.css
+- [x] Wall panel — done: 2026-04-06
+- [x] Tape panel — done: 2026-04-06
+- [x] Label panel — done: 2026-04-06
+- [x] Handle panel — done: 2026-04-06 (refactored to type-section-header pattern: 2026-04-06)
+- [x] Bottom panel — done: 2026-04-06
+- [x] Style panel (Textures, Materials, Colors, Properties) — done: 2026-04-06
 - [ ] Internal layers panel (Layers, Exploded/Cutaway view) — priority: high — complexity: complex
 - [ ] Create Image modal + output — priority: medium — complexity: medium
 - [ ] Add to Library modal — priority: medium — complexity: medium

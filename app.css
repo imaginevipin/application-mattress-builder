@@ -811,3 +811,1823 @@ input:focus-visible {
 .app-toast[hidden] {
   display: none;
 }
+
+
+/* ─────────────────────────────────────────────────────────
+   PANEL SUBVIEWS
+   Used by Top (and future panels) for drill-down views
+   ───────────────────────────────────────────────────────── */
+
+.panel-subview {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.panel-subview[hidden] {
+  display: none;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   TOP PANEL (shared patterns reused by Wall / Bottom)
+   ───────────────────────────────────────────────────────── */
+
+/* CTA bar — the "Add Top" / "Add Wall" etc. button strip */
+
+.panel-cta-bar {
+  padding: var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+}
+
+.btn-panel-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  background: var(--surface-primary-default);
+  border: none;
+  border-radius: var(--br-100);
+  color: #ffffff;
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn-panel-cta:hover {
+  background: var(--surface-primary-default-hover);
+}
+
+.btn-panel-cta:active {
+  transform: scale(0.98);
+}
+
+
+/* Type selector row — ‹ [Box Pillow Top ▾] › */
+
+.type-selector-row {
+  display: flex;
+  align-items: center;
+  padding: var(--s-200) var(--s-300);
+  border-bottom: var(--bw) solid var(--border-default);
+  gap: var(--s-100);
+}
+
+.type-cycle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--br-100);
+  color: var(--text-default-placeholder);
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+}
+
+.type-cycle-btn .material-symbols-outlined {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.type-cycle-btn:hover {
+  color: var(--text-default-heading);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.type-name-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: var(--s-200);
+  padding: 0 var(--s-100);
+  color: var(--text-default-heading);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: var(--text-small-lh);
+  min-width: 0;
+  transition: color 0.15s;
+}
+
+.type-name-btn span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-name-btn__arrow {
+  font-size: 16px !important;
+  color: var(--text-default-placeholder);
+  flex-shrink: 0;
+}
+
+.type-name-btn:hover {
+  color: var(--text-primary-default);
+}
+
+.type-name-btn:hover .type-name-btn__arrow {
+  color: var(--text-primary-default);
+}
+
+
+/* Pattern rows — label + swatch button */
+
+.pattern-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-300);
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default);
+}
+
+.pattern-row__label {
+  font-size: var(--text-small-size);
+  font-weight: 400;
+  color: var(--text-default-body);
+  line-height: var(--text-small-lh);
+}
+
+.pattern-swatch-btn {
+  display: block;
+  flex-shrink: 0;
+  border-radius: var(--br-100);
+  overflow: hidden;
+  border: 1.5px solid var(--border-default-secondary);
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.pattern-swatch-btn:hover {
+  border-color: var(--border-primary-default);
+  transform: scale(1.06);
+}
+
+.pattern-thumb {
+  display: block;
+  width: 38px;
+  height: 38px;
+}
+
+
+/* Feature add row — "+ Add tufts / Alpha texture" */
+
+.feature-add-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default);
+}
+
+.feature-add-row[hidden] {
+  display: none;
+}
+
+.btn-feature-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary-default);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: var(--text-small-lh);
+  transition: color 0.15s;
+}
+
+.btn-feature-add .material-symbols-outlined {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-feature-add:hover {
+  color: var(--text-primary-default-hover);
+}
+
+.btn-text-subtle {
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 400;
+  color: var(--text-default-placeholder);
+  line-height: var(--text-small-lh);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.btn-text-subtle:hover {
+  color: var(--text-default-body);
+  text-decoration-color: currentColor;
+}
+
+
+/* Tuft config — expandable section */
+
+.tuft-config {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.tuft-config[hidden] {
+  display: none;
+}
+
+.tuft-config__header {
+  border-bottom: var(--bw) solid var(--border-default);
+}
+
+.config-field-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-300);
+  padding: var(--s-200) var(--s-400);
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   SHARED FORM ELEMENTS
+   Used across Top / Wall / Tape / Label / Handle / Bottom
+   ───────────────────────────────────────────────────────── */
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-200);
+  padding: var(--s-300) var(--s-400);
+}
+
+.form-grid-2--actions {
+  padding-top: 0;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-100);
+}
+
+.form-field-label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+  color: var(--text-default-placeholder);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.form-input {
+  width: 100%;
+  height: 30px;
+  padding: 0 var(--s-300);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--br-100);
+  color: var(--text-default-heading);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 400;
+  line-height: 1;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.form-input:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.form-input:focus {
+  border-color: var(--border-primary-focus);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(236, 78, 11, 0.12);
+}
+
+.form-input--inline {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.form-input[type="number"]::-webkit-inner-spin-button,
+.form-input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.4;
+}
+
+/* Range slider */
+
+.form-slider-field {
+  padding: var(--s-100) var(--s-400) var(--s-300);
+}
+
+.form-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s-200);
+}
+
+.form-slider-val {
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-default-body);
+  min-width: 28px;
+  text-align: right;
+}
+
+.form-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    to right,
+    var(--surface-primary-default) 0%,
+    var(--surface-primary-default) var(--fill, 6%),
+    rgba(255, 255, 255, 0.12) var(--fill, 6%),
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.form-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface-primary-default);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.form-range::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 6px rgba(236, 78, 11, 0.18);
+}
+
+.form-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface-primary-default);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+/* Form action buttons (Mirror Tuft, All Sides, etc.) */
+
+.btn-form-action {
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--br-100);
+  color: var(--text-default-body);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-form-action:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-default-heading);
+}
+
+.btn-form-action.is-active {
+  background: rgba(236, 78, 11, 0.15);
+  border-color: var(--border-primary-default);
+  color: var(--text-primary-default);
+}
+
+/* Save Preset button */
+
+.btn-save-preset {
+  display: block;
+  width: calc(100% - var(--s-800));
+  margin: var(--s-100) var(--s-400) var(--s-400);
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--br-100);
+  color: var(--text-default-body);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-save-preset:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--text-default-heading);
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   PATTERN PICKER (shared drill-down sub-view)
+   ───────────────────────────────────────────────────────── */
+
+.picker-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+}
+
+.btn-back-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-default-body);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.btn-back-nav .material-symbols-outlined {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.btn-back-nav:hover {
+  color: var(--text-default-heading);
+}
+
+.btn-upload-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px var(--s-300);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--br-100);
+  color: var(--text-default-body);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn-upload-action .material-symbols-outlined {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.btn-upload-action:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-default-heading);
+}
+
+.pattern-picker-body {
+  padding: var(--s-300);
+}
+
+.pattern-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-300);
+}
+
+.pattern-card {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--border-default-secondary);
+  border-radius: var(--br-200);
+  overflow: hidden;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, transform 0.1s;
+}
+
+.pattern-card:hover {
+  border-color: var(--grey-600);
+  transform: translateY(-1px);
+}
+
+.pattern-card.is-active {
+  border-color: var(--border-primary-default);
+}
+
+.pattern-card__thumb {
+  display: block;
+  width: 100%;
+  height: 88px;
+}
+
+.pattern-card__name {
+  display: block;
+  padding: var(--s-200) var(--s-300);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text-default-body);
+  background: var(--surface-default-secondary);
+  border-top: 1px solid var(--border-default-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pattern-card.is-active .pattern-card__name {
+  background: var(--surface-primary-default-hover);
+  color: #ffffff;
+  border-top-color: var(--surface-primary-default-hover);
+}
+
+.pattern-grid-empty {
+  grid-column: 1 / -1;
+  padding: var(--s-500) 0;
+  font-size: var(--text-small-size);
+  color: var(--text-default-placeholder);
+  text-align: center;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   CSS PATTERN DEFINITIONS
+   ───────────────────────────────────────────────────────── */
+
+.ptn-diamond {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image:
+    repeating-linear-gradient(45deg,  rgba(255,255,255,.22) 0, rgba(255,255,255,.22) 1px, transparent 0, transparent 8px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.22) 0, rgba(255,255,255,.22) 1px, transparent 0, transparent 8px);
+  background-size: 16px 16px;
+}
+
+.ptn-xshape {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(255,255,255,.2) 0, rgba(255,255,255,.2) 1px, transparent 0, transparent 10px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.2) 0, rgba(255,255,255,.2) 1px, transparent 0, transparent 10px);
+  background-size: 10px 10px;
+}
+
+.ptn-buttons {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.55) 1.5px, transparent 1.5px) 0    0    / 9px 9px,
+    radial-gradient(circle, rgba(255,255,255,.55) 1.5px, transparent 1.5px) 4.5px 4.5px / 9px 9px;
+}
+
+.ptn-rolling {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image:
+    repeating-linear-gradient(60deg, rgba(255,255,255,.28) 0, rgba(255,255,255,.28) 1.5px, transparent 0, transparent 9px);
+}
+
+.ptn-polkadot {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.5) 2.5px, transparent 2.5px);
+  background-size: 11px 11px;
+}
+
+.ptn-scallop {
+  background-color: rgba(255, 255, 255, 0.03);
+  background-image:
+    radial-gradient(ellipse 100% 55% at 50% 0%,   transparent 68%, rgba(255,255,255,.28) 70%, rgba(255,255,255,.28) 72%, transparent 73%),
+    radial-gradient(ellipse 100% 55% at 50% 100%, transparent 68%, rgba(255,255,255,.28) 70%, rgba(255,255,255,.28) 72%, transparent 73%);
+  background-size: 14px 14px;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   TAPE / LABEL / HANDLE PANELS
+   ───────────────────────────────────────────────────────── */
+
+/* 3-column form grid (Scale X / Y / Z) */
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-200);
+  padding: var(--s-300) var(--s-400);
+}
+
+/* Inner CTA bar (Reset Scale / Save Preset) — no top border, tighter top padding */
+
+.panel-cta-bar--inner {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* Foot CTA bar — sticks to bottom of scroll container */
+
+.panel-cta-bar--foot {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface-panel);
+  border-top: var(--bw) solid var(--border-default-secondary);
+  border-bottom: none;
+  z-index: 1;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   TYPE SECTION HEADER (accordion — Top / Wall main view)
+   ───────────────────────────────────────────────────────── */
+
+.type-section-header {
+  display: flex;
+  align-items: center;
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+}
+
+/* Type name — expands to fill row, click opens type picker */
+.type-section-name {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--s-300);
+  padding: var(--s-200) var(--s-400);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-body-size);
+  font-weight: 500;
+  color: var(--text-default-heading);
+  text-align: left;
+  transition: color 0.15s;
+  min-width: 0;
+}
+
+/* Thumbnail inside the name button — treat as a flex-shrink item */
+.type-section-name .top-type-thumb,
+.type-section-name .wall-type-thumb,
+.type-section-name .type-thumb-sm {
+  flex-shrink: 0;
+  display: block;
+}
+
+.type-section-name span:last-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-section-name:hover {
+  color: var(--text-primary-default);
+}
+
+/* Collapse chevron — separate button, right side */
+.type-section-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 40px;
+  color: var(--text-default-placeholder);
+  transition: color 0.15s;
+}
+
+.type-section-collapse .material-symbols-outlined {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.type-section-collapse:hover {
+  color: var(--text-default-heading);
+}
+
+.type-section-body[hidden] { display: none; }
+
+/* Type thumb row — small swatch preview below section header */
+
+.type-thumb-row {
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default);
+}
+
+.top-type-thumb,
+.wall-type-thumb {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--br-100);
+  border: var(--bw) solid var(--border-default-secondary);
+  overflow: hidden;
+  background: var(--surface-default-secondary);
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   ALPHA BADGE
+   ───────────────────────────────────────────────────────── */
+
+.alpha-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font), sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary-default);
+  border: 1.5px solid var(--border-primary-default);
+  border-radius: var(--br-100);
+  padding: 2px 8px;
+  background: transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.alpha-badge--sm {
+  font-size: 10px;
+  padding: 1px 6px;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   TUFT CONFIG — updated header layout
+   ───────────────────────────────────────────────────────── */
+
+.tuft-config__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-200);
+  padding: var(--s-200) var(--s-300);
+  border-bottom: var(--bw) solid var(--border-default);
+}
+
+.tuft-config__header-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--s-300);
+  min-width: 0;
+}
+
+.tuft-config__header-left .tuft-swatch {
+  flex-shrink: 0;
+}
+
+.tuft-config__header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--s-100);
+  flex-shrink: 0;
+}
+
+.type-selector-row--compact {
+  padding: 0;
+  gap: 2px;
+}
+
+.tuft-type-name {
+  flex: 1;
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  color: var(--text-default-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.tuft-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--br-100);
+  color: var(--text-default-placeholder);
+  background: transparent;
+  transition: color 0.15s, background 0.15s;
+}
+
+.tuft-action-btn .material-symbols-outlined {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tuft-action-btn:hover {
+  color: var(--text-default-heading);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tuft-swatch-row {
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default);
+}
+
+.tuft-swatch {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-default-secondary);
+  border: var(--bw) solid var(--border-default-secondary);
+}
+
+#topTuftBody[hidden],
+#wallTuftBody[hidden] { display: none; }
+
+
+/* ─────────────────────────────────────────────────────────
+   TOP & WALL TYPE PICKER ILLUSTRATIONS
+   Outline/neutral style — matches Size & Height panel cards.
+   Minimal primary color; active state handled by card border.
+   ───────────────────────────────────────────────────────── */
+
+/* Shared base: white thumb, no overflow */
+.tt-box-pillow,
+.tt-euro-15, .tt-euro-2, .tt-euro-25, .tt-euro-3,
+.tt-euro-375, .tt-euro-4, .tt-euro-575,
+.wt-quilted, .wt-stretch, .wt-damask, .wt-woven, .wt-smooth {
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* Shared: thin horizontal layer lines at bottom (mattress body) */
+.tt-box-pillow::after,
+.tt-euro-15::after, .tt-euro-2::after, .tt-euro-25::after, .tt-euro-3::after,
+.tt-euro-375::after, .tt-euro-4::after, .tt-euro-575::after {
+  content: '';
+  position: absolute;
+  left: 10%; right: 10%; bottom: 14%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 36%;
+  background: repeating-linear-gradient(
+    180deg,
+    #cccccc 0px, #cccccc 2px,
+    transparent 2px, transparent 9px
+  );
+}
+
+/* Box Pillow Top — outlined rounded block at top */
+.tt-box-pillow::before {
+  content: '';
+  position: absolute;
+  top: 12%; left: 14%; right: 14%;
+  height: 36%;
+  border: 1.5px solid #999999;
+  border-radius: 3px 3px 0 0;
+  background: transparent;
+}
+
+/* Euro Top variants — flat outlined bar, height grows proportionally */
+.tt-euro-15::before  { content: ''; position: absolute; top: 52%; left: 10%; right: 10%; height:  6%; border: 1.5px solid #999999; background: transparent; }
+.tt-euro-2::before   { content: ''; position: absolute; top: 46%; left: 10%; right: 10%; height: 10%; border: 1.5px solid #999999; background: transparent; }
+.tt-euro-25::before  { content: ''; position: absolute; top: 40%; left: 10%; right: 10%; height: 14%; border: 1.5px solid #999999; background: transparent; }
+.tt-euro-3::before   { content: ''; position: absolute; top: 34%; left: 10%; right: 10%; height: 18%; border: 1.5px solid #999999; background: transparent; }
+.tt-euro-375::before { content: ''; position: absolute; top: 28%; left: 10%; right: 10%; height: 22%; border: 1.5px solid #999999; background: transparent; }
+.tt-euro-4::before   { content: ''; position: absolute; top: 22%; left: 10%; right: 10%; height: 26%; border: 1.5px solid #999999; background: transparent; }
+.tt-euro-575::before { content: ''; position: absolute; top: 10%; left: 10%; right: 10%; height: 38%; border: 1.5px solid #999999; background: transparent; }
+
+/* Wall type thumbnails — neutral fabric texture representations */
+.wt-quilted {
+  background:
+    repeating-linear-gradient(45deg,  transparent 0, transparent 7px, #d0d0d0 7px, #d0d0d0 8px),
+    repeating-linear-gradient(-45deg, transparent 0, transparent 7px, #d0d0d0 7px, #d0d0d0 8px),
+    #f5f5f5;
+}
+
+.wt-stretch {
+  background:
+    repeating-linear-gradient(90deg, transparent 0, transparent 4px, #d0d0d0 4px, #d0d0d0 5px),
+    #f0f0f0;
+}
+
+.wt-damask {
+  background:
+    repeating-linear-gradient(180deg, #c8c8c8 0, #c8c8c8 2px, transparent 2px, transparent 10px),
+    repeating-linear-gradient(90deg,  #c8c8c8 0, #c8c8c8 2px, transparent 2px, transparent 10px),
+    #f0ece8;
+}
+
+.wt-woven {
+  background:
+    repeating-linear-gradient(45deg,  #d0cdc9 0, #d0cdc9 3px, transparent 3px, transparent 8px),
+    repeating-linear-gradient(-45deg, #bfbcb8 0, #bfbcb8 3px, transparent 3px, transparent 8px),
+    #eeebe7;
+}
+
+.wt-smooth {
+  background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+}
+
+/* Section label ("Tape properties", "Label properties", …) */
+
+.section-label {
+  display: block;
+  padding: var(--s-400) var(--s-400) var(--s-100);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  color: var(--text-default-placeholder);
+  text-transform: uppercase;
+}
+
+.section-label__note {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-disabled-default);
+}
+
+/* Type swatch row — [thumb] [name ▾] — used by Tape / Label / Handle */
+
+.type-swatch-row {
+  display: flex;
+  align-items: center;
+  padding: var(--s-200) var(--s-300);
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+}
+
+.type-swatch-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--s-300);
+  flex: 1;
+  min-width: 0;
+  color: var(--text-default-heading);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  line-height: var(--text-small-lh);
+  padding: var(--s-100) var(--s-100);
+  border-radius: var(--br-100);
+  transition: color 0.15s, background 0.15s;
+}
+
+.type-swatch-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-default-heading);
+}
+
+.type-thumb-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--br-100);
+  border: var(--bw) solid var(--border-default-secondary);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.type-swatch-btn__name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-swatch-btn__arrow {
+  font-size: 16px !important;
+  color: var(--text-default-placeholder);
+  flex-shrink: 0;
+}
+
+/* Side select row */
+
+.side-select-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-300);
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+}
+
+.form-select {
+  height: 30px;
+  padding: 0 var(--s-300);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--br-100);
+  color: var(--text-default-heading);
+  font-family: var(--font), sans-serif;
+  font-size: var(--text-small-size);
+  font-weight: 400;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  /* Remove default OS arrow on WebKit */
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: var(--s-700);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237f7f7f' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.form-select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.form-select:focus {
+  border-color: var(--border-primary-focus);
+  box-shadow: 0 0 0 3px rgba(236, 78, 11, 0.12);
+}
+
+.form-select option {
+  background: #1a1a1a;
+  color: var(--text-default-body);
+}
+
+/* Slider hint text (Handle Position Z) */
+
+.form-slider-hint {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-default-placeholder);
+  padding: 0 0 var(--s-200);
+}
+
+/* Mirror Top to Bottom toggle row */
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-300);
+  padding: var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+}
+
+.toggle-label {
+  font-size: var(--text-small-size);
+  font-weight: 400;
+  color: var(--text-default-body);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--white);
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.toggle-input:checked + .toggle-track {
+  background: var(--surface-primary-default);
+}
+
+.toggle-input:checked + .toggle-track::after {
+  transform: translateX(14px);
+}
+
+.toggle-input:focus-visible + .toggle-track {
+  outline: 2px solid var(--border-primary-focus);
+  outline-offset: 2px;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   TAPE STYLE CSS PREVIEWS
+   ───────────────────────────────────────────────────────── */
+
+.tape-flat {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.18) 0, rgba(255,255,255,0.18) 1.5px,
+    transparent 1.5px, transparent 10px
+  );
+}
+
+.tape-corded {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 4px,
+    rgba(255,255,255,0.24) 4px, rgba(255,255,255,0.24) 6px,
+    rgba(255,255,255,0.08) 6px, rgba(255,255,255,0.08) 10px
+  );
+}
+
+.tape-piped {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.28) 0, rgba(255,255,255,0.28) 2px,
+      transparent 2px, transparent 12px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 1px,
+      transparent 1px, transparent 6px
+    );
+}
+
+.tape-ribbon {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.15) 0, rgba(255,255,255,0.15) 2px,
+    transparent 2px, transparent 8px
+  );
+}
+
+.tape-decorative {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.4) 1.5px, transparent 1.5px) 0 0 / 7px 7px,
+    radial-gradient(circle, rgba(255,255,255,0.4) 1.5px, transparent 1.5px) 3.5px 3.5px / 7px 7px;
+}
+
+.tape-woven {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(255,255,255,0.12) 0, rgba(255,255,255,0.12) 1.5px, transparent 1.5px, transparent 5px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0, rgba(255,255,255,0.12) 1.5px, transparent 1.5px, transparent 5px);
+}
+
+.tape-oval {
+  background-color: rgba(255, 255, 255, 0.04);
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,0.22) 0, rgba(255,255,255,0.22) 2px,
+    transparent 2px, transparent 8px
+  );
+}
+
+/* Inline select — used inside pattern-row for Label, Side, etc. */
+.form-select--inline {
+  width: auto;
+  min-width: 90px;
+  max-width: 160px;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   LABEL TYPE CSS PREVIEWS
+   ───────────────────────────────────────────────────────── */
+
+.lbl-sm-rect {
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lbl-sm-rect::after  { content: ''; display: block; width: 52%;  height: 32%; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 2px; }
+.lbl-lg-rect::after  { content: ''; display: block; width: 72%;  height: 36%; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 2px; }
+.lbl-square::after   { content: ''; display: block; width: 40%;  height: 40%; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 2px; }
+.lbl-oval::after     { content: ''; display: block; width: 55%;  height: 30%; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 999px; }
+.lbl-tag::after      { content: ''; display: block; width: 38%;  height: 50%; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 2px 2px 2px 999px; }
+.lbl-strip::after    { content: ''; display: block; width: 80%;  height: 20%; border: 1.5px solid rgba(255,255,255,0.35); border-radius: 999px; }
+
+.lbl-lg-rect,
+.lbl-square,
+.lbl-oval,
+.lbl-tag,
+.lbl-strip {
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   HANDLE TYPE CSS PREVIEWS
+   ───────────────────────────────────────────────────────── */
+
+.hdl-horizontal,
+.hdl-vertical,
+.hdl-loop,
+.hdl-strap,
+.hdl-ring,
+.hdl-cord {
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hdl-horizontal::after { content: ''; display: block; width: 68%; height: 14%; background: rgba(255,255,255,0.28); border-radius: 999px; }
+.hdl-vertical::after   { content: ''; display: block; width: 14%; height: 58%; background: rgba(255,255,255,0.28); border-radius: 999px; }
+.hdl-loop::after       { content: ''; display: block; width: 42%; height: 42%; border: 4px solid rgba(255,255,255,0.3); border-radius: 50%; background: transparent; }
+.hdl-strap::after      { content: ''; display: block; width: 62%; height: 18%; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 3px, transparent 3px, transparent 6px); border-radius: 4px; }
+.hdl-ring::after       { content: ''; display: block; width: 36%; height: 36%; border: 5px solid rgba(255,255,255,0.28); border-radius: 50%; background: transparent; }
+.hdl-cord::after       { content: ''; display: block; width: 56%; height: 10%; background: rgba(255,255,255,0.22); border-radius: 999px; box-shadow: 0 8px 0 rgba(255,255,255,0.12), 0 -8px 0 rgba(255,255,255,0.12); }
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Tab bar
+   ───────────────────────────────────────────────────────── */
+
+.style-tabs {
+  display: flex;
+  border-bottom: var(--bw) solid var(--border-default-secondary);
+  flex-shrink: 0;
+}
+
+.style-tab {
+  flex: 1;
+  padding: var(--s-300) 0;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  color: var(--text-default-placeholder);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.style-tab:hover {
+  color: var(--text-default-body);
+}
+
+.style-tab.is-active {
+  color: var(--text-primary-default);
+  border-bottom-color: var(--border-primary-default);
+}
+
+/* Tab panes */
+
+.style-tab-pane {
+  display: flex;
+  flex-direction: column;
+}
+
+.style-tab-pane[hidden] {
+  display: none;
+}
+
+/* Search bar with inline Upload button (Textures tab) */
+.style-search-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-200);
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default);
+  position: relative;
+}
+
+.style-search-bar .panel-search-icon {
+  position: static;
+  transform: none;
+  font-size: 16px;
+  color: var(--text-default-placeholder);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.style-search-bar .panel-search-input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  padding-left: var(--s-200);
+}
+
+.style-upload-inline {
+  flex-shrink: 0;
+  font-size: 12px;
+  padding: 5px var(--s-300);
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Texture / Material asset grid
+   ───────────────────────────────────────────────────────── */
+
+.style-asset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-300);
+}
+
+/* Asset card — extends pattern-card with relative positioning for badge */
+
+.style-asset-thumb {
+  display: block;
+  width: 100%;
+  height: 88px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--br-200) var(--br-200) 0 0;
+}
+
+.style-asset-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px var(--s-200);
+  background: linear-gradient(90deg, var(--papaya-600), var(--papaya-400));
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Materials filter chips
+   ───────────────────────────────────────────────────────── */
+
+.style-filter-chips {
+  display: flex;
+  gap: var(--s-200);
+  padding: var(--s-300) var(--s-400);
+  border-bottom: var(--bw) solid var(--border-default);
+  flex-wrap: wrap;
+}
+
+.style-chip {
+  padding: 4px var(--s-300);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 400;
+  border: var(--bw) solid var(--border-default-secondary);
+  color: var(--text-default-placeholder);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.style-chip:hover {
+  color: var(--text-default-body);
+  border-color: var(--grey-600);
+}
+
+.style-chip.is-active {
+  background: var(--surface-default-secondary);
+  border-color: var(--grey-600);
+  color: var(--text-default-heading);
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Material CSS previews
+   ───────────────────────────────────────────────────────── */
+
+.mat-linen-cotton-1 { background: #c8bfb0; }
+.mat-linen-cotton-2 { background: #8fa8c4; }
+.mat-linen-cotton-3 { background: #a0b8cc; }
+.mat-fabric-warm    { background: #ccc0a0; }
+.mat-fabric-cool    { background: #b0c4d4; }
+.mat-fabric-neutral { background: #d8d0c4; }
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Colors tab: Color picker
+   ───────────────────────────────────────────────────────── */
+
+.color-picker-wrap {
+  padding: var(--s-400);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-300);
+}
+
+/* SV gradient field */
+.color-picker-field {
+  width: 100%;
+  aspect-ratio: 1.4;
+  border-radius: var(--br-100);
+  position: relative;
+  cursor: crosshair;
+  overflow: hidden;
+  background:
+    linear-gradient(to bottom, transparent 0%, #000 100%),
+    linear-gradient(to right,  #fff 0%, hsl(var(--cp-hue, 0), 100%, 50%) 100%);
+  flex-shrink: 0;
+}
+
+.color-picker-cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.4);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  top: 10%;
+  left: 90%;
+}
+
+/* Hue rainbow slider */
+.color-picker-hue-wrap {
+  position: relative;
+}
+
+.color-picker-hue {
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  background: linear-gradient(to right,
+    #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+}
+
+.color-picker-hue-thumb {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  top: 50%;
+  left: 0%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Colors tab: HEX row
+   ───────────────────────────────────────────────────────── */
+
+.color-hex-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-200);
+  padding: 0 var(--s-400) var(--s-300);
+}
+
+.color-hex-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-default-placeholder);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.color-hex-eyedropper {
+  color: var(--text-default-placeholder);
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.color-hex-eyedropper:hover { color: var(--text-default-body); }
+
+.color-hex-eyedropper .material-symbols-outlined {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.color-hex-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.color-preview-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--br-100);
+  background: #ffffff;
+  border: var(--bw) solid var(--border-default-secondary);
+  flex-shrink: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Colors tab: RGB channel sliders
+   ───────────────────────────────────────────────────────── */
+
+.color-channels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-200);
+  padding: 0 var(--s-400) var(--s-300);
+}
+
+.color-channel-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-300);
+}
+
+.color-channel-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-default-placeholder);
+  width: 10px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.color-channel-range {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.color-channel-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  cursor: pointer;
+}
+
+.color-channel-range--r {
+  background: linear-gradient(to right, rgb(0, var(--cp-g, 255), var(--cp-b, 255)), rgb(255, var(--cp-g, 255), var(--cp-b, 255)));
+}
+.color-channel-range--g {
+  background: linear-gradient(to right, rgb(var(--cp-r, 255), 0, var(--cp-b, 255)), rgb(var(--cp-r, 255), 255, var(--cp-b, 255)));
+}
+.color-channel-range--b {
+  background: linear-gradient(to right, rgb(var(--cp-r, 255), var(--cp-g, 255), 0), rgb(var(--cp-r, 255), var(--cp-g, 255), 255));
+}
+
+.color-channel-val {
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-default-body);
+  width: 26px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Colors tab: Swatches
+   ───────────────────────────────────────────────────────── */
+
+.color-swatches-section {
+  padding: var(--s-200) var(--s-400) var(--s-400);
+  border-top: var(--bw) solid var(--border-default-secondary);
+}
+
+.color-swatches-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--s-300);
+}
+
+.color-swatches-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-default-placeholder);
+}
+
+.color-swatches-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.color-swatch-action-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--br-100);
+  border: var(--bw) solid var(--border-default-secondary);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--text-default-body);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-swatch-action-btn:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.18);
+  color: var(--text-default-heading);
+}
+
+.color-swatches-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-200);
+}
+
+.color-swatch-item {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--br-100);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.color-swatch-item:hover { transform: scale(1.1); }
+
+.color-swatch-item.is-active {
+  border-color: var(--border-primary-default);
+}
+
+.color-swatches-empty {
+  font-size: 11px;
+  color: var(--text-default-placeholder);
+  font-style: italic;
+}
+
+
+/* ─────────────────────────────────────────────────────────
+   STYLE PANEL — Properties tab
+   ───────────────────────────────────────────────────────── */
+
+/* Outlined CTA button variant (Save in library) */
+.btn-panel-cta--outline {
+  background: transparent;
+  border: var(--bw) solid var(--border-default-secondary);
+  color: var(--text-default-body);
+  gap: var(--s-200);
+  font-size: var(--text-small-size);
+}
+
+.btn-panel-cta--outline:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text-default-heading);
+}
+
+.btn-panel-cta--outline .material-symbols-outlined {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Material preview swatch */
+.style-material-preview {
+  margin: 0 var(--s-400) var(--s-300);
+  width: calc(100% - var(--s-800));
+  aspect-ratio: 1;
+  border-radius: var(--br-200);
+  background: #c8bfb0;
+  border: var(--bw) solid var(--border-default-secondary);
+}
+
+/* Front Texture / Fit Texture toggle row — stacked layout */
+.style-texture-type-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-200);
+  padding: var(--s-400) var(--s-400) var(--s-300);
+}
+
+.style-texture-type-row .section-label {
+  padding: 0;
+  margin: 0;
+}
+
+.style-texture-btns {
+  display: flex;
+  gap: var(--s-200);
+}
+
+.style-texture-btn {
+  flex: 1;
+  padding: var(--s-200) var(--s-300);
+  border-radius: var(--br-100);
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  border: var(--bw) solid var(--border-default-secondary);
+  color: var(--text-default-placeholder);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.style-texture-btn:hover {
+  color: var(--text-default-body);
+  border-color: var(--grey-600);
+}
+
+.style-texture-btn.is-active {
+  border-color: var(--border-primary-default);
+  color: var(--text-primary-default);
+  background: rgba(236, 78, 11, 0.08);
+}
+
+/* Dimension row (Width + Height inputs + reset button) */
+.style-dimension-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-200);
+  padding: 0 var(--s-400) var(--s-300);
+}
+
+.style-dimension-row .form-grid-2 {
+  flex: 1;
+  min-width: 0;
+}
+
+.style-dimension-reset {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: var(--bw) solid var(--border-default-secondary);
+  color: var(--text-default-placeholder);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.style-dimension-reset:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text-default-body);
+}
+
+.style-dimension-reset .material-symbols-outlined {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Position X / Y grid (no padding override needed — uses own class) */
+.style-pos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-200);
+  padding: 0 var(--s-400) var(--s-300);
+}
+
+/* Rotation preset buttons */
+.style-rotation-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-200);
+  padding: 0 var(--s-400) var(--s-400);
+}
+
+.style-rot-btn {
+  padding: 6px 0;
+  border-radius: var(--br-100);
+  font-size: 11px;
+  font-weight: 500;
+  border: var(--bw) solid var(--border-default-secondary);
+  color: var(--text-default-placeholder);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.style-rot-btn:hover {
+  color: var(--text-default-body);
+  border-color: var(--grey-600);
+}
+
+.style-rot-btn.is-active {
+  border-color: var(--border-primary-default);
+  color: var(--text-primary-default);
+}
