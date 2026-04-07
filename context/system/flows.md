@@ -19,19 +19,37 @@ type: project
 9. **Style** — apply textures / materials / colors / properties to selected parts
 10. **Images / Cameras** — capture previews, manage camera angles
 
-> Flow is non-linear. User can jump to any section at any time via sidebar icons.
+> Flow is non-linear. User can jump to any section at any time via sidebar icons **or by clicking directly on the 3D mattress**.
 
-Current implemented state:
-- Size and Height are live and update the 3D viewport immediately
-- Remaining sections are navigable but still placeholder panels
+Current implemented state: all panels and the interactive viewport are live.
+
+---
+
+## Shortcut Flow: Click a 3D Part to Open Its Panel
+
+Available in External mode only.
+
+1. Hover over any visible mattress part in the 3D viewport
+2. Part glows orange (emissive highlight) and cursor changes to pointer
+3. Click the part → the corresponding sidebar panel opens immediately
+4. Orbit/drag is unaffected — the panel only opens on a true click (not a drag)
+
+Part → panel mapping:
+- Top quilting surface → Top panel
+- Side walls (front/back/left/right) → Wall panel
+- Tape border → Tape panel
+- Main body shell → Bottom panel
 
 ---
 
 ## Secondary Flow: Internal Layer Build
 
 1. Switch mode: External → Internal (top bar toggle)
-2. **Layers** — add layers from type library (foam, coil, batting)
-3. Set height per layer
+2. **Layers** — click "Add new layer" (top CTA) → navigates to layer picker sub-view
+   - Breadcrumb header: `← Layers › Add new layer` (back button returns without adding)
+   - Search field filters the grid live
+   - 2-column grid of layer type cards; click any card → layer is added and panel returns to main Layers view
+3. Set height per layer via the expanded card slider
 4. Use View customization:
    - Exploded — inspect layer separation
    - Inner Build — see assembled construction

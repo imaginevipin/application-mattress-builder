@@ -1915,6 +1915,44 @@ function renderLayersPanel() {
   syncViewportLayers();
 }
 
+function openLayersPicker() {
+  const mainView = document.getElementById('layersMainView');
+  const pickerView = document.getElementById('layersPickerView');
+  const search = document.getElementById('layersPickerSearch');
+  if (mainView) mainView.hidden = true;
+  if (pickerView) pickerView.hidden = false;
+  if (search) search.value = '';
+  renderLayersPickerGrid('');
+  if (search) search.focus();
+}
+
+function closeLayersPicker() {
+  const mainView = document.getElementById('layersMainView');
+  const pickerView = document.getElementById('layersPickerView');
+  if (mainView) mainView.hidden = false;
+  if (pickerView) pickerView.hidden = true;
+}
+
+function renderLayersPickerGrid(filter) {
+  const grid = document.getElementById('layersPickerGrid');
+  if (!grid) return;
+
+  const q = (filter || '').toLowerCase();
+  const visible = LAYER_TEMPLATES.filter(t => !q || t.name.toLowerCase().includes(q));
+
+  if (!visible.length) {
+    grid.innerHTML = `<p class="layers-picker-empty">No layers match "<strong>${filter}</strong>"</p>`;
+    return;
+  }
+
+  grid.innerHTML = visible.map(t => `
+    <button class="layers-picker-card" type="button" data-picker-template="${t.id}" aria-label="Add ${t.name}">
+      <span class="layers-picker-card__thumb" style="--layer-accent:${t.color}"></span>
+      <span class="layers-picker-card__name">${t.name}</span>
+    </button>
+  `).join('');
+}
+
 function renderLayoutsPanel() {
   const explodedCard = document.getElementById('layoutExplodedCard');
   const explodedBody = document.getElementById('layoutExplodedBody');
@@ -1981,13 +2019,37 @@ function initLayersPanel() {
 
   if (addBtn) {
     addBtn.addEventListener('click', () => {
-      const template = LAYER_TEMPLATES[(state.layers.length) % LAYER_TEMPLATES.length];
-      const nextLayer = createLayerFromTemplate(template.id);
+      openLayersPicker();
+    });
+  }
+
+  const pickerBack = document.getElementById('layersPickerBack');
+  if (pickerBack) {
+    pickerBack.addEventListener('click', () => {
+      closeLayersPicker();
+    });
+  }
+
+  const pickerSearch = document.getElementById('layersPickerSearch');
+  if (pickerSearch) {
+    pickerSearch.addEventListener('input', () => {
+      renderLayersPickerGrid(pickerSearch.value.trim());
+    });
+  }
+
+  const pickerGrid = document.getElementById('layersPickerGrid');
+  if (pickerGrid) {
+    pickerGrid.addEventListener('click', event => {
+      const card = event.target.closest('[data-picker-template]');
+      if (!card) return;
+      const templateId = card.dataset.pickerTemplate;
+      const nextLayer = createLayerFromTemplate(templateId);
       state.layers.push(nextLayer);
       state.layersExpandedId = nextLayer.id;
+      closeLayersPicker();
       renderLayersPanel();
       renderLayoutsPanel();
-      showToast('Added a new layer');
+      showToast(`Added ${nextLayer.name}`);
     });
   }
 

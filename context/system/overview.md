@@ -135,6 +135,8 @@ Sidebar sections:
 
 ### Layers (Internal mode)
 - Layer types: Convoluted Foam 1, Convoluted Foam 2, Edge-To-Edge Pocket Coil, Fiber Batting, Foam Slab, Hole Punch Foam Layer
+- "Add new layer" CTA is at top of panel (consistent with all External panels)
+- Clicking it navigates to a picker sub-view: breadcrumb header (`← Layers › Add new layer`), live search, 2-column grid of layer cards; selecting a card adds the layer and returns to the main view
 - Each layer has: Height (inches), visibility/lock/delete icons
 - View customization:
   - Exploded — gap between layers slider
@@ -194,6 +196,15 @@ Sidebar sections:
 - All panel CTA bars use `btn-panel-cta` / `btn-panel-cta--outline`; the `--inner` modifier removes top padding/border for stacked CTAs (do not use `--inner` when full padding is needed)
 
 ## Build Status (as of 2026-04-07)
-All panels and output flows are functional. Remaining work is refinement and backend integration.
-- **Done:** All 11 External panels, Internal layers panel, Export modal, Image Viewer, Camera management, File operations
+All panels, output flows, and core viewport interactions are functional. Remaining work is refinement and backend integration.
+- **Done:** All 11 External panels, Internal layers panel (incl. picker sub-view with breadcrumb nav + search + 2-col grid), Export modal, Image Viewer, Camera management, File operations, Interactive 3D viewport (hover highlight + click-to-panel)
 - **Not yet wired to backend:** Create Image (uses canvas capture), Camera snapshots, Add to Library (localStorage only)
+
+## Interactive Viewport (added 2026-04-07)
+- Raycasting via `THREE.Raycaster` runs on every `mousemove` against `interactiveMeshes[]`
+- `interactiveMeshes` is rebuilt inside `buildMattress()` on every size/height/mode change — only populated in external mode
+- Each mesh in `interactiveMeshes` gets a **cloned material** so emissive changes are isolated (shared base materials `bodyMat`, `topMat`, `sideMat`, `tapeMat` are never mutated)
+- Hover: papaya orange emissive (`0xec4e0b`, intensity `0.14`) + `cursor: pointer`
+- Click → `window.setSection(part)` opens the matching panel; drag detection (mousedown delta > 4px) prevents panel switch on orbit gestures
+- Part → panel mapping: `top` → Top, `wall` → Wall, `tape` → Tape, `bottom` → Bottom
+- `window.setSection` is exposed from `app.js` for viewport to call cross-module

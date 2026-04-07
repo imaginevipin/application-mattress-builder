@@ -37,10 +37,15 @@ type: project
 - [x] Bottom panel — done: 2026-04-06
 - [x] Style panel (Textures, Materials, Colors, Properties) — done: 2026-04-06
 - [x] Internal layers panel (Layers, Exploded/Cutaway view) — done: 2026-04-06
+- [x] Layers panel — Add new layer picker sub-view (breadcrumb nav, live search, 2-col type grid) — done: 2026-04-07
 - [x] Create Image modal + output — done: 2026-04-06
 - [x] Add to Library modal — done: 2026-04-06
 - [x] Camera management — done: 2026-04-06
 - [x] File operations shell (Save, Save as New, Quit, Download PDF summary) — done: 2026-04-02 — implemented browser-native project actions via dropdown menu, localStorage, reset state, printable summary
+
+## Interactive Viewport (2026-04-07)
+
+- [x] Interactive 3D viewport — hover highlight + click-to-panel — done: 2026-04-07
 
 ## UI Polish (2026-04-07)
 

@@ -992,13 +992,34 @@
 
         <!-- Layers (Internal) ── -->
         <div class="panel" id="panel-layers" hidden>
-          <div class="panel-header">
-            <p class="panel-title">Layers</p>
+
+          <!-- Main view -->
+          <div class="layers-main-view" id="layersMainView">
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="layersAddBtn">Add new layer</button>
+            </div>
+            <div class="layers-stack" id="layersStack"></div>
           </div>
-          <div class="layers-stack" id="layersStack"></div>
-          <div class="panel-cta-bar panel-cta-bar--foot">
-            <button class="btn-panel-cta" id="layersAddBtn">Add new layer</button>
+
+          <!-- Picker view -->
+          <div class="layers-picker-view" id="layersPickerView" hidden>
+            <div class="panel-header layers-picker-header">
+              <button class="layers-picker-back" id="layersPickerBack" type="button" aria-label="Back to layers">
+                <span class="material-symbols-outlined layers-picker-back__icon">arrow_back_ios</span>
+                <span class="layers-breadcrumb">
+                  <span class="layers-breadcrumb__parent">Layers</span>
+                  <span class="material-symbols-outlined layers-breadcrumb__sep">chevron_right</span>
+                  <span class="layers-breadcrumb__current">Add new layer</span>
+                </span>
+              </button>
+            </div>
+            <div class="layers-picker-search-wrap">
+              <span class="material-symbols-outlined layers-picker-search-icon">search</span>
+              <input class="layers-picker-search" type="text" id="layersPickerSearch" placeholder="Search layer" autocomplete="off" />
+            </div>
+            <div class="layers-picker-grid" id="layersPickerGrid"></div>
           </div>
+
         </div>
 
         <!-- Layouts (Internal) ── -->

@@ -2993,6 +2993,193 @@ input:focus-visible {
   font-size: 11px;
 }
 
+/* ── Layers picker view ─────────────────────────────────── */
+
+.layers-main-view,
+.layers-picker-view {
+  flex-direction: column;
+  height: 100%;
+}
+
+.layers-main-view {
+  display: flex;
+}
+
+.layers-picker-view {
+  display: none;
+}
+
+.layers-main-view[hidden] {
+  display: none;
+}
+
+.layers-picker-view:not([hidden]) {
+  display: flex;
+}
+
+.layers-picker-header {
+  display: flex;
+  align-items: center;
+  padding: var(--s-400) var(--s-500);
+  border-bottom: 1px solid var(--border-default-secondary);
+}
+
+.layers-picker-back {
+  display: flex;
+  align-items: center;
+  gap: var(--s-200);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-default-heading);
+  font-family: var(--font);
+}
+
+.layers-picker-back:hover .layers-breadcrumb__parent {
+  color: var(--text-primary-default);
+}
+
+.layers-picker-back__icon {
+  font-size: 16px;
+  color: var(--text-default-placeholder);
+}
+
+.layers-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--s-100);
+  font-size: var(--text-small-size);
+  line-height: 1;
+}
+
+.layers-breadcrumb__parent {
+  color: var(--text-default-body);
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.layers-breadcrumb__sep {
+  font-size: 14px;
+  color: var(--text-default-placeholder);
+}
+
+.layers-breadcrumb__current {
+  color: var(--text-default-heading);
+  font-weight: 600;
+}
+
+.layers-picker-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--s-300);
+  margin: var(--s-400) var(--s-400) var(--s-200);
+  padding: 0 var(--s-400);
+  height: 40px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-default-secondary);
+  border-radius: var(--br-200);
+}
+
+.layers-picker-search-icon {
+  font-size: 18px;
+  color: var(--text-default-placeholder);
+  flex-shrink: 0;
+}
+
+.layers-picker-search {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--font);
+  font-size: var(--text-small-size);
+  color: var(--text-default-heading);
+}
+
+.layers-picker-search::placeholder {
+  color: var(--text-default-placeholder);
+}
+
+.layers-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-300);
+  padding: var(--s-200) var(--s-400) var(--s-400);
+  overflow-y: auto;
+}
+
+.layers-picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default-secondary);
+  border-radius: var(--br-200);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  padding: 0;
+  text-align: left;
+  font-family: var(--font);
+}
+
+.layers-picker-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.layers-picker-card:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.layers-picker-card__thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.03) 60%),
+    var(--layer-accent, #808080);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.layers-picker-card__thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.04) 0px,
+    rgba(255, 255, 255, 0.04) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+
+.layers-picker-card__name {
+  display: block;
+  padding: var(--s-300) var(--s-300);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-default-heading);
+  line-height: 1.3;
+}
+
+.layers-picker-empty {
+  grid-column: 1 / -1;
+  padding: var(--s-600);
+  text-align: center;
+  font-size: var(--text-small-size);
+  color: var(--text-default-placeholder);
+}
+
+.layers-picker-empty strong {
+  color: var(--text-default-body);
+}
+
+/* ── End layers picker ──────────────────────────────────── */
+
 .layouts-stack {
   padding: var(--s-400);
 }

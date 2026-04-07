@@ -101,3 +101,9 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **Decision:** Render items use a flex row with an 80px thumbnail on the left and body (name + status + meta) on the right, matching the pattern of the preview cards
 - **Reason:** The original render item was a plain text row with no thumbnail — inconsistent with Previews and the reference tool screenshots
 - **Alternatives considered:** Full-width thumbnail (same as preview cards), text-only row retained
+
+### 2026-04-07 | Interactive 3D viewport — hover highlight + click to open panel
+- **Decision:** Hovering over a mattress part in the 3D viewport shows an orange emissive glow; clicking opens the corresponding sidebar panel
+- **Reason:** The 3D model was view-only; making it interactive gives users a direct spatial shortcut to any panel without needing to locate the correct sidebar icon
+- **Implementation:** `THREE.Raycaster` on `mousemove`; each interactive mesh gets a cloned material so emissive changes are isolated; drag detection (mousedown delta > 4px) prevents panel switch during orbit; `window.setSection` exposed from `app.js` for cross-module call; no tooltip — highlight + pointer cursor is sufficient
+- **Alternatives considered:** Tooltip label following the cursor (built and then removed — visual noise without added value), outline/wireframe highlight (emissive glow is more natural in a 3D scene)
