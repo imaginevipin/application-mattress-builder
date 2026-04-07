@@ -7,6 +7,18 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 
+// ── Hover / click interaction ────────────────────────────
+
+let interactiveMeshes = [];
+let hoveredMesh       = null;
+let isMouseDown       = false;
+let isDragging        = false;
+let mouseDownPos      = { x: 0, y: 0 };
+
+const raycaster = new THREE.Raycaster();
+const mouse     = new THREE.Vector2();
+
+
 // ── Mattress size data (inches) ──────────────────────────
 
 const SIZES = {
@@ -199,6 +211,7 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
   body.position.x = shellOffsetX;
   body.castShadow = true;
   body.receiveShadow = true;
+  body.userData.part = 'bottom';
   if (currentMode === 'external') {
     body.material = bodyMat;
   } else {
@@ -216,6 +229,7 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
   topPanel.position.y = currentMode === 'internal' ? h + topLift : h + 0.02;
   topPanel.position.x = shellOffsetX;
   topPanel.castShadow = false;
+  topPanel.userData.part = 'top';
   if (currentMode === 'internal') {
     topPanel.material = topMat.clone();
     topPanel.material.transparent = internalView.cutaway;
@@ -231,10 +245,12 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
     sideMat
   );
   frontWall.position.set(shellOffsetX, currentMode === 'internal' ? wallH / 2 + 0.02 : wallH / 2 + h * 0.25, shellDepth / 2 + 0.005);
+  frontWall.userData.part = 'wall';
   shellGroup.add(frontWall);
 
   const backWall = frontWall.clone();
   backWall.position.set(shellOffsetX, wallH / 2 + h * 0.25, -(shellDepth / 2 + 0.005));
+  backWall.userData.part = 'wall';
   if (!internalView.cutaway) shellGroup.add(backWall);
 
   const leftWall = new THREE.Mesh(
@@ -242,10 +258,12 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
     sideMat
   );
   leftWall.position.set(shellOffsetX - (shellWidth / 2 + 0.005), wallH / 2 + h * 0.25, 0);
+  leftWall.userData.part = 'wall';
   shellGroup.add(leftWall);
 
   const rightWall = leftWall.clone();
   rightWall.position.set(shellOffsetX + shellWidth / 2 + 0.005, currentMode === 'internal' ? wallH / 2 + 0.02 : wallH / 2 + h * 0.25, 0);
+  rightWall.userData.part = 'wall';
   if (!internalView.cutaway) shellGroup.add(rightWall);
 
   // Tape border — runs along the top edge perimeter
@@ -257,10 +275,12 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
     tapeMat
   );
   tapeF.position.set(shellOffsetX, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, shellDepth / 2);
+  tapeF.userData.part = 'tape';
   if (currentMode === 'external') shellGroup.add(tapeF);
 
   const tapeB = tapeF.clone();
   tapeB.position.set(shellOffsetX, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, -shellDepth / 2);
+  tapeB.userData.part = 'tape';
   if (!internalView.cutaway && currentMode === 'external') shellGroup.add(tapeB);
 
   const tapeL = new THREE.Mesh(
@@ -268,10 +288,12 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
     tapeMat
   );
   tapeL.position.set(shellOffsetX - shellWidth / 2, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, 0);
+  tapeL.userData.part = 'tape';
   if (currentMode === 'external') shellGroup.add(tapeL);
 
   const tapeR = tapeL.clone();
   tapeR.position.set(shellOffsetX + shellWidth / 2, currentMode === 'internal' ? trayHeight - tapeH / 2 + 0.02 : h - tapeH / 2, 0);
+  tapeR.userData.part = 'tape';
   if (!internalView.cutaway && currentMode === 'external') shellGroup.add(tapeR);
 
   // Internal layers — normalized to selected mattress height
@@ -312,10 +334,95 @@ function buildMattress(sizeId = currentSizeId, heightInches = currentHeightInche
 
   // Center the group so mattress sits on y=0
   mattressGroup.position.set(0, 0, 0);
+
+  // ── Reset hover + rebuild interactive mesh list ──────
+  if (hoveredMesh) {
+    hoveredMesh = null;
+    if (renderer.domElement) renderer.domElement.style.cursor = '';
+  }
+  interactiveMeshes = [];
+  if (currentMode === 'external') {
+    shellGroup.traverse(obj => {
+      if (obj.isMesh && obj.userData.part) {
+        obj.material = obj.material.clone();
+        interactiveMeshes.push(obj);
+      }
+    });
+  }
 }
 
 // Default
 buildMattress('king');
+
+
+// ── Part hover / click ───────────────────────────────────
+
+
+renderer.domElement.addEventListener('mousedown', (e) => {
+  mouseDownPos = { x: e.clientX, y: e.clientY };
+  isMouseDown  = true;
+  isDragging   = false;
+});
+
+window.addEventListener('mouseup', () => {
+  isMouseDown = false;
+  isDragging  = false;
+});
+
+renderer.domElement.addEventListener('mousemove', (e) => {
+  if (isMouseDown) {
+    const dx = e.clientX - mouseDownPos.x;
+    const dy = e.clientY - mouseDownPos.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 4) {
+      isDragging = true;
+      if (hoveredMesh) {
+        hoveredMesh.material.emissive.set(0x000000);
+        hoveredMesh.material.emissiveIntensity = 0;
+        hoveredMesh = null;
+        renderer.domElement.style.cursor = '';
+      }
+    }
+    return;
+  }
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+  mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(interactiveMeshes, false);
+  const hit  = hits.length ? hits[0].object : null;
+
+  if (hit !== hoveredMesh) {
+    if (hoveredMesh) {
+      hoveredMesh.material.emissive.set(0x000000);
+      hoveredMesh.material.emissiveIntensity = 0;
+    }
+    hoveredMesh = hit;
+    if (hoveredMesh) {
+      hoveredMesh.material.emissive.set(0xec4e0b);
+      hoveredMesh.material.emissiveIntensity = 0.14;
+      renderer.domElement.style.cursor = 'pointer';
+    } else {
+      renderer.domElement.style.cursor = '';
+    }
+  }
+});
+
+renderer.domElement.addEventListener('mouseleave', () => {
+  if (hoveredMesh) {
+    hoveredMesh.material.emissive.set(0x000000);
+    hoveredMesh.material.emissiveIntensity = 0;
+    hoveredMesh = null;
+  }
+  renderer.domElement.style.cursor = '';
+});
+
+renderer.domElement.addEventListener('click', () => {
+  if (isDragging || !hoveredMesh) return;
+  const part = hoveredMesh.userData.part;
+  if (part && window.setSection) window.setSection(part);
+});
 
 
 // ── Public API (called from app.js on size change) ───────

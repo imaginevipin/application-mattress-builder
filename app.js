@@ -3176,6 +3176,8 @@ function setSection(section) {
   });
 }
 
+window.setSection = setSection;
+
 function initNavigation() {
   document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => setSection(item.dataset.section));
