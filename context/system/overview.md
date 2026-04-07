@@ -128,7 +128,7 @@ Sidebar sections:
 - Quilting pattern — gusset
 
 ### Style (4 tabs)
-1. **Textures** — searchable library, "Exclusive for Mattress" badge, Upload button
+1. **Textures** — search (icon inside input) + Upload dropdown; grid mixes normal and "Exclusive for Mattress" badged items
 2. **Materials** — filtered by tags (Mattress Builder, Cotton, Flexi AI); e.g. Linen Cotton Blend 1/2/3, Fabric 007
 3. **Colors** — full HSB/RGB/Hex picker, color swatches
 4. **Properties** — Width/Height (inches), Position X/Y, Rotation, Gloss slider, Fit Texture / Reset Texture, Save in library
@@ -143,19 +143,26 @@ Sidebar sections:
 
 ### Images
 - Tabs: Previews | Renders
-- Previews: thumbnail, name, date, resolution
-- Renders: separate render queue ("No renders produced yet" default state)
-- Create Image modal:
-  - Toggle: Preview / High Resolution
-  - Resolution presets: 480p / 1080p / 4k
-  - Custom width/height (px)
-  - File name
-  - Options: Transparent Bg / Shadow on floor
+- **Previews**: 16:9 thumbnail card, name, camera name, relative time
+- **Renders**: horizontal card (80px thumbnail + body: name, status badge, camera · dimensions)
+- **Image Viewer** (full-screen overlay): dark rail (#1a1a1a), viewer-meta typography, 16:9 thumbnails, orange border active state, glassmorphism caption bar (filename left, dimensions right)
+- **Export Image modal** — premium three-zone layout (header / two-column body / footer):
+  - Left column: camera checklist with Select All
+  - Right column settings:
+    - Mode toggle: Preview | High Resolution ♛ (segmented pill)
+    - Resolution: 1080p / 1440p / 4k (mode-aware presets — Preview uses screen sizes, High Res uses standard px)
+    - Dimensions: Width × Height with aspect ratio lock button between inputs
+    - DPI (High Res only): selector (72/96/150/300) + computed physical size — folded inline into File Name row
+    - File Name row: `[filename] [DPI ▼ — High Res only] [JPG/PNG ▼]`
+    - Render options: Transparent background / Shadow on floor toggles
+  - Footer: right-aligned "Create Image" CTA
 
 ### Cameras
-- + Add Current View (saves current 3D camera angle)
-- Import Camera Presets
-- Lists named camera presets with resolution (e.g. Camera 1 — 1920×1080)
+- + Add Current View (saves current 3D camera angle with snapshot)
+- Import Camera Presets (adds 3 offset angle presets)
+- Camera cards: hover/active reveals pencil (rename) + trash (delete) icons
+  - Rename: inline input replaces name span; Enter/blur saves, Escape cancels
+  - Delete: removes from state; Current Camera is immutable (no actions shown)
 - Preset search
 
 ---
@@ -177,7 +184,16 @@ Sidebar sections:
 ---
 
 ## Current UI Decisions Reflected in Code
-- Search inputs use a neutral dark-surface treatment rather than a strong primary-color focus state
+- Search inputs use a neutral dark-surface treatment rather than a strong primary-color focus state; icon is positioned inside the input using `.panel-search` / `.style-search-input-wrap` patterns
 - Panel cards use orange primarily for selected states, with restrained use elsewhere
 - Card labels are compact, single-line, medium-weight names with inline dimensions
-- The builder currently favors consistent panel scaffolding: search row + 2-column option grid where applicable
+- The builder favors consistent panel scaffolding: search row + 2-column option grid where applicable
+- Modals use three-zone layout (header / body / footer) with two-column body grids where content warrants it
+- Camera cards support inline rename and delete; Current Camera is always immutable
+- `form-select` uses custom chevron SVG, fully styled to match dark theme
+- All panel CTA bars use `btn-panel-cta` / `btn-panel-cta--outline`; the `--inner` modifier removes top padding/border for stacked CTAs (do not use `--inner` when full padding is needed)
+
+## Build Status (as of 2026-04-07)
+All panels and output flows are functional. Remaining work is refinement and backend integration.
+- **Done:** All 11 External panels, Internal layers panel, Export modal, Image Viewer, Camera management, File operations
+- **Not yet wired to backend:** Create Image (uses canvas capture), Camera snapshots, Add to Library (localStorage only)
