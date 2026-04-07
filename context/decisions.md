@@ -66,3 +66,38 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **Decision:** Implement `Save Project`, `Save as New`, `Quit Project`, and `Download Pdf` using `localStorage`, reset logic, and printable summary output
 - **Reason:** This gives the shell credible project actions immediately without blocking on backend/storage/export infrastructure
 - **Alternatives considered:** Leave File menu visual-only until a full persistence/export backend exists
+
+### 2026-04-07 | Style panel search fields use icon-inside-input pattern
+- **Decision:** Search icons are positioned absolutely inside a `.style-search-input-wrap` wrapper (position: relative), not as a sibling element to the input
+- **Reason:** Icon-inside pattern matches industry standard for search inputs and the existing `panel-search` pattern used elsewhere in the app
+- **Alternatives considered:** Icon as static sibling outside the input (was the original implementation)
+
+### 2026-04-07 | Camera cards support inline rename and delete; Current Camera is immutable
+- **Decision:** Saved cameras show a pencil (rename) and trash (delete) icon on hover/active. Rename triggers an inline `<input>` replacing the name span. Current Camera shows neither action.
+- **Reason:** Inline editing is less disruptive than a modal; Current Camera represents live viewport state and must always exist
+- **Alternatives considered:** Modal dialog for rename; separate settings page
+
+### 2026-04-07 | Export Image modal is header/body/footer — not a flat scrollable form
+- **Decision:** Modal uses a three-zone layout: fixed header (title + close), scrollable body (two-column: cameras left, settings right), fixed footer (CTA)
+- **Reason:** The flat padding layout scrolled on smaller viewports and the CTA (full-width 900px) looked disproportionate; splitting zones gives each element a fixed anchor
+- **Alternatives considered:** Single scrollable column, full-width CTA retained
+
+### 2026-04-07 | DPI selector lives in the File Name row, not a standalone section
+- **Decision:** In High Resolution mode, the DPI `<select>` appears inline inside the file name row (`[filename] [DPI ▼] [JPG ▼]`). Physical size is shown as a caption hint below.
+- **Reason:** A standalone DPI section caused the settings column to overflow and require scrolling; combining into one row removes the need for scroll entirely
+- **Alternatives considered:** DPI as its own labelled section (original implementation)
+
+### 2026-04-07 | Resolution presets are mode-aware
+- **Decision:** `IMAGE_RESOLUTION_PRESETS` is split by mode — Preview 1080p = 1500×843, High Res 1080p = 1920×1080
+- **Reason:** Preview exports target screen/web use (smaller, faster), High Res targets print/production (standard pixel dimensions)
+- **Alternatives considered:** Single preset table shared across modes
+
+### 2026-04-07 | Image Viewer rail uses dark theme colors, not the legacy blue-gray
+- **Decision:** Rail background changed to `#1a1a1a`, matching the app's dark surface tokens instead of `rgba(70, 74, 79, 0.82)`
+- **Reason:** The blue-gray rail was visually disconnected from the rest of the app; a neutral dark surface maintains consistency
+- **Alternatives considered:** Keep existing blue-gray, use a semi-transparent overlay
+
+### 2026-04-07 | Render items in the Images panel are horizontal cards with a fixed-width thumbnail
+- **Decision:** Render items use a flex row with an 80px thumbnail on the left and body (name + status + meta) on the right, matching the pattern of the preview cards
+- **Reason:** The original render item was a plain text row with no thumbnail — inconsistent with Previews and the reference tool screenshots
+- **Alternatives considered:** Full-width thumbnail (same as preview cards), text-only row retained

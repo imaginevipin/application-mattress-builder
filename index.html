@@ -1067,9 +1067,11 @@
           <div class="style-tab-pane" id="styleTabTextures" role="tabpanel">
 
             <div class="style-search-bar">
-              <label class="sr-only" for="styleTextureSearch">Search textures</label>
-              <span class="material-symbols-outlined panel-search-icon">search</span>
-              <input class="panel-search-input" id="styleTextureSearch" type="text" placeholder="Search texture" autocomplete="off">
+              <div class="style-search-input-wrap">
+                <label class="sr-only" for="styleTextureSearch">Search textures</label>
+                <span class="material-symbols-outlined panel-search-icon">search</span>
+                <input class="panel-search-input" id="styleTextureSearch" type="text" placeholder="Search texture" autocomplete="off">
+              </div>
               <button class="btn-upload-action style-upload-inline">
                 <span class="material-symbols-outlined">upload</span>
                 Upload
@@ -1255,7 +1257,7 @@
           <div class="panel-cta-bar">
             <button class="btn-panel-cta" id="cameraAddCurrentBtn">Add Current View</button>
           </div>
-          <div class="panel-cta-bar panel-cta-bar--inner">
+          <div class="panel-cta-bar">
             <button class="btn-panel-cta btn-panel-cta--outline" id="cameraImportBtn">
               <span class="material-symbols-outlined">upload</span>
               Import Camera Presets
@@ -1284,24 +1286,22 @@
   <div class="app-modal" id="createImageModal" hidden>
     <div class="app-modal__backdrop" data-close-modal="create-image"></div>
     <div class="app-modal__dialog app-modal__dialog--dark app-modal__dialog--wide">
-      <button class="app-modal__close" id="createImageCloseBtn" aria-label="Close create image modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
       <div class="create-image-modal">
-        <div class="create-image-modal__top">
-          <button class="create-image-mode is-active" id="createModePreviewBtn" data-image-mode="preview">
-            <span class="create-image-mode__check"></span>
-            Preview
+
+        <!-- Header -->
+        <div class="create-image-modal__header">
+          <span class="create-image-modal__title">Export Image</span>
+          <button class="create-image-modal__close-btn" id="createImageCloseBtn" aria-label="Close export image modal">
+            <span class="material-symbols-outlined">close</span>
           </button>
-          <button class="create-image-mode" id="createModeHighResBtn" data-image-mode="highres">
-            <span class="create-image-mode__check"></span>
-            High Resolution
-          </button>
-          <span class="material-symbols-outlined create-image-modal__crown">crown</span>
         </div>
 
+        <!-- Body -->
         <div class="create-image-modal__body">
+
+          <!-- Left: Camera selection -->
           <div class="create-image-cameras">
+            <p class="create-image-section-label">Cameras</p>
             <label class="create-image-selectall">
               <input type="checkbox" id="createImageSelectAll">
               <span>Select all (<span id="createImageCameraCount">1</span> camera)</span>
@@ -1309,55 +1309,96 @@
             <div class="create-image-camera-list" id="createImageCameraList"></div>
           </div>
 
+          <!-- Right: Export settings -->
           <div class="create-image-settings">
-            <div class="create-image-resolution" id="createImageResolutionBtns">
-              <button class="create-image-res-btn is-active" data-resolution="1080p">1080p</button>
-              <button class="create-image-res-btn" data-resolution="1440p">1440p</button>
-              <button class="create-image-res-btn" data-resolution="4k">4k</button>
-            </div>
 
-            <div class="create-image-dims">
-              <div class="form-field">
-                <label class="form-field-label" for="createImageWidth">Width (px)</label>
-                <input class="form-input" id="createImageWidth" type="number" min="320" step="1" value="1500">
-              </div>
-              <div class="form-field">
-                <label class="form-field-label" for="createImageHeight">Height (px)</label>
-                <input class="form-input" id="createImageHeight" type="number" min="240" step="1" value="843">
+            <!-- Mode toggle -->
+            <div class="create-image-setting-group create-image-setting-group--mode">
+              <div class="create-image-mode-tabs">
+                <button class="create-image-mode is-active" id="createModePreviewBtn" data-image-mode="preview">Preview</button>
+                <button class="create-image-mode" id="createModeHighResBtn" data-image-mode="highres">
+                  High Resolution
+                  <span class="material-symbols-outlined create-image-modal__crown">crown</span>
+                </button>
               </div>
             </div>
 
-            <div class="form-field">
-              <label class="form-field-label" for="createImageFilename">File name</label>
+            <!-- Resolution -->
+            <div class="create-image-setting-group">
+              <p class="create-image-section-label">Resolution</p>
+              <div class="create-image-resolution" id="createImageResolutionBtns">
+                <button class="create-image-res-btn is-active" data-resolution="1080p">1080p</button>
+                <button class="create-image-res-btn" data-resolution="1440p">1440p</button>
+                <button class="create-image-res-btn" data-resolution="4k">4k</button>
+              </div>
+            </div>
+
+            <!-- Dimensions -->
+            <div class="create-image-setting-group">
+              <p class="create-image-section-label">Dimensions</p>
+              <div class="create-image-dims">
+                <div class="form-field">
+                  <label class="form-field-label" for="createImageWidth">Width (px)</label>
+                  <input class="form-input" id="createImageWidth" type="number" min="320" step="1" value="1500">
+                </div>
+                <button class="create-image-aspect-lock is-locked" id="createImageAspectLock" aria-label="Lock aspect ratio">
+                  <span class="material-symbols-outlined">lock</span>
+                </button>
+                <div class="form-field">
+                  <label class="form-field-label" for="createImageHeight">Height (px)</label>
+                  <input class="form-input" id="createImageHeight" type="number" min="240" step="1" value="843">
+                </div>
+              </div>
+            </div>
+
+            <!-- File name + DPI -->
+            <div class="create-image-setting-group">
+              <p class="create-image-section-label">File name</p>
               <div class="create-image-file-row">
                 <input class="form-input" id="createImageFilename" type="text" value="New Mattress_4-image1">
+                <select class="form-select" id="createImageDpi" hidden>
+                  <option value="72">72 DPI</option>
+                  <option value="96">96 DPI</option>
+                  <option value="150">150 DPI</option>
+                  <option value="300">300 DPI</option>
+                </select>
                 <select class="form-select create-image-format" id="createImageFormat">
                   <option value="jpg">JPG</option>
                   <option value="png">PNG</option>
                 </select>
               </div>
+              <span class="create-image-dpi-size" id="createImageDpiSize" hidden>26.67in × 15in</span>
             </div>
 
-            <div class="create-image-options">
-              <label class="toggle-row create-image-option">
-                <span class="toggle-label">Transparent Bg</span>
-                <span class="toggle-switch">
-                  <input class="toggle-input" id="createImageTransparentBg" type="checkbox">
-                  <span class="toggle-track"></span>
-                </span>
-              </label>
-              <label class="toggle-row create-image-option">
-                <span class="toggle-label">Shadow on floor</span>
-                <span class="toggle-switch">
-                  <input class="toggle-input" id="createImageShadowFloor" type="checkbox" checked>
-                  <span class="toggle-track"></span>
-                </span>
-              </label>
+            <!-- Render options -->
+            <div class="create-image-setting-group create-image-setting-group--last">
+              <p class="create-image-section-label">Render options</p>
+              <div class="create-image-options">
+                <label class="toggle-row create-image-option">
+                  <span class="toggle-label">Transparent background</span>
+                  <span class="toggle-switch">
+                    <input class="toggle-input" id="createImageTransparentBg" type="checkbox">
+                    <span class="toggle-track"></span>
+                  </span>
+                </label>
+                <label class="toggle-row create-image-option">
+                  <span class="toggle-label">Shadow on floor</span>
+                  <span class="toggle-switch">
+                    <input class="toggle-input" id="createImageShadowFloor" type="checkbox" checked>
+                    <span class="toggle-track"></span>
+                  </span>
+                </label>
+              </div>
             </div>
+
           </div>
         </div>
 
-        <button class="btn-panel-cta create-image-submit" id="createImageSubmitBtn">Create Image</button>
+        <!-- Footer -->
+        <div class="create-image-modal__footer">
+          <button class="btn-panel-cta create-image-submit" id="createImageSubmitBtn">Create Image</button>
+        </div>
+
       </div>
     </div>
   </div>

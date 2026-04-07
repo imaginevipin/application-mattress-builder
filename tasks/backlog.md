@@ -41,3 +41,15 @@ type: project
 - [x] Add to Library modal — done: 2026-04-06
 - [x] Camera management — done: 2026-04-06
 - [x] File operations shell (Save, Save as New, Quit, Download PDF summary) — done: 2026-04-02 — implemented browser-native project actions via dropdown menu, localStorage, reset state, printable summary
+
+## UI Polish (2026-04-07)
+
+- [x] Style panel — Textures tab: search icon moved inside input, Upload button height matched, textures mixed exclusive/normal — done: 2026-04-07
+- [x] Cameras panel — Import Camera Presets padding fix (removed --inner modifier from CTA bar) — done: 2026-04-07
+- [x] Cameras panel — inline rename (click pencil → editable input, Enter/blur saves, Escape cancels) + delete (trash icon, not available on Current Camera) — done: 2026-04-07
+- [x] Export Image modal — full premium redesign: header/body/footer structure, segmented mode toggle, section labels, right-aligned CTA — done: 2026-04-07
+- [x] Export Image modal — file row fixes: gap between filename and format, render options alignment (specificity fix), CTA button right-aligned auto-width — done: 2026-04-07
+- [x] Export Image modal — High Resolution features: mode-aware resolution presets (Preview vs High Res px values), DPI selector with computed physical size, aspect ratio lock button, DPI folded into file name row — done: 2026-04-07
+- [x] Images panel — Previews: 16:9 thumbnail, camera name + relative time meta (removed "Status: 0/1") — done: 2026-04-07
+- [x] Images panel — Renders: horizontal card with 80px thumbnail, body with name/status badge/meta — done: 2026-04-07
+- [x] Image Viewer — full redesign: dark rail (#1a1a1a), structured viewer-meta typography, 16:9 thumbnails, thumb-footer row, orange border active state, proper close button, glassmorphism caption bar with filename + dimensions — done: 2026-04-07

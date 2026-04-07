@@ -63,11 +63,11 @@ const HANDLE_TYPES = [
 // ── Style panel data ─────────────────────────────────────
 
 const TEXTURES = [
-  { id: 'diamond',  name: 'Diamond quilt 1234',  css: 'ptn-diamond',  exclusive: true },
+  { id: 'diamond',  name: 'Diamond quilt 1234',  css: 'ptn-diamond'  },
   { id: 'xshape',   name: 'X shape, top quilt',  css: 'ptn-xshape',   exclusive: true },
-  { id: 'buttons',  name: 'Buttons top quilt',   css: 'ptn-buttons',  exclusive: true },
+  { id: 'buttons',  name: 'Buttons top quilt',   css: 'ptn-buttons'  },
   { id: 'rolling',  name: 'Rolling 6ft lem',     css: 'ptn-rolling',  exclusive: true },
-  { id: 'polkadot', name: 'Polka Dot Quilt',     css: 'ptn-polkadot', exclusive: true },
+  { id: 'polkadot', name: 'Polka Dot Quilt',     css: 'ptn-polkadot' },
   { id: 'scallop',  name: 'Scalloped Mesh',      css: 'ptn-scallop',  exclusive: true },
 ];
 
@@ -142,9 +142,16 @@ let imageUid = 0;
 let cameraUid = 0;
 
 const IMAGE_RESOLUTION_PRESETS = {
-  '1080p': { width: 1500, height: 843 },
-  '1440p': { width: 1920, height: 1080 },
-  '4k':    { width: 3840, height: 2160 },
+  preview: {
+    '1080p': { width: 1500, height: 843 },
+    '1440p': { width: 1920, height: 1080 },
+    '4k':    { width: 3840, height: 2160 },
+  },
+  highres: {
+    '1080p': { width: 1920, height: 1080 },
+    '1440p': { width: 2560, height: 1440 },
+    '4k':    { width: 3840, height: 2160 },
+  },
 };
 
 function createLayerFromTemplate(templateId) {
@@ -272,6 +279,9 @@ const BASE_STATE = {
   createImageTransparentBg: false,
   createImageShadowFloor: true,
   cameraQuery: '',
+  editingCameraId: null,
+  createImageDpi: 72,
+  createImageAspectLocked: true,
   libraryAvailableCount: 397,
 };
 
@@ -2533,7 +2543,7 @@ function renderImagesPanel() {
 
   if (state.imagesTab === 'previews') {
     if (!state.previewImages.length) {
-      list.innerHTML = `<p class="images-empty">No previews created yet</p>`;
+      list.innerHTML = `<p class="images-empty">No previews yet</p>`;
       return;
     }
 
@@ -2543,8 +2553,8 @@ function renderImagesPanel() {
         <div class="image-card__body">
           <span class="image-card__name">${image.name}</span>
           <div class="image-card__meta">
+            <span>${image.cameraName}</span>
             <span>${relativeTimeLabel(image.createdAt)}</span>
-            <span>Status: 0/1</span>
           </div>
         </div>
       </button>
@@ -2553,19 +2563,24 @@ function renderImagesPanel() {
   }
 
   if (!state.renderImages.length) {
-    list.innerHTML = `<p class="images-empty">No renders produced yet</p>`;
+    list.innerHTML = `<p class="images-empty">No renders yet</p>`;
     return;
   }
 
   list.innerHTML = `
     <div class="render-list">
       ${state.renderImages.map(image => `
-        <button class="render-item" data-image-id="${image.id}" data-image-tab="renders" ${image.status !== 'completed' ? 'disabled' : ''}>
-          <div class="render-item__head">
-            <span class="render-item__name">${image.name}</span>
-            <span class="render-item__status">${image.status}</span>
+        <button class="render-item${image.status !== 'completed' ? ' render-item--queued' : ''}" data-image-id="${image.id}" data-image-tab="renders" ${image.status !== 'completed' ? 'disabled' : ''}>
+          ${image.dataUrl
+            ? `<img class="render-item__thumb" src="${image.dataUrl}" alt="${image.name}">`
+            : `<div class="render-item__thumb render-item__thumb--placeholder"></div>`}
+          <div class="render-item__body">
+            <div class="render-item__head">
+              <span class="render-item__name">${image.name}</span>
+              <span class="render-item__status">${image.status}</span>
+            </div>
+            <div class="render-item__meta">${image.cameraName} · ${image.width} × ${image.height}</div>
           </div>
-          <div class="render-item__meta">${image.cameraName} · ${image.width} × ${image.height}</div>
         </button>
       `).join('')}
     </div>
@@ -2591,12 +2606,47 @@ function renderCamerasPanel() {
     return;
   }
 
-  list.innerHTML = visible.map(camera => `
-    <button class="camera-card${camera.id === state.activeCameraId ? ' is-active' : ''}" data-camera-id="${camera.id}">
-      <span class="camera-card__name">${camera.name}</span>
-      <span class="camera-card__meta">${camera.resolution}</span>
-    </button>
-  `).join('');
+  list.innerHTML = visible.map(camera => {
+    const isActive = camera.id === state.activeCameraId;
+    const isEditing = camera.id === state.editingCameraId;
+    return `
+      <div class="camera-card${isActive ? ' is-active' : ''}" data-camera-id="${camera.id}">
+        <div class="camera-card__info">
+          ${isEditing
+            ? `<input class="camera-card__name-input" value="${camera.name}" data-edit-camera="${camera.id}">`
+            : `<span class="camera-card__name">${camera.name}</span>`
+          }
+          <span class="camera-card__meta">${camera.resolution}</span>
+        </div>
+        ${!camera.isCurrent ? `
+          <div class="camera-card__actions">
+            ${!isEditing ? `<button class="camera-card__btn" data-rename-camera="${camera.id}" aria-label="Rename camera"><span class="material-symbols-outlined">edit</span></button>` : ''}
+            <button class="camera-card__btn camera-card__btn--delete" data-delete-camera="${camera.id}" aria-label="Delete camera"><span class="material-symbols-outlined">delete</span></button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  if (state.editingCameraId) {
+    const input = list.querySelector(`[data-edit-camera="${state.editingCameraId}"]`);
+    if (input) {
+      input.focus();
+      input.select();
+      function commitRename() {
+        const camera = state.cameras.find(c => c.id === state.editingCameraId);
+        if (camera && input.value.trim()) camera.name = input.value.trim();
+        state.editingCameraId = null;
+        renderCamerasPanel();
+        syncCreateImageModal();
+      }
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); commitRename(); }
+        if (e.key === 'Escape') { state.editingCameraId = null; renderCamerasPanel(); }
+      });
+      input.addEventListener('blur', commitRename);
+    }
+  }
 }
 
 function syncCreateImageModal() {
@@ -2614,9 +2664,14 @@ function syncCreateImageModal() {
   const cameraList = document.getElementById('createImageCameraList');
   const selectAll = document.getElementById('createImageSelectAll');
   const cameraCount = document.getElementById('createImageCameraCount');
+  const dpiSelect = document.getElementById('createImageDpi');
+  const dpiSize = document.getElementById('createImageDpiSize');
+  const aspectLock = document.getElementById('createImageAspectLock');
 
-  if (previewBtn) previewBtn.classList.toggle('is-active', state.createImageMode === 'preview');
-  if (highResBtn) highResBtn.classList.toggle('is-active', state.createImageMode === 'highres');
+  const isHighRes = state.createImageMode === 'highres';
+
+  if (previewBtn) previewBtn.classList.toggle('is-active', !isHighRes);
+  if (highResBtn) highResBtn.classList.toggle('is-active', isHighRes);
   if (widthInput) widthInput.value = String(state.createImageWidth);
   if (heightInput) heightInput.value = String(state.createImageHeight);
   if (filenameInput) filenameInput.value = state.createImageFilename;
@@ -2624,6 +2679,21 @@ function syncCreateImageModal() {
   if (transparentToggle) transparentToggle.checked = state.createImageTransparentBg;
   if (shadowToggle) shadowToggle.checked = state.createImageShadowFloor;
   if (cameraCount) cameraCount.textContent = String(state.cameras.length);
+
+  if (dpiSelect) {
+    dpiSelect.value = String(state.createImageDpi);
+    dpiSelect.hidden = !isHighRes;
+  }
+  if (dpiSize) {
+    dpiSize.textContent = computePhysicalSize(state.createImageWidth, state.createImageHeight, state.createImageDpi);
+    dpiSize.hidden = !isHighRes;
+  }
+
+  if (aspectLock) {
+    aspectLock.classList.toggle('is-locked', state.createImageAspectLocked);
+    const icon = aspectLock.querySelector('.material-symbols-outlined');
+    if (icon) icon.textContent = state.createImageAspectLocked ? 'lock' : 'lock_open';
+  }
 
   document.querySelectorAll('.create-image-res-btn').forEach(button => {
     button.classList.toggle('is-active', button.dataset.resolution === state.createImageResolution);
@@ -2714,19 +2784,35 @@ function renderImageViewer() {
 
   viewer.hidden = false;
   imageEl.src = active.dataUrl;
-  caption.textContent = `${active.name}.${active.format} (${active.width}*${active.height})`;
+
+  caption.innerHTML = `
+    <span class="viewer-caption__name">${active.name}.${active.format}</span>
+    <span class="viewer-caption__dims">${active.width} × ${active.height}</span>
+  `;
+
   meta.innerHTML = `
-    <strong>${active.name}</strong><br>
-    <span>${active.cameraName} · ${relativeTimeLabel(active.createdAt)}</span>
+    <p class="viewer-meta__name">${active.name}</p>
+    <p class="viewer-meta__info">${active.cameraName} · ${relativeTimeLabel(active.createdAt)}</p>
   `;
 
   thumbs.innerHTML = images.map(image => `
     <button class="app-viewer__thumb${image.id === active.id ? ' is-active' : ''}" data-image-id="${image.id}" data-image-tab="${state.viewerTab}">
-      ${state.viewerTab === 'renders' ? `<span class="app-viewer__thumb-badge">${image.status || 'completed'}</span>` : ''}
       <img src="${image.dataUrl}" alt="${image.name}">
-      <span class="app-viewer__thumb-label">${image.cameraName}</span>
+      <div class="app-viewer__thumb-footer">
+        <span class="app-viewer__thumb-label">${image.cameraName}</span>
+        ${state.viewerTab === 'renders' ? `<span class="app-viewer__thumb-badge">${image.status || 'completed'}</span>` : ''}
+      </div>
     </button>
   `).join('');
+}
+
+function computePhysicalSize(width, height, dpi) {
+  return `${(width / dpi).toFixed(2)}in × ${(height / dpi).toFixed(2)}in`;
+}
+
+function getResolutionPreset(mode, resolution) {
+  const modePresets = IMAGE_RESOLUTION_PRESETS[mode] || IMAGE_RESOLUTION_PRESETS.preview;
+  return modePresets[resolution] || modePresets['1080p'];
 }
 
 function cloneCameraSnapshot(snapshot) {
@@ -2901,6 +2987,26 @@ function initOutputFeatures() {
 
   if (cameraList) {
     cameraList.addEventListener('click', event => {
+      const renameBtn = event.target.closest('[data-rename-camera]');
+      if (renameBtn) {
+        state.editingCameraId = renameBtn.dataset.renameCamera;
+        renderCamerasPanel();
+        return;
+      }
+
+      const deleteBtn = event.target.closest('[data-delete-camera]');
+      if (deleteBtn) {
+        const id = deleteBtn.dataset.deleteCamera;
+        state.cameras = state.cameras.filter(c => c.id !== id);
+        if (state.activeCameraId === id) {
+          state.activeCameraId = state.cameras[0]?.id || null;
+        }
+        state.createImageSelectedCameraIds = state.createImageSelectedCameraIds.filter(cid => cid !== id);
+        renderCamerasPanel();
+        syncCreateImageModal();
+        return;
+      }
+
       const card = event.target.closest('[data-camera-id]');
       if (!card) return;
       const camera = state.cameras.find(item => item.id === card.dataset.cameraId);
@@ -2923,6 +3029,9 @@ function initOutputFeatures() {
   document.querySelectorAll('.create-image-mode').forEach(button => {
     button.addEventListener('click', () => {
       state.createImageMode = button.dataset.imageMode;
+      const preset = getResolutionPreset(state.createImageMode, state.createImageResolution);
+      state.createImageWidth = preset.width;
+      state.createImageHeight = preset.height;
       syncCreateImageModal();
     });
   });
@@ -2930,7 +3039,7 @@ function initOutputFeatures() {
   document.querySelectorAll('.create-image-res-btn').forEach(button => {
     button.addEventListener('click', () => {
       state.createImageResolution = button.dataset.resolution;
-      const preset = IMAGE_RESOLUTION_PRESETS[state.createImageResolution];
+      const preset = getResolutionPreset(state.createImageMode, state.createImageResolution);
       state.createImageWidth = preset.width;
       state.createImageHeight = preset.height;
       syncCreateImageModal();
@@ -2958,8 +3067,50 @@ function initOutputFeatures() {
     }
   });
 
-  if (widthInput) widthInput.addEventListener('input', () => { state.createImageWidth = Number(widthInput.value) || 1500; });
-  if (heightInput) heightInput.addEventListener('input', () => { state.createImageHeight = Number(heightInput.value) || 843; });
+  if (widthInput) {
+    widthInput.addEventListener('input', () => {
+      const w = Number(widthInput.value) || 1500;
+      if (state.createImageAspectLocked && state.createImageWidth > 0) {
+        state.createImageHeight = Math.round(w * (state.createImageHeight / state.createImageWidth));
+        const hi = document.getElementById('createImageHeight');
+        if (hi) hi.value = String(state.createImageHeight);
+      }
+      state.createImageWidth = w;
+      const dpiSize = document.getElementById('createImageDpiSize');
+      if (dpiSize) dpiSize.textContent = computePhysicalSize(state.createImageWidth, state.createImageHeight, state.createImageDpi);
+    });
+  }
+
+  if (heightInput) {
+    heightInput.addEventListener('input', () => {
+      const h = Number(heightInput.value) || 843;
+      if (state.createImageAspectLocked && state.createImageHeight > 0) {
+        state.createImageWidth = Math.round(h * (state.createImageWidth / state.createImageHeight));
+        const wi = document.getElementById('createImageWidth');
+        if (wi) wi.value = String(state.createImageWidth);
+      }
+      state.createImageHeight = h;
+      const dpiSize = document.getElementById('createImageDpiSize');
+      if (dpiSize) dpiSize.textContent = computePhysicalSize(state.createImageWidth, state.createImageHeight, state.createImageDpi);
+    });
+  }
+
+  const dpiSelectEl = document.getElementById('createImageDpi');
+  if (dpiSelectEl) {
+    dpiSelectEl.addEventListener('change', () => {
+      state.createImageDpi = Number(dpiSelectEl.value);
+      syncCreateImageModal();
+    });
+  }
+
+  const aspectLockBtn = document.getElementById('createImageAspectLock');
+  if (aspectLockBtn) {
+    aspectLockBtn.addEventListener('click', () => {
+      state.createImageAspectLocked = !state.createImageAspectLocked;
+      syncCreateImageModal();
+    });
+  }
+
   if (filenameInput) filenameInput.addEventListener('input', () => { state.createImageFilename = filenameInput.value.trim() || 'mattress-image'; });
   if (formatSelect) formatSelect.addEventListener('change', () => { state.createImageFormat = formatSelect.value; });
   if (transparentToggle) transparentToggle.addEventListener('change', () => { state.createImageTransparentBg = transparentToggle.checked; });
