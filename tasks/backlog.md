@@ -47,6 +47,15 @@ type: project
 
 - [x] Interactive 3D viewport — hover highlight + click-to-panel — done: 2026-04-07
 
+## UI Polish (2026-04-08)
+
+- [x] Layers panel — bug fix: Style panel (display:flex ID specificity) was overriding hidden attribute, showing style tabs in every panel — fixed with `#panel-style[hidden]` rule — done: 2026-04-08
+- [x] Layers panel — redesign: removed 4-button action row, added drag handle (left) + delete button (right) only — done: 2026-04-08
+- [x] Layers panel — removed duplicate height value from card header (now only in slider row) — done: 2026-04-08
+- [x] Layers panel — budget-constrained height system: AUTO layer auto-fills budget, non-default layers are user-adjustable, single-layer stack is locked — done: 2026-04-08
+- [x] Layers panel — drag-to-reorder via mousedown-on-handle pattern (prevents accidental drags from card clicks) — done: 2026-04-08
+- [x] Layers panel — inline number input for precise height entry (transparent at rest, border on hover/focus, no spinners) — done: 2026-04-08
+
 ## UI Polish (2026-04-07)
 
 - [x] Style panel — Textures tab: search icon moved inside input, Upload button height matched, textures mixed exclusive/normal — done: 2026-04-07

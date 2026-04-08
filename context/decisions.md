@@ -102,6 +102,18 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **Reason:** The original render item was a plain text row with no thumbnail — inconsistent with Previews and the reference tool screenshots
 - **Alternatives considered:** Full-width thumbnail (same as preview cards), text-only row retained
 
+### 2026-04-08 | Internal layers — budget-constrained height system
+- **Decision:** Internal layer height is governed by a budget (`mattressHeight − 1.5" top reserve − 0.5" bottom reserve`). One layer is always designated AUTO (default) and auto-fills remaining budget. Single-layer stacks lock height entirely.
+- **Reason:** Prevents layers from summing to more or less than the available internal space; gives users precise control over non-default layers while keeping the total honest
+- **Implementation:** `getInternalBudget()`, `rebalanceLayers(changedId)`, `redistributeLayersEvenly()` in `app.js`; `state.layersDefaultId` tracks the AUTO layer; deleting the default promotes the next layer (index+1, fallback index-1)
+- **Alternatives considered:** Free-form height adjustment with a running total indicator (not self-correcting)
+
+### 2026-04-08 | Layers panel UI — drag-to-reorder + inline height input
+- **Decision:** Replace the 4-button action row (move-up, visibility, lock, delete) with a drag handle icon on the left and a single delete button on the right. Height value is an inline `<input type="number">` that looks like plain text at rest (transparent border, reveals on hover/focus).
+- **Reason:** The action row was visually noisy for a panel that primarily needs reordering and deletion; visibility/lock controls are deferred until needed. The plain-text number input provides precision without looking like a form field.
+- **Drag implementation:** `mousedown` on `.layer-card__drag-handle` sets `card.draggable = true`; any other mousedown sets it to false. This prevents accidental drags from card clicks.
+- **Alternatives considered:** Keep 4-button row, use a separate modal for layer settings
+
 ### 2026-04-07 | Interactive 3D viewport — hover highlight + click to open panel
 - **Decision:** Hovering over a mattress part in the 3D viewport shows an orange emissive glow; clicking opens the corresponding sidebar panel
 - **Reason:** The 3D model was view-only; making it interactive gives users a direct spatial shortcut to any panel without needing to locate the correct sidebar icon

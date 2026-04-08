@@ -137,6 +137,11 @@ const LAYER_TEMPLATES = [
   { id: 'foam-slab',       name: 'Foam Slab',                cssName: 'Foam Slab',   color: '#7eb26d', thickness: 2.0   },
 ];
 
+// Internal height budget — inches consumed by top quilt/cover and bottom panel
+const INTERNAL_TOP_RESERVE    = 1.5;
+const INTERNAL_BOTTOM_RESERVE = 0.5;
+const LAYER_MIN_THICKNESS     = 0.25; // no layer can be thinner than this
+
 let layerUid = 0;
 let imageUid = 0;
 let cameraUid = 0;
@@ -269,6 +274,7 @@ const BASE_STATE = {
   layersInnerBuild: false,
   layersCutaway: false,
   layersCutawayOpen: false,
+  layersDefaultId: null,   // ID of the auto-adjusting layer
   // Images / cameras / output
   imagesTab: 'previews',
   createImageMode: 'preview',
@@ -293,6 +299,7 @@ function createDefaultState() {
     styleColorSwatches: [],
     layers,
     layersExpandedId: layers[0] ? layers[0].id : null,
+    layersDefaultId:  layers[0] ? layers[0].id : null,
     createImageFilename: 'New Mattress_4-image1',
     createImageSelectedCameraIds: [defaultCamera.id],
     previewImages: [],
@@ -1859,6 +1866,57 @@ function getExpandedLayer() {
   return state.layers.find(layer => layer.id === state.layersExpandedId) || state.layers[0] || null;
 }
 
+// Returns inches available for internal layers after top/bottom cover reserves
+function getInternalBudget() {
+  const height = HEIGHTS.find(h => h.id === state.height);
+  const totalInches = height ? height.inches : 10;
+  return Math.max(LAYER_MIN_THICKNESS, totalInches - INTERNAL_TOP_RESERVE - INTERNAL_BOTTOM_RESERVE);
+}
+
+// Called when a layer is added or deleted — distributes budget evenly
+function redistributeLayersEvenly() {
+  if (!state.layers.length) return;
+  const budget = getInternalBudget();
+  const each = Math.max(LAYER_MIN_THICKNESS, budget / state.layers.length);
+  state.layers.forEach(l => { l.thickness = each; });
+  // Ensure default layer id is valid
+  if (!state.layers.find(l => l.id === state.layersDefaultId)) {
+    state.layersDefaultId = state.layers[0].id;
+  }
+}
+
+// Called when a non-default layer's slider moves — auto-adjusts the default layer
+function rebalanceLayers(changedLayerId) {
+  if (state.layers.length <= 1) return;
+  const budget = getInternalBudget();
+
+  let defaultLayer = state.layers.find(l => l.id === state.layersDefaultId);
+  if (!defaultLayer) {
+    defaultLayer = state.layers[0];
+    state.layersDefaultId = defaultLayer.id;
+  }
+  // Default layer is auto-managed; its slider is disabled so this shouldn't fire for it
+  if (changedLayerId === state.layersDefaultId) return;
+
+  const othersSum = state.layers
+    .filter(l => l.id !== state.layersDefaultId)
+    .reduce((sum, l) => sum + Number(l.thickness), 0);
+
+  const remaining = budget - othersSum;
+
+  if (remaining < LAYER_MIN_THICKNESS) {
+    // Clamp the layer that just changed so default can stay at minimum
+    const changed = state.layers.find(l => l.id === changedLayerId);
+    if (changed) {
+      const otherFixed = othersSum - changed.thickness;
+      changed.thickness = Math.max(LAYER_MIN_THICKNESS, budget - otherFixed - LAYER_MIN_THICKNESS);
+    }
+    defaultLayer.thickness = LAYER_MIN_THICKNESS;
+  } else {
+    defaultLayer.thickness = remaining;
+  }
+}
+
 function renderLayersPanel() {
   const stack = document.getElementById('layersStack');
   if (!stack) return;
@@ -1870,45 +1928,60 @@ function renderLayersPanel() {
     return;
   }
 
-  stack.innerHTML = state.layers.map((layer, index) => `
+  const budget = getInternalBudget();
+  const isSingleLayer = state.layers.length === 1;
+
+  stack.innerHTML = state.layers.map(layer => {
+    const isDefault = layer.id === state.layersDefaultId;
+    const sliderDisabled = isSingleLayer || isDefault;
+    // Max a non-default layer can be = budget minus minimum room for every other layer
+    const maxForLayer = isSingleLayer
+      ? budget
+      : budget - (state.layers.length - 1) * LAYER_MIN_THICKNESS;
+
+    return `
     <article class="layer-card${state.layersExpandedId === layer.id ? '' : ' is-collapsed'}" data-layer-id="${layer.id}">
       <div class="layer-card__header">
+        <span class="layer-card__drag-handle" aria-hidden="true">
+          <span class="material-symbols-outlined">drag_indicator</span>
+        </span>
         <button class="layer-card__toggle" type="button" data-layer-toggle="${layer.id}">
           <span class="layer-card__preview" style="--layer-accent:${layer.color}"></span>
-          <div class="layer-card__text">
-            <span class="layer-card__title">${layer.name}</span>
-          </div>
+          <span class="layer-card__title">${layer.name}</span>
         </button>
-        <span class="layer-card__value">${Number(layer.thickness).toFixed(3)} (in)</span>
-      </div>
-
-      <div class="layer-card__actions-row">
-        <div class="layer-card__action-group">
-          <button class="layer-card__mini-btn" type="button" data-action="move-up" ${index === 0 ? 'disabled' : ''} aria-label="Move layer up">
-            <span class="material-symbols-outlined">swap_vert</span>
-          </button>
-          <button class="layer-card__mini-btn" type="button" data-action="visibility" aria-label="Toggle visibility">
-            <span class="material-symbols-outlined">${layer.visible ? 'visibility' : 'visibility_off'}</span>
-          </button>
-          <button class="layer-card__mini-btn" type="button" data-action="lock" aria-label="Toggle lock">
-            <span class="material-symbols-outlined">${layer.locked ? 'lock' : 'lock_open'}</span>
-          </button>
-          <button class="layer-card__mini-btn" type="button" data-action="delete" aria-label="Delete layer">
-            <span class="material-symbols-outlined">delete</span>
-          </button>
-        </div>
-        <div class="layer-chip">${layer.cssName}</div>
+        <button class="layer-card__mini-btn layer-card__delete-btn" type="button" data-action="delete" aria-label="Delete layer">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
       </div>
 
       <div class="form-slider-field">
         <div class="layer-card__header-line">
-          <label class="form-field-label" for="layerThicknessRange-${layer.id}">Height</label>
-          <span class="layer-card__value" id="layerThicknessVal-${layer.id}">${Number(layer.thickness).toFixed(3)} (in)</span>
+          <label class="form-field-label" for="layerThicknessRange-${layer.id}">
+            HEIGHT${isDefault && !isSingleLayer ? ' <span class="layer-auto-badge">AUTO</span>' : ''}
+          </label>
+          <input class="form-input form-input--inline layer-thickness-input"
+                 id="layerThicknessVal-${layer.id}"
+                 data-layer-id="${layer.id}"
+                 type="number"
+                 min="${LAYER_MIN_THICKNESS}"
+                 max="${maxForLayer.toFixed(3)}"
+                 step="0.001"
+                 value="${Number(layer.thickness).toFixed(3)}"
+                 ${sliderDisabled ? 'disabled' : ''}>
         </div>
-        <input class="form-range layer-thickness-range" id="layerThicknessRange-${layer.id}" data-layer-id="${layer.id}" type="range" min="0.5" max="8" step="0.001" value="${Number(layer.thickness)}">
+        <input class="form-range layer-thickness-range"
+               id="layerThicknessRange-${layer.id}"
+               data-layer-id="${layer.id}"
+               type="range"
+               min="${LAYER_MIN_THICKNESS}"
+               max="${maxForLayer.toFixed(3)}"
+               step="0.001"
+               value="${Number(layer.thickness).toFixed(3)}"
+               ${sliderDisabled ? 'disabled' : ''}>
       </div>
     </article>
-  `).join('');
+  `;
+  }).join('');
 
   stack.querySelectorAll('.layer-thickness-range').forEach(updateSliderFill);
   updateViewportLabel();
@@ -2046,6 +2119,7 @@ function initLayersPanel() {
       const nextLayer = createLayerFromTemplate(templateId);
       state.layers.push(nextLayer);
       state.layersExpandedId = nextLayer.id;
+      redistributeLayersEvenly();
       closeLayersPicker();
       renderLayersPanel();
       renderLayoutsPanel();
@@ -2086,6 +2160,7 @@ function initLayersPanel() {
   }
 
   if (stack) {
+    // ── Click: expand/collapse + delete ─────────────────────
     stack.addEventListener('click', event => {
       const toggleBtn = event.target.closest('[data-layer-toggle]');
       if (toggleBtn) {
@@ -2094,47 +2169,135 @@ function initLayersPanel() {
         return;
       }
 
-      const actionBtn = event.target.closest('[data-action]');
+      const actionBtn = event.target.closest('[data-action="delete"]');
       if (!actionBtn) return;
 
       const card = actionBtn.closest('[data-layer-id]');
       if (!card) return;
       const layerId = card.dataset.layerId;
-      const index = state.layers.findIndex(layer => layer.id === layerId);
+      const index = state.layers.findIndex(l => l.id === layerId);
       if (index === -1) return;
 
-      const action = actionBtn.dataset.action;
-      if (action === 'move-up') moveLayer(index, index - 1);
-      if (action === 'visibility') state.layers[index].visible = !state.layers[index].visible;
-      if (action === 'lock') state.layers[index].locked = !state.layers[index].locked;
-      if (action === 'delete' && state.layers.length > 1) {
-        state.layers.splice(index, 1);
-        if (state.layersExpandedId === layerId) {
-          state.layersExpandedId = state.layers[0] ? state.layers[0].id : null;
-        }
-      } else if (action === 'delete') {
+      if (state.layers.length <= 1) {
         showToast('At least one internal layer is required');
         return;
       }
 
+      const wasDefault = state.layersDefaultId === layerId;
+      // Pick successor before splicing: prefer index+1, fall back to index-1
+      const successorIndex = index + 1 < state.layers.length ? index + 1 : index - 1;
+      const successorId = state.layers[successorIndex]?.id ?? null;
+
+      state.layers.splice(index, 1);
+
+      if (state.layersExpandedId === layerId) {
+        state.layersExpandedId = state.layers[0] ? state.layers[0].id : null;
+      }
+      if (wasDefault) {
+        state.layersDefaultId = successorId ?? (state.layers[0]?.id ?? null);
+      }
+      redistributeLayersEvenly();
       renderLayersPanel();
       renderLayoutsPanel();
     });
 
-    stack.addEventListener('input', event => {
-      const layerId = event.target.dataset.layerId;
-      if (!layerId) return;
-      const layer = state.layers.find(item => item.id === layerId);
-      if (!layer) return;
+    // ── Shared: apply a thickness change and sync all DOM ────
+    function applyThicknessChange(layer, rawValue) {
+      const budget = getInternalBudget();
+      const maxForLayer = state.layers.length === 1
+        ? budget
+        : budget - (state.layers.length - 1) * LAYER_MIN_THICKNESS;
+      layer.thickness = Math.max(LAYER_MIN_THICKNESS, Math.min(Number(rawValue), maxForLayer));
+      rebalanceLayers(layer.id);
 
-      if (event.target.classList.contains('layer-thickness-range')) {
-        layer.thickness = Number(event.target.value);
-        const valueEl = document.getElementById(`layerThicknessVal-${layer.id}`);
-        if (valueEl) valueEl.textContent = `${Number(layer.thickness).toFixed(3)} (in)`;
-        updateSliderFill(event.target);
+      // Sync changed layer's input + slider
+      const valInput = document.getElementById(`layerThicknessVal-${layer.id}`);
+      const rangeEl  = document.getElementById(`layerThicknessRange-${layer.id}`);
+      if (valInput) valInput.value = Number(layer.thickness).toFixed(3);
+      if (rangeEl)  { rangeEl.value = String(layer.thickness); updateSliderFill(rangeEl); }
+
+      // Sync auto-adjusted default layer
+      const defaultLayer = state.layers.find(l => l.id === state.layersDefaultId);
+      if (defaultLayer && defaultLayer.id !== layer.id) {
+        const defInput = document.getElementById(`layerThicknessVal-${defaultLayer.id}`);
+        const defRange = document.getElementById(`layerThicknessRange-${defaultLayer.id}`);
+        if (defInput) defInput.value = Number(defaultLayer.thickness).toFixed(3);
+        if (defRange) { defRange.value = String(defaultLayer.thickness); updateSliderFill(defRange); }
       }
+
       updateViewportLabel();
       syncViewportLayers();
+    }
+
+    // ── Slider: live update while dragging ───────────────────
+    stack.addEventListener('input', event => {
+      if (!event.target.classList.contains('layer-thickness-range')) return;
+      const layerId = event.target.dataset.layerId;
+      const layer = state.layers.find(item => item.id === layerId);
+      if (!layer) return;
+      applyThicknessChange(layer, event.target.value);
+    });
+
+    // ── Number input: commit on change (blur / Enter) ────────
+    stack.addEventListener('change', event => {
+      if (!event.target.classList.contains('layer-thickness-input')) return;
+      const layerId = event.target.dataset.layerId;
+      const layer = state.layers.find(item => item.id === layerId);
+      if (!layer) return;
+      applyThicknessChange(layer, event.target.value);
+    });
+
+    // ── Drag-and-drop: reorder layers ───────────────────────
+    let dragSrcIndex = null;
+
+    // Enable drag only when pointerdown starts on the handle
+    stack.addEventListener('mousedown', event => {
+      const handle = event.target.closest('.layer-card__drag-handle');
+      const card   = event.target.closest('.layer-card');
+      if (!card) return;
+      card.draggable = !!handle;
+    });
+
+    stack.addEventListener('dragstart', event => {
+      const card = event.target.closest('.layer-card');
+      if (!card || !card.draggable) { event.preventDefault(); return; }
+      dragSrcIndex = [...stack.querySelectorAll('.layer-card')].indexOf(card);
+      card.classList.add('is-dragging');
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(dragSrcIndex));
+    });
+
+    stack.addEventListener('dragover', event => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      const card = event.target.closest('.layer-card');
+      stack.querySelectorAll('.layer-card').forEach(c => c.classList.remove('drag-over'));
+      if (card) card.classList.add('drag-over');
+    });
+
+    stack.addEventListener('dragleave', event => {
+      if (!stack.contains(event.relatedTarget)) {
+        stack.querySelectorAll('.layer-card').forEach(c => c.classList.remove('drag-over'));
+      }
+    });
+
+    stack.addEventListener('drop', event => {
+      event.preventDefault();
+      const card = event.target.closest('.layer-card');
+      if (!card || dragSrcIndex === null) return;
+      const destIndex = [...stack.querySelectorAll('.layer-card')].indexOf(card);
+      if (destIndex !== -1 && destIndex !== dragSrcIndex) {
+        moveLayer(dragSrcIndex, destIndex);
+        renderLayersPanel();
+        renderLayoutsPanel();
+      }
+    });
+
+    stack.addEventListener('dragend', () => {
+      dragSrcIndex = null;
+      stack.querySelectorAll('.layer-card').forEach(c => {
+        c.classList.remove('is-dragging', 'drag-over');
+      });
     });
   }
 
