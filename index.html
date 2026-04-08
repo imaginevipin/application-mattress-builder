@@ -1056,16 +1056,18 @@
             </button>
 
             <section class="layout-card" id="layoutCutawayCard">
-              <button class="layout-card__header" id="layoutCutawayToggle" aria-expanded="false">
-                <span class="layout-card__title-wrap">
-                  <span class="material-symbols-outlined">crop</span>
-                  <span class="layout-card__title">Cutaway View</span>
-                </span>
-                <span class="layout-card__header-actions">
-                  <span class="layout-mini-toggle${''}" id="layoutFrontIcon"></span>
-                  <span class="layout-mini-toggle is-active" id="layoutSideIcon"></span>
-                </span>
-              </button>
+              <div class="layout-card__header-row">
+                <button class="layout-card__header" id="layoutCutawayToggle" aria-expanded="false">
+                  <span class="layout-card__title-wrap">
+                    <span class="material-symbols-outlined">crop</span>
+                    <span class="layout-card__title">Cutaway View</span>
+                  </span>
+                </button>
+                <div class="layout-card__header-actions">
+                  <button class="layout-mini-toggle" id="layoutCutawayRect" title="Rectangular cut" aria-label="Rectangular cut"></button>
+                  <button class="layout-mini-toggle layout-mini-toggle--circle" id="layoutCutawayCircle" title="Circular cut" aria-label="Circular cut"></button>
+                </div>
+              </div>
               <div class="layout-card__body" id="layoutCutawayBody" hidden>
                 <div class="layout-cutaway-list" id="layoutCutawayList"></div>
               </div>

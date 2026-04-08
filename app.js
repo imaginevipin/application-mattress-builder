@@ -274,6 +274,7 @@ const BASE_STATE = {
   layersInnerBuild: false,
   layersCutaway: false,
   layersCutawayOpen: false,
+  layersCutawayShape: 'rect',
   layersDefaultId: null,   // ID of the auto-adjusting layer
   // Images / cameras / output
   imagesTab: 'previews',
@@ -519,6 +520,7 @@ function syncViewportLayers() {
         explodedGap: state.layersExplodedGap,
         innerBuild: state.layersInnerBuild,
         cutaway: state.layersCutaway,
+      cutawayShape: state.layersCutawayShape,
       },
     });
     return;
@@ -531,6 +533,7 @@ function syncViewportLayers() {
       explodedGap: state.layersExplodedGap,
       innerBuild: state.layersInnerBuild,
       cutaway: state.layersCutaway,
+      cutawayShape: state.layersCutawayShape,
     });
   }
   if (window.viewportSetMode) window.viewportSetMode(state.mode);
@@ -2036,6 +2039,8 @@ function renderLayoutsPanel() {
   const cutawayCard = document.getElementById('layoutCutawayCard');
   const cutawayBody = document.getElementById('layoutCutawayBody');
   const cutawayList = document.getElementById('layoutCutawayList');
+  const cutawayRectBtn = document.getElementById('layoutCutawayRect');
+  const cutawayCircleBtn = document.getElementById('layoutCutawayCircle');
 
   if (explodedCard) explodedCard.classList.toggle('is-active', state.layersExploded);
   if (explodedBody) explodedBody.hidden = !state.layersExplodedOpen;
@@ -2051,12 +2056,30 @@ function renderLayoutsPanel() {
     innerBuildBtn.setAttribute('aria-pressed', String(state.layersInnerBuild));
   }
 
+  const cutawayToggleEl = document.getElementById('layoutCutawayToggle');
   if (cutawayCard) cutawayCard.classList.toggle('is-active', state.layersCutaway);
   if (cutawayBody) cutawayBody.hidden = !state.layersCutawayOpen;
+  if (cutawayToggleEl) cutawayToggleEl.setAttribute('aria-expanded', String(state.layersCutawayOpen));
+  if (cutawayRectBtn) cutawayRectBtn.classList.toggle('is-active', state.layersCutaway && state.layersCutawayShape === 'rect');
+  if (cutawayCircleBtn) cutawayCircleBtn.classList.toggle('is-active', state.layersCutaway && state.layersCutawayShape === 'circle');
 
   if (cutawayList) {
     const visible = state.layers.filter(layer => layer.visible).slice(0, 2);
-    cutawayList.innerHTML = visible.map(layer => `
+    const isCircle = state.layersCutawayShape === 'circle';
+    cutawayList.innerHTML = visible.map(layer => {
+      if (isCircle) {
+        return `
+      <div class="layout-cutaway-group">
+        <div class="form-slider-field">
+          <div class="form-slider-header">
+            <label class="form-field-label" for="layerFrontCut-${layer.id}">${layer.name}</label>
+            <span class="form-slider-val" id="layerFrontCutVal-${layer.id}">${Number(layer.frontCut).toFixed(1)}</span>
+          </div>
+          <input class="form-range layer-front-cut-range" id="layerFrontCut-${layer.id}" data-layer-id="${layer.id}" type="range" min="0" max="1" step="0.1" value="${Number(layer.frontCut)}">
+        </div>
+      </div>`;
+      }
+      return `
       <div class="layout-cutaway-group">
         <span class="layout-cutaway-name">${layer.name}</span>
         <div class="form-slider-field">
@@ -2073,8 +2096,8 @@ function renderLayoutsPanel() {
           </div>
           <input class="form-range layer-side-cut-range" id="layerSideCut-${layer.id}" data-layer-id="${layer.id}" type="range" min="0" max="1" step="0.1" value="${Number(layer.sideCut)}">
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
 
     cutawayList.querySelectorAll('.layer-front-cut-range, .layer-side-cut-range').forEach(updateSliderFill);
   }
@@ -2089,6 +2112,8 @@ function initLayersPanel() {
   const explodedGap = document.getElementById('layersExplodedGap');
   const innerBuildBtn = document.getElementById('layersInnerBuildBtn');
   const cutawayToggle = document.getElementById('layoutCutawayToggle');
+  const cutawayRectBtn = document.getElementById('layoutCutawayRect');
+  const cutawayCircleBtn = document.getElementById('layoutCutawayCircle');
 
   if (addBtn) {
     addBtn.addEventListener('click', () => {
@@ -2127,10 +2152,34 @@ function initLayersPanel() {
     });
   }
 
+  function activateExploded() {
+    state.layersInnerBuild = false;
+    state.layersCutaway = false;
+    state.layersCutawayOpen = false;
+  }
+
+  function activateInnerBuild() {
+    state.layersExploded = false;
+    state.layersCutaway = false;
+    state.layersCutawayOpen = false;
+  }
+
+  function activateCutaway() {
+    state.layersExploded = false;
+    state.layersInnerBuild = false;
+  }
+
   if (explodedToggle) {
     explodedToggle.addEventListener('click', () => {
-      state.layersExploded = true;
-      state.layersExplodedOpen = !state.layersExplodedOpen;
+      if (!state.layersExploded) {
+        // Activating — open the body
+        activateExploded();
+        state.layersExploded = true;
+        state.layersExplodedOpen = true;
+      } else {
+        // Already active — toggle body open/close
+        state.layersExplodedOpen = !state.layersExplodedOpen;
+      }
       renderLayoutsPanel();
     });
   }
@@ -2138,14 +2187,21 @@ function initLayersPanel() {
   if (explodedGap) {
     explodedGap.addEventListener('input', () => {
       state.layersExplodedGap = Number(explodedGap.value);
-      state.layersExploded = state.layersExplodedGap > 0;
+      if (state.layersExplodedGap > 0) {
+        activateExploded();
+        state.layersExploded = true;
+      } else {
+        state.layersExploded = false;
+      }
       renderLayoutsPanel();
     });
   }
 
   if (innerBuildBtn) {
     innerBuildBtn.addEventListener('click', () => {
-      state.layersInnerBuild = !state.layersInnerBuild;
+      const next = !state.layersInnerBuild;
+      if (next) activateInnerBuild();
+      state.layersInnerBuild = next;
       renderLayoutsPanel();
     });
   }
@@ -2153,8 +2209,29 @@ function initLayersPanel() {
   if (cutawayToggle) {
     cutawayToggle.addEventListener('click', () => {
       const nextOpen = !state.layersCutawayOpen;
+      if (nextOpen) activateCutaway();
       state.layersCutawayOpen = nextOpen;
       state.layersCutaway = nextOpen;
+      renderLayoutsPanel();
+    });
+  }
+
+  if (cutawayRectBtn) {
+    cutawayRectBtn.addEventListener('click', () => {
+      activateCutaway();
+      state.layersCutawayShape = 'rect';
+      state.layersCutaway = true;
+      state.layersCutawayOpen = true;
+      renderLayoutsPanel();
+    });
+  }
+
+  if (cutawayCircleBtn) {
+    cutawayCircleBtn.addEventListener('click', () => {
+      activateCutaway();
+      state.layersCutawayShape = 'circle';
+      state.layersCutaway = true;
+      state.layersCutawayOpen = true;
       renderLayoutsPanel();
     });
   }

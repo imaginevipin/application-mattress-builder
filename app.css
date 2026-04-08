@@ -3296,6 +3296,24 @@ input:focus-visible {
   overflow: hidden;
 }
 
+.layout-card__header-row {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+}
+
+.layout-card__header-row .layout-card__header {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  min-height: 48px;
+}
+
+.layout-card__header-row .layout-card__header-actions {
+  padding-right: var(--s-300);
+  flex-shrink: 0;
+}
+
 .layout-card__header,
 .layout-card--button {
   width: 100%;
@@ -3307,10 +3325,13 @@ input:focus-visible {
   padding: 0 var(--s-300);
   color: var(--text-default-heading);
   text-align: left;
-  background: transparent;
-  border: 0;
   font: inherit;
   cursor: pointer;
+}
+
+.layout-card__header {
+  background: transparent;
+  border: 0;
 }
 
 .layout-card__title-wrap {
@@ -3366,10 +3387,22 @@ input:focus-visible {
   border-radius: 3px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   background: transparent;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.layout-mini-toggle--circle {
+  border-radius: 50%;
 }
 
 .layout-mini-toggle.is-active {
   border-color: var(--border-primary-default);
+}
+
+.layout-mini-toggle:hover:not(.is-active) {
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .layout-cutaway-list {
@@ -4048,6 +4081,7 @@ input:focus-visible {
 .color-channel-range {
   flex: 1;
   -webkit-appearance: none;
+  appearance: none;
   height: 6px;
   border-radius: 3px;
   outline: none;
