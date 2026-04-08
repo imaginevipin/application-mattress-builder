@@ -1084,6 +1084,9 @@
             <button class="style-tab" data-style-tab="properties" role="tab" aria-selected="false" aria-controls="styleTabProperties">Properties</button>
           </div>
 
+          <!-- Tab pane scroll body -->
+          <div class="style-panel-body">
+
           <!-- ── Textures tab ───────────────────────────── -->
           <div class="style-tab-pane" id="styleTabTextures" role="tabpanel">
 
@@ -1108,12 +1111,6 @@
 
           <!-- ── Materials tab ─────────────────────────── -->
           <div class="style-tab-pane" id="styleTabMaterials" role="tabpanel" hidden>
-
-            <div class="style-filter-chips" id="styleMaterialFilters">
-              <button class="style-chip is-active" data-filter="all">Mattress Builder</button>
-              <button class="style-chip" data-filter="cotton">Cotton</button>
-              <button class="style-chip" data-filter="trim">Trim AI</button>
-            </div>
 
             <div class="panel-search">
               <label class="sr-only" for="styleMaterialSearch">Search materials</label>
@@ -1209,30 +1206,27 @@
 
             <!-- Width / Height + reset -->
             <div class="style-dimension-row">
-              <div class="form-grid-2">
-                <div class="form-field">
-                  <label class="form-field-label" for="stylePropWidth">Width (inches)</label>
-                  <input class="form-input" id="stylePropWidth" type="number" value="1" step="0.1" min="0.1">
-                </div>
-                <div class="form-field">
-                  <label class="form-field-label" for="stylePropHeight">Height (inches)</label>
-                  <input class="form-input" id="stylePropHeight" type="number" value="1" step="0.1" min="0.1">
-                </div>
+              <div class="style-dimension-labels">
+                <label class="form-field-label" for="stylePropWidth">Width (inches)</label>
+                <label class="form-field-label" for="stylePropHeight">Height (inches)</label>
               </div>
-              <button class="style-dimension-reset" id="stylePropDimReset" aria-label="Reset dimensions">
-                <span class="material-symbols-outlined">restart_alt</span>
-              </button>
+              <div class="style-dimension-inputs">
+                <input class="form-input" id="stylePropWidth" type="number" value="1" step="0.1" min="0.1">
+                <input class="form-input" id="stylePropHeight" type="number" value="1" step="0.1" min="0.1">
+                <button class="style-dimension-reset" id="stylePropDimReset" aria-label="Reset dimensions">
+                  <span class="material-symbols-outlined">restart_alt</span>
+                </button>
+              </div>
             </div>
 
             <!-- Position X / Y -->
-            <p class="section-label">Position</p>
             <div class="style-pos-grid">
               <div class="form-field">
-                <label class="form-field-label" for="stylePropPosX">X</label>
+                <label class="form-field-label" for="stylePropPosX">Position-X</label>
                 <input class="form-input" id="stylePropPosX" type="number" value="0" step="1">
               </div>
               <div class="form-field">
-                <label class="form-field-label" for="stylePropPosY">Y</label>
+                <label class="form-field-label" for="stylePropPosY">Position-Y</label>
                 <input class="form-input" id="stylePropPosY" type="number" value="0" step="1">
               </div>
             </div>
@@ -1256,6 +1250,8 @@
             </div>
 
           </div>
+
+          </div><!-- /.style-panel-body -->
 
         </div>
 

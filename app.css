@@ -432,6 +432,8 @@ input:focus-visible {
   flex-shrink: 0;
   background: var(--surface-panel);
   border-right: var(--bw) solid var(--border-default-secondary);
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
@@ -2437,6 +2439,11 @@ input:focus-visible {
   padding-top: 0;
 }
 
+/* Properties tab CTA bar needs top padding to clear the tab bar */
+#styleTabProperties .panel-cta-bar--inner {
+  padding-top: var(--s-400);
+}
+
 /* Foot CTA bar — sticks to bottom of scroll container */
 
 .panel-cta-bar--foot {
@@ -3603,6 +3610,37 @@ input:focus-visible {
    STYLE PANEL — Tab bar
    ───────────────────────────────────────────────────────── */
 
+/* Style panel is a flex column — tab bar fixed, body scrolls */
+#panel-style {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.style-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default-secondary) transparent;
+}
+
+.style-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.style-panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.style-panel-body::-webkit-scrollbar-thumb {
+  background: var(--border-default-secondary);
+  border-radius: 2px;
+}
+
 .style-tabs {
   display: flex;
   border-bottom: var(--bw) solid var(--border-default-secondary);
@@ -4048,9 +4086,9 @@ input:focus-visible {
 
 /* Material preview swatch */
 .style-material-preview {
-  margin: 0 var(--s-400) var(--s-300);
+  margin: var(--s-400) var(--s-400) var(--s-300);
   width: calc(100% - var(--s-800));
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 3;
   border-radius: var(--br-200);
   background: #c8bfb0;
   border: var(--bw) solid var(--border-default-secondary);
@@ -4100,12 +4138,25 @@ input:focus-visible {
 /* Dimension row (Width + Height inputs + reset button) */
 .style-dimension-row {
   display: flex;
-  align-items: flex-end;
-  gap: var(--s-200);
+  flex-direction: column;
+  gap: var(--s-100);
   padding: 0 var(--s-400) var(--s-300);
 }
 
-.style-dimension-row .form-grid-2 {
+.style-dimension-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-200);
+  padding-right: calc(32px + var(--s-200));
+}
+
+.style-dimension-inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--s-200);
+}
+
+.style-dimension-inputs .form-input {
   flex: 1;
   min-width: 0;
 }
@@ -4120,7 +4171,7 @@ input:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2px;
+  margin-bottom: 0;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
