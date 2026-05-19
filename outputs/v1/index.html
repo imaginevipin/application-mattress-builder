@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mattress Builder — imagine.io</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="tokens-dark.css">
+  <link rel="stylesheet" href="app.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ── Top Bar ──────────────────────────────────────────── -->
+    <header class="topbar">
+
+      <div class="topbar-left">
+        <div class="brand-mark" role="img" aria-label="imagine.io logo">
+          <img src="../../assets/logos/Logo Mark.png" alt="" class="brand-mark__img">
+        </div>
+
+        <div class="file-menu">
+          <button class="btn-file" id="fileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fileMenu">
+            File
+            <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
+          </button>
+
+          <div class="file-menu__panel" id="fileMenu" role="menu" aria-labelledby="fileMenuBtn" hidden>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="save">
+              <span class="material-symbols-outlined">save</span>
+              <span>Save Project</span>
+            </button>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="save-as-new">
+              <span class="material-symbols-outlined">add_circle</span>
+              <span>Save as New</span>
+            </button>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="quit">
+              <span class="material-symbols-outlined">power_settings_new</span>
+              <span>Quit Project</span>
+            </button>
+            <button class="file-menu__item" type="button" role="menuitem" data-file-action="download-pdf">
+              <span class="material-symbols-outlined">picture_as_pdf</span>
+              <span>Download Pdf</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mode-toggle" role="group" aria-label="Configuration mode">
+          <button class="mode-btn is-active" data-mode="external" aria-pressed="true">External</button>
+          <button class="mode-btn" data-mode="internal" aria-pressed="false">Internal</button>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <input
+          class="mattress-name"
+          type="text"
+          value="New Mattress_4"
+          spellcheck="false"
+          aria-label="Mattress name"
+        >
+      </div>
+
+      <div class="topbar-right">
+        <button class="btn-action" id="requestPropBtn">
+          Request Prop
+        </button>
+        <button class="btn-action" id="addToLibraryBtn">
+          Add to library
+        </button>
+        <button class="btn-action btn-action--primary" id="createImageBtn">Create Image</button>
+      </div>
+
+    </header>
+
+    <!-- ── App Body ─────────────────────────────────────────── -->
+    <div class="app-body">
+
+      <!-- Icon Strip ──────────────────────────────────────── -->
+      <nav class="icon-strip" aria-label="Section navigation">
+
+        <!-- External-only sections -->
+        <div class="nav-group" id="navExternal">
+          <button class="nav-item is-active" data-section="size" aria-current="page">
+            <span class="material-symbols-outlined">straighten</span>
+            <span class="nav-label">Size</span>
+          </button>
+          <button class="nav-item" data-section="height">
+            <span class="material-symbols-outlined">height</span>
+            <span class="nav-label">Height</span>
+          </button>
+          <button class="nav-item" data-section="top">
+            <span class="material-symbols-outlined">vertical_align_top</span>
+            <span class="nav-label">Top</span>
+          </button>
+          <button class="nav-item" data-section="wall">
+            <span class="material-symbols-outlined">texture</span>
+            <span class="nav-label">Wall</span>
+          </button>
+          <button class="nav-item" data-section="tape">
+            <span class="material-symbols-outlined">horizontal_rule</span>
+            <span class="nav-label">Tape</span>
+          </button>
+          <button class="nav-item" data-section="label">
+            <span class="material-symbols-outlined">label</span>
+            <span class="nav-label">Label</span>
+          </button>
+          <button class="nav-item" data-section="handle">
+            <span class="material-symbols-outlined">drag_handle</span>
+            <span class="nav-label">Handle</span>
+          </button>
+          <button class="nav-item" data-section="bottom">
+            <span class="material-symbols-outlined">vertical_align_bottom</span>
+            <span class="nav-label">Bottom</span>
+          </button>
+        </div>
+
+        <!-- Internal-only sections -->
+        <div class="nav-group nav-group--hidden" id="navInternal">
+          <button class="nav-item" data-section="layers">
+            <span class="material-symbols-outlined">layers</span>
+            <span class="nav-label">Layers</span>
+          </button>
+          <button class="nav-item" data-section="layouts">
+            <span class="material-symbols-outlined">dashboard_customize</span>
+            <span class="nav-label">Layouts</span>
+          </button>
+        </div>
+
+        <div class="nav-divider"></div>
+
+        <!-- Shared sections (both modes) -->
+        <div class="nav-group" id="navShared">
+          <button class="nav-item" data-section="style">
+            <span class="material-symbols-outlined">palette</span>
+            <span class="nav-label">Style</span>
+          </button>
+          <button class="nav-item" data-section="images">
+            <span class="material-symbols-outlined">image</span>
+            <span class="nav-label">Images</span>
+          </button>
+          <button class="nav-item" data-section="cameras">
+            <span class="material-symbols-outlined">photo_camera</span>
+            <span class="nav-label">Cameras</span>
+          </button>
+        </div>
+
+      </nav>
+
+      <!-- Context Panel ──────────────────────────────────── -->
+      <aside class="context-panel" id="contextPanel">
+
+        <!-- Size ──── -->
+        <div class="panel" id="panel-size">
+          <div class="panel-header">
+            <p class="panel-title">Size</p>
+          </div>
+          <div class="panel-search">
+            <label class="sr-only" for="sizeSearch">Search mattress sizes</label>
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="sizeSearch" type="text" placeholder="Search size" autocomplete="off">
+          </div>
+          <div class="panel-body">
+            <div class="size-grid" id="sizeGrid"></div>
+          </div>
+        </div>
+
+        <!-- Height ── -->
+        <div class="panel" id="panel-height" hidden>
+          <div class="panel-header">
+            <p class="panel-title">Height</p>
+          </div>
+          <div class="panel-search">
+            <label class="sr-only" for="heightSearch">Search mattress heights</label>
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="heightSearch" type="text" placeholder="Search height" autocomplete="off">
+          </div>
+          <div class="panel-body">
+            <div class="height-grid" id="heightGrid"></div>
+          </div>
+        </div>
+
+        <!-- Top ───── -->
+        <div class="panel" id="panel-top" hidden>
+
+          <!-- ── View: Main ────────────────────────────── -->
+          <div class="panel-subview" id="topMainView">
+
+            <!-- CTA bar — always at top -->
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="topAddBtn">Add Top</button>
+            </div>
+
+            <!-- Config (shown after a type is selected) -->
+            <div class="top-config" id="topConfig" hidden>
+
+              <!-- Section header: thumb + name (→ type picker) + collapse chevron -->
+              <div class="type-section-header">
+                <button class="type-section-name" id="topTypeNameBtn" aria-label="Change top type">
+                  <span class="top-type-thumb" id="topTypeThumb"></span>
+                  <span id="topTypeName">Box Pillow Top</span>
+                </button>
+                <button class="type-section-collapse" id="topCollapseBtn" aria-expanded="true" aria-label="Collapse section">
+                  <span class="material-symbols-outlined" id="topSectionChevron">expand_less</span>
+                </button>
+              </div>
+
+              <!-- Section body (collapsible) -->
+              <div class="type-section-body" id="topSectionBody">
+
+                <!-- Quilting: top -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Quilting pattern - top :</span>
+                  <button class="pattern-swatch-btn" id="topPatternBtn" aria-label="Select top quilting pattern">
+                    <span class="pattern-thumb" id="topPatternThumb"></span>
+                  </button>
+                </div>
+
+                <!-- Quilting: gusset -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Quilting pattern - gusset :</span>
+                  <button class="pattern-swatch-btn" id="topGussetBtn" aria-label="Select gusset quilting pattern">
+                    <span class="pattern-thumb" id="topGussetThumb"></span>
+                  </button>
+                </div>
+
+                <!-- Add tufts row -->
+                <div class="feature-add-row" id="topTuftsRow">
+                  <button class="btn-feature-add" id="topTuftsToggle">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    Add tufts
+                  </button>
+                  <span class="alpha-badge">Alpha Version</span>
+                </div>
+
+                <!-- Tuft config (expands when tufts added) -->
+                <div class="tuft-config" id="topTuftConfig" hidden>
+
+                  <div class="tuft-config__header">
+                    <div class="tuft-config__header-left">
+                      <span class="tuft-swatch"></span>
+                      <div class="type-selector-row type-selector-row--compact">
+                        <button class="type-cycle-btn" id="tuftTypePrev" aria-label="Previous tuft type">
+                          <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <span id="tuftTypeName" class="tuft-type-name">Classic Tuft</span>
+                        <button class="type-cycle-btn" id="tuftTypeNext" aria-label="Next tuft type">
+                          <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="tuft-config__header-right">
+                      <span class="alpha-badge alpha-badge--sm">Alpha Version</span>
+                      <button class="tuft-action-btn" id="topTuftDeleteBtn" aria-label="Remove tuft">
+                        <span class="material-symbols-outlined">delete</span>
+                      </button>
+                      <button class="tuft-action-btn" id="topTuftCollapseBtn" aria-label="Collapse tuft config" aria-expanded="true">
+                        <span class="material-symbols-outlined" id="topTuftCollapseIcon">expand_less</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tuft config body (collapsible) -->
+                  <div id="topTuftBody">
+
+                    <div class="form-grid-2">
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftStartX">Starts From X</label>
+                        <input class="form-input" id="tuftStartX" type="number" value="0" min="0">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftStartY">Starts From Y</label>
+                        <input class="form-input" id="tuftStartY" type="number" value="0" min="0">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftColCount">Column Count</label>
+                        <input class="form-input" id="tuftColCount" type="number" value="6" min="1">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftColGap">Column Gap</label>
+                        <input class="form-input" id="tuftColGap" type="number" value="13.59" step="0.01">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftRowCount">Row Count</label>
+                        <input class="form-input" id="tuftRowCount" type="number" value="6" min="1">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftRowGap">Row Gap</label>
+                        <input class="form-input" id="tuftRowGap" type="number" value="14.38" step="0.01">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftOffset">Offset Alternate Rows</label>
+                        <input class="form-input" id="tuftOffset" type="number" value="0" min="0">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="tuftDiameter">Diameter Size</label>
+                        <input class="form-input" id="tuftDiameter" type="number" value="1" min="0.1" step="0.1">
+                      </div>
+                    </div>
+
+                    <div class="form-slider-field">
+                      <div class="form-slider-header">
+                        <label class="form-field-label" for="tuftDepth">Comfort Depth</label>
+                        <span class="form-slider-val" id="tuftDepthVal">0.5</span>
+                      </div>
+                      <input class="form-range" id="tuftDepth" type="range" min="0" max="8.5" step="0.1" value="0.5">
+                    </div>
+
+                    <div class="panel-cta-bar panel-cta-bar--inner">
+                      <button class="btn-save-preset">Save Preset</button>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+
+          <!-- ── View: Type Picker ──────────────────────── -->
+          <div class="panel-subview" id="topTypePickerView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="topTypePickerBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="topTypeSearch">Search top</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="topTypeSearch" type="text" placeholder="Search top" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="topTypeGrid"></div>
+            </div>
+
+          </div>
+
+          <!-- ── View: Pattern Picker ──────────────────── -->
+          <div class="panel-subview" id="topPatternView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="topPatternBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+              <button class="btn-upload-action">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="patternSearch">Search patterns</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="patternSearch" type="text" placeholder="Search pattern" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="topPatternGrid"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Wall ──── -->
+        <div class="panel" id="panel-wall" hidden>
+
+          <!-- ── View: Main ────────────────────────────── -->
+          <div class="panel-subview" id="wallMainView">
+
+            <!-- CTA bar — always at top -->
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="wallAddBtn">Add Wall</button>
+            </div>
+
+            <!-- Config (shown after a type is selected) -->
+            <div class="wall-config" id="wallConfig" hidden>
+
+              <!-- Section header: thumb + name (→ type picker) + collapse chevron -->
+              <div class="type-section-header">
+                <button class="type-section-name" id="wallTypeNameBtn" aria-label="Change wall type">
+                  <span class="wall-type-thumb" id="wallTypeThumb"></span>
+                  <span id="wallTypeName">Quilted Panel</span>
+                </button>
+                <button class="type-section-collapse" id="wallCollapseBtn" aria-expanded="true" aria-label="Collapse section">
+                  <span class="material-symbols-outlined" id="wallSectionChevron">expand_less</span>
+                </button>
+              </div>
+
+              <!-- Section body (collapsible) -->
+              <div class="type-section-body" id="wallSectionBody">
+
+                <!-- Quilting: wall -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Quilting pattern - wall :</span>
+                  <button class="pattern-swatch-btn" id="wallPatternBtn" aria-label="Select wall quilting pattern">
+                    <span class="pattern-thumb" id="wallPatternThumb"></span>
+                  </button>
+                </div>
+
+                <!-- Quilting: band -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Quilting pattern - band :</span>
+                  <button class="pattern-swatch-btn" id="wallBandBtn" aria-label="Select band quilting pattern">
+                    <span class="pattern-thumb" id="wallBandThumb"></span>
+                  </button>
+                </div>
+
+                <!-- Add tufts row -->
+                <div class="feature-add-row" id="wallTuftsRow">
+                  <button class="btn-feature-add" id="wallTuftsToggle">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    Add tufts
+                  </button>
+                  <span class="alpha-badge">Alpha Version</span>
+                </div>
+
+                <!-- Tuft config (expands when tufts added) -->
+                <div class="tuft-config" id="wallTuftConfig" hidden>
+
+                  <div class="tuft-config__header">
+                    <div class="tuft-config__header-left">
+                      <span class="tuft-swatch"></span>
+                      <div class="type-selector-row type-selector-row--compact">
+                        <button class="type-cycle-btn" id="wallTuftTypePrev" aria-label="Previous tuft type">
+                          <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <span id="wallTuftTypeName" class="tuft-type-name">Classic Tuft</span>
+                        <button class="type-cycle-btn" id="wallTuftTypeNext" aria-label="Next tuft type">
+                          <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="tuft-config__header-right">
+                      <span class="alpha-badge alpha-badge--sm">Alpha Version</span>
+                      <button class="tuft-action-btn" id="wallTuftDeleteBtn" aria-label="Remove tuft">
+                        <span class="material-symbols-outlined">delete</span>
+                      </button>
+                      <button class="tuft-action-btn" id="wallTuftCollapseBtn" aria-label="Collapse tuft config" aria-expanded="true">
+                        <span class="material-symbols-outlined" id="wallTuftCollapseIcon">expand_less</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tuft config body (collapsible) -->
+                  <div id="wallTuftBody">
+
+                    <div class="form-grid-2">
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftStartX">Starts From X</label>
+                        <input class="form-input" id="wallTuftStartX" type="number" value="0" min="0">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftStartY">Starts From Y</label>
+                        <input class="form-input" id="wallTuftStartY" type="number" value="0" min="0">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftColCount">Column Count</label>
+                        <input class="form-input" id="wallTuftColCount" type="number" value="6" min="1">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftColGap">Column Gap</label>
+                        <input class="form-input" id="wallTuftColGap" type="number" value="13.59" step="0.01">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftRowCount">Row Count</label>
+                        <input class="form-input" id="wallTuftRowCount" type="number" value="6" min="1">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftRowGap">Row Gap</label>
+                        <input class="form-input" id="wallTuftRowGap" type="number" value="14.38" step="0.01">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftOffset">Offset Alternate Rows</label>
+                        <input class="form-input" id="wallTuftOffset" type="number" value="0" min="0">
+                      </div>
+                      <div class="form-field">
+                        <label class="form-field-label" for="wallTuftDiameter">Diameter Size</label>
+                        <input class="form-input" id="wallTuftDiameter" type="number" value="1" min="0.1" step="0.1">
+                      </div>
+                    </div>
+
+                    <div class="form-slider-field">
+                      <div class="form-slider-header">
+                        <label class="form-field-label" for="wallTuftDepth">Comfort Depth</label>
+                        <span class="form-slider-val" id="wallTuftDepthVal">0.5</span>
+                      </div>
+                      <input class="form-range" id="wallTuftDepth" type="range" min="0" max="8.5" step="0.1" value="0.5">
+                    </div>
+
+                    <div class="panel-cta-bar panel-cta-bar--inner">
+                      <button class="btn-save-preset">Save Preset</button>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+
+          <!-- ── View: Type Picker ──────────────────────── -->
+          <div class="panel-subview" id="wallTypePickerView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="wallTypePickerBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="wallTypeSearch">Search wall</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="wallTypeSearch" type="text" placeholder="Search wall" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="wallTypeGrid"></div>
+            </div>
+
+          </div>
+
+          <!-- ── View: Pattern Picker ──────────────────── -->
+          <div class="panel-subview" id="wallPatternView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="wallPatternBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+              <button class="btn-upload-action">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="wallPatternSearch">Search patterns</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="wallPatternSearch" type="text" placeholder="Search pattern" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="wallPatternGrid"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Tape ──── -->
+        <div class="panel" id="panel-tape" hidden>
+
+          <!-- ── View: Main ────────────────────────────── -->
+          <div class="panel-subview" id="tapeMainView">
+
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="tapeAddBtn">Add Tape</button>
+            </div>
+
+            <div class="tape-config" id="tapeConfig" hidden>
+
+              <!-- Section header: thumb + name (→ style picker) + collapse chevron -->
+              <div class="type-section-header">
+                <button class="type-section-name" id="tapeTypeNameBtn" aria-label="Change tape style">
+                  <span class="type-thumb-sm" id="tapeTypeThumb"></span>
+                  <span id="tapeTypeName">0.5" Wide Flat Tape</span>
+                </button>
+                <button class="type-section-collapse" id="tapeCollapseBtn" aria-expanded="true" aria-label="Collapse section">
+                  <span class="material-symbols-outlined" id="tapeSectionChevron">expand_less</span>
+                </button>
+              </div>
+
+              <!-- Section body (collapsible) -->
+              <div class="type-section-body" id="tapeSectionBody">
+
+                <!-- Tape properties -->
+                <p class="section-label">Tape properties</p>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="tapePosition">Position</label>
+                    <span class="form-slider-val" id="tapePositionVal">2.0</span>
+                  </div>
+                  <input class="form-range" id="tapePosition" type="range" min="0" max="10" step="0.1" value="2.0">
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="form-field">
+                    <label class="form-field-label" for="tapeScaleX">Scale X</label>
+                    <input class="form-input" id="tapeScaleX" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                  <div class="form-field">
+                    <label class="form-field-label" for="tapeScaleY">Scale Y</label>
+                    <input class="form-input" id="tapeScaleY" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                  <div class="form-field">
+                    <label class="form-field-label" for="tapeScaleZ">Scale Z</label>
+                    <input class="form-input" id="tapeScaleZ" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                </div>
+
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Label</span>
+                  <select class="form-select form-select--inline" id="tapeLabel">
+                    <option value="">—</option>
+                    <option value="standard">Standard</option>
+                    <option value="premium">Premium</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+
+                <div class="panel-cta-bar panel-cta-bar--inner">
+                  <button class="btn-panel-cta" id="tapeResetScaleBtn">Reset Scale</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- ── View: Tape Style Picker ───────────────── -->
+          <div class="panel-subview" id="tapePickerView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="tapePickerBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+              <button class="btn-upload-action">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="tapeSearch">Search tape styles</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="tapeSearch" type="text" placeholder="Search tape" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="tapeStyleGrid"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Label ─── -->
+        <div class="panel" id="panel-label" hidden>
+
+          <!-- ── View: Main ────────────────────────────── -->
+          <div class="panel-subview" id="labelMainView">
+
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="labelAddBtn">Add Label</button>
+            </div>
+
+            <div class="label-config" id="labelConfig" hidden>
+
+              <!-- Section header: thumb + name : side (→ type picker) + collapse chevron -->
+              <div class="type-section-header">
+                <button class="type-section-name" id="labelTypeNameBtn" aria-label="Change label type">
+                  <span class="type-thumb-sm" id="labelTypeThumb"></span>
+                  <span id="labelTypeName">Small Rectangle Label : Front</span>
+                </button>
+                <button class="type-section-collapse" id="labelCollapseBtn" aria-expanded="true" aria-label="Collapse section">
+                  <span class="material-symbols-outlined" id="labelSectionChevron">expand_less</span>
+                </button>
+              </div>
+
+              <!-- Section body (collapsible) -->
+              <div class="type-section-body" id="labelSectionBody">
+
+                <!-- Side -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Side</span>
+                  <select class="form-select form-select--inline" id="labelSide">
+                    <option value="front">Front</option>
+                    <option value="back">Back</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
+                  </select>
+                </div>
+
+                <!-- Size -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Size</span>
+                  <select class="form-select form-select--inline" id="labelSize">
+                    <option value="from">From mattress</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+
+                <!-- Label properties -->
+                <p class="section-label">Label properties <span class="section-label__note" id="labelDimensions">(# 9.90×3.708 inches)</span></p>
+
+                <div class="form-grid-3">
+                  <div class="form-field">
+                    <label class="form-field-label" for="labelScaleX">Scale X</label>
+                    <input class="form-input" id="labelScaleX" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                  <div class="form-field">
+                    <label class="form-field-label" for="labelScaleY">Scale Y</label>
+                    <input class="form-input" id="labelScaleY" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                  <div class="form-field">
+                    <label class="form-field-label" for="labelScaleZ">Scale Z</label>
+                    <input class="form-input" id="labelScaleZ" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                </div>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="labelPosX">Position X</label>
+                    <span class="form-slider-val" id="labelPosXVal">0.5</span>
+                  </div>
+                  <input class="form-range" id="labelPosX" type="range" min="0" max="1" step="0.01" value="0.5">
+                </div>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="labelPosY">Position Y</label>
+                    <span class="form-slider-val" id="labelPosYVal">0.5</span>
+                  </div>
+                  <input class="form-range" id="labelPosY" type="range" min="0" max="1" step="0.01" value="0.5">
+                </div>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="labelPosZ">Position Z</label>
+                    <span class="form-slider-val" id="labelPosZVal">1.0</span>
+                  </div>
+                  <input class="form-range" id="labelPosZ" type="range" min="0" max="2" step="0.01" value="1.0">
+                </div>
+
+                <div class="form-grid-2 form-grid-2--actions">
+                  <button class="btn-form-action" id="labelAdjacentBtn">Adjacent Object</button>
+                  <button class="btn-form-action" id="labelMoveBtn">Move Object</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- ── View: Label Type Picker ───────────────── -->
+          <div class="panel-subview" id="labelPickerView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="labelPickerBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+              <button class="btn-upload-action">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="labelSearch">Search label types</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="labelSearch" type="text" placeholder="Search label" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="labelTypeGrid"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Handle ── -->
+        <div class="panel" id="panel-handle" hidden>
+
+          <!-- ── View: Main ────────────────────────────── -->
+          <div class="panel-subview" id="handleMainView">
+
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="handleAddBtn">Add Handle</button>
+            </div>
+
+            <div class="handle-config" id="handleConfig" hidden>
+
+              <!-- Section header: thumb + name : side (→ type picker) + collapse chevron -->
+              <div class="type-section-header">
+                <button class="type-section-name" id="handleTypeNameBtn" aria-label="Change handle type">
+                  <span class="type-thumb-sm" id="handleTypeThumb"></span>
+                  <span id="handleTypeName">Horizontal Handle : Front</span>
+                </button>
+                <button class="type-section-collapse" id="handleCollapseBtn" aria-expanded="true" aria-label="Collapse section">
+                  <span class="material-symbols-outlined" id="handleSectionChevron">expand_less</span>
+                </button>
+              </div>
+
+              <!-- Section body (collapsible) -->
+              <div class="type-section-body" id="handleSectionBody">
+
+                <!-- Side -->
+                <div class="pattern-row">
+                  <span class="pattern-row__label">Side</span>
+                  <select class="form-select form-select--inline" id="handleSide">
+                    <option value="front">Front</option>
+                    <option value="back">Back</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+
+                <!-- Handle properties -->
+                <p class="section-label">Handle properties</p>
+
+                <div class="form-grid-3">
+                  <div class="form-field">
+                    <label class="form-field-label" for="handleScaleX">Scale X</label>
+                    <input class="form-input" id="handleScaleX" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                  <div class="form-field">
+                    <label class="form-field-label" for="handleScaleY">Scale Y</label>
+                    <input class="form-input" id="handleScaleY" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                  <div class="form-field">
+                    <label class="form-field-label" for="handleScaleZ">Scale Z</label>
+                    <input class="form-input" id="handleScaleZ" type="number" value="1" step="0.1" min="0.1">
+                  </div>
+                </div>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="handlePosX">Position X</label>
+                    <span class="form-slider-val" id="handlePosXVal">0.5</span>
+                  </div>
+                  <input class="form-range" id="handlePosX" type="range" min="0" max="1" step="0.01" value="0.5">
+                </div>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="handlePosY">Position Y</label>
+                    <span class="form-slider-val" id="handlePosYVal">0.5</span>
+                  </div>
+                  <input class="form-range" id="handlePosY" type="range" min="0" max="1" step="0.01" value="0.5">
+                </div>
+
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="handlePosZ">Position Z</label>
+                    <span class="form-slider-val" id="handlePosZVal">1.0</span>
+                  </div>
+                  <p class="form-slider-hint">Places a handle directly next to the selected one</p>
+                  <input class="form-range" id="handlePosZ" type="range" min="0" max="2" step="0.01" value="1.0">
+                </div>
+
+                <div class="form-grid-2 form-grid-2--actions">
+                  <button class="btn-form-action" id="handleAdjacentBtn">Adjacent Object</button>
+                  <button class="btn-form-action" id="handleMirrorBtn">Mirror Object</button>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── View: Handle Type Picker ──────────────── -->
+          <div class="panel-subview" id="handlePickerView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="handlePickerBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+              <button class="btn-upload-action">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="handleSearch">Search handle types</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="handleSearch" type="text" placeholder="Search handle" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="handleTypeGrid"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Bottom ── -->
+        <div class="panel" id="panel-bottom" hidden>
+
+          <!-- ── View: Main ────────────────────────────── -->
+          <div class="panel-subview" id="bottomMainView">
+
+            <!-- Mirror Top to Bottom toggle -->
+            <div class="toggle-row">
+              <label class="toggle-label" for="bottomMirrorToggle">Mirror Top to Bottom</label>
+              <div class="toggle-switch">
+                <input class="toggle-input" type="checkbox" id="bottomMirrorToggle" role="switch" aria-checked="false">
+                <span class="toggle-track"></span>
+              </div>
+            </div>
+
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="bottomAddBtn">Add Bottom</button>
+            </div>
+
+            <div class="bottom-config" id="bottomConfig" hidden>
+
+              <!-- Type selector -->
+              <div class="type-selector-row">
+                <button class="type-cycle-btn" id="bottomTypePrev" aria-label="Previous bottom type">
+                  <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button class="type-name-btn" id="bottomTypeNameBtn">
+                  <span id="bottomTypeName">Smooth Bottom</span>
+                  <span class="material-symbols-outlined type-name-btn__arrow">expand_more</span>
+                </button>
+                <button class="type-cycle-btn" id="bottomTypeNext" aria-label="Next bottom type">
+                  <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+              </div>
+
+              <!-- Quilting: bottom -->
+              <div class="pattern-row">
+                <span class="pattern-row__label">Quilting pattern - bottom</span>
+                <button class="pattern-swatch-btn" id="bottomPatternBtn" aria-label="Select bottom quilting pattern">
+                  <span class="pattern-thumb" id="bottomPatternThumb"></span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ── View: Pattern Picker ──────────────────── -->
+          <div class="panel-subview" id="bottomPatternView" hidden>
+
+            <div class="picker-topbar">
+              <button class="btn-back-nav" id="bottomPatternBackBtn">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+                Back
+              </button>
+              <button class="btn-upload-action">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="panel-search">
+              <label class="sr-only" for="bottomPatternSearch">Search patterns</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="bottomPatternSearch" type="text" placeholder="Search pattern" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="pattern-picker-grid" id="bottomPatternGrid"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Layers (Internal) ── -->
+        <div class="panel" id="panel-layers" hidden>
+
+          <!-- Main view -->
+          <div class="layers-main-view" id="layersMainView">
+            <div class="panel-cta-bar">
+              <button class="btn-panel-cta" id="layersAddBtn">Add new layer</button>
+            </div>
+            <div class="layers-stack" id="layersStack"></div>
+          </div>
+
+          <!-- Picker view -->
+          <div class="layers-picker-view" id="layersPickerView" hidden>
+            <div class="panel-header layers-picker-header">
+              <button class="layers-picker-back" id="layersPickerBack" type="button" aria-label="Back to layers">
+                <span class="material-symbols-outlined layers-picker-back__icon">arrow_back_ios</span>
+                <span class="layers-breadcrumb">
+                  <span class="layers-breadcrumb__parent">Layers</span>
+                  <span class="material-symbols-outlined layers-breadcrumb__sep">chevron_right</span>
+                  <span class="layers-breadcrumb__current">Add new layer</span>
+                </span>
+              </button>
+            </div>
+            <div class="layers-picker-search-wrap">
+              <span class="material-symbols-outlined layers-picker-search-icon">search</span>
+              <input class="layers-picker-search" type="text" id="layersPickerSearch" placeholder="Search layer" autocomplete="off" />
+            </div>
+            <div class="layers-picker-grid" id="layersPickerGrid"></div>
+          </div>
+
+        </div>
+
+        <!-- Layouts (Internal) ── -->
+        <div class="panel" id="panel-layouts" hidden>
+          <div class="panel-header">
+            <p class="panel-title">View customization</p>
+          </div>
+
+          <div class="layouts-stack">
+            <section class="layout-card" id="layoutExplodedCard">
+              <button class="layout-card__header" id="layoutExplodedToggle" aria-expanded="true">
+                <span class="layout-card__title-wrap">
+                  <span class="material-symbols-outlined">layers</span>
+                  <span class="layout-card__title">Exploded</span>
+                </span>
+                <span class="material-symbols-outlined layout-card__chevron" id="layoutExplodedChevron">expand_less</span>
+              </button>
+              <div class="layout-card__body" id="layoutExplodedBody">
+                <div class="layout-slider-row">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="layersExplodedGap">Gap between layers</label>
+                    <span class="form-slider-val" id="layersExplodedGapVal">0.3</span>
+                  </div>
+                  <input class="form-range" id="layersExplodedGap" type="range" min="0" max="1" step="0.05" value="0.3">
+                </div>
+              </div>
+            </section>
+
+            <button class="layout-card layout-card--button" id="layersInnerBuildBtn" aria-pressed="true">
+              <span class="layout-card__title-wrap">
+                <span class="material-symbols-outlined">table_rows_narrow</span>
+                <span class="layout-card__title">Inner Build</span>
+              </span>
+            </button>
+
+            <section class="layout-card" id="layoutCutawayCard">
+              <div class="layout-card__header-row">
+                <button class="layout-card__header" id="layoutCutawayToggle" aria-expanded="false">
+                  <span class="layout-card__title-wrap">
+                    <span class="material-symbols-outlined">crop</span>
+                    <span class="layout-card__title">Cutaway View</span>
+                  </span>
+                </button>
+                <div class="layout-card__header-actions">
+                  <button class="layout-mini-toggle" id="layoutCutawayRect" title="Rectangular cut" aria-label="Rectangular cut"></button>
+                  <button class="layout-mini-toggle layout-mini-toggle--circle" id="layoutCutawayCircle" title="Circular cut" aria-label="Circular cut"></button>
+                </div>
+              </div>
+              <div class="layout-card__body" id="layoutCutawayBody" hidden>
+                <div class="layout-cutaway-list" id="layoutCutawayList"></div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Style ─── -->
+        <div class="panel" id="panel-style" hidden>
+
+          <!-- Tab bar -->
+          <div class="style-tabs" role="tablist">
+            <button class="style-tab is-active" data-style-tab="textures" role="tab" aria-selected="true" aria-controls="styleTabTextures">Textures</button>
+            <button class="style-tab" data-style-tab="materials" role="tab" aria-selected="false" aria-controls="styleTabMaterials">Materials</button>
+            <button class="style-tab" data-style-tab="colors" role="tab" aria-selected="false" aria-controls="styleTabColors">Colors</button>
+            <button class="style-tab" data-style-tab="properties" role="tab" aria-selected="false" aria-controls="styleTabProperties">Properties</button>
+          </div>
+
+          <!-- Tab pane scroll body -->
+          <div class="style-panel-body">
+
+          <!-- ── Textures tab ───────────────────────────── -->
+          <div class="style-tab-pane" id="styleTabTextures" role="tabpanel">
+
+            <div class="style-search-bar">
+              <div class="style-search-input-wrap">
+                <label class="sr-only" for="styleTextureSearch">Search textures</label>
+                <span class="material-symbols-outlined panel-search-icon">search</span>
+                <input class="panel-search-input" id="styleTextureSearch" type="text" placeholder="Search texture" autocomplete="off">
+              </div>
+              <button class="btn-upload-action style-upload-inline">
+                <span class="material-symbols-outlined">upload</span>
+                Upload
+                <span class="material-symbols-outlined">expand_more</span>
+              </button>
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="style-asset-grid" id="styleTextureGrid"></div>
+            </div>
+
+          </div>
+
+          <!-- ── Materials tab ─────────────────────────── -->
+          <div class="style-tab-pane" id="styleTabMaterials" role="tabpanel" hidden>
+
+            <div class="panel-search">
+              <label class="sr-only" for="styleMaterialSearch">Search materials</label>
+              <span class="material-symbols-outlined panel-search-icon">search</span>
+              <input class="panel-search-input" id="styleMaterialSearch" type="text" placeholder="Search material" autocomplete="off">
+            </div>
+
+            <div class="pattern-picker-body">
+              <div class="style-asset-grid" id="styleMaterialGrid"></div>
+            </div>
+
+          </div>
+
+          <!-- ── Colors tab ─────────────────────────────── -->
+          <div class="style-tab-pane" id="styleTabColors" role="tabpanel" hidden>
+
+            <!-- SV picker field + hue slider -->
+            <div class="color-picker-wrap">
+              <div class="color-picker-field" id="colorPickerField">
+                <div class="color-picker-cursor" id="colorPickerCursor"></div>
+              </div>
+              <div class="color-picker-hue-wrap">
+                <div class="color-picker-hue" id="colorPickerHue">
+                  <div class="color-picker-hue-thumb" id="colorPickerHueThumb"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hex row -->
+            <div class="color-hex-row">
+              <span class="color-hex-label">HEX</span>
+              <button class="color-hex-eyedropper" aria-label="Edit colour">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <input class="form-input color-hex-input" id="colorHexInput" type="text" value="FFFFFF" maxlength="6" spellcheck="false">
+              <div class="color-preview-swatch" id="colorPreviewSwatch"></div>
+            </div>
+
+            <!-- RGB sliders -->
+            <div class="color-channels">
+              <div class="color-channel-row">
+                <span class="color-channel-label">R</span>
+                <input class="color-channel-range color-channel-range--r" id="colorR" type="range" min="0" max="255" value="255">
+                <span class="color-channel-val" id="colorRVal">255</span>
+              </div>
+              <div class="color-channel-row">
+                <span class="color-channel-label">G</span>
+                <input class="color-channel-range color-channel-range--g" id="colorG" type="range" min="0" max="255" value="255">
+                <span class="color-channel-val" id="colorGVal">255</span>
+              </div>
+              <div class="color-channel-row">
+                <span class="color-channel-label">B</span>
+                <input class="color-channel-range color-channel-range--b" id="colorB" type="range" min="0" max="255" value="255">
+                <span class="color-channel-val" id="colorBVal">255</span>
+              </div>
+            </div>
+
+            <!-- Color swatches -->
+            <div class="color-swatches-section">
+              <div class="color-swatches-header">
+                <span class="color-swatches-label">Color swatches</span>
+                <div class="color-swatches-actions">
+                  <button class="color-swatch-action-btn" id="colorSwatchAdd" aria-label="Add swatch">+</button>
+                  <button class="color-swatch-action-btn" id="colorSwatchRemove" aria-label="Remove swatch">−</button>
+                </div>
+              </div>
+              <div class="color-swatches-grid" id="colorSwatchesGrid"></div>
+            </div>
+
+          </div>
+
+          <!-- ── Properties tab ─────────────────────────── -->
+          <div class="style-tab-pane" id="styleTabProperties" role="tabpanel" hidden>
+
+            <div class="panel-cta-bar panel-cta-bar--inner">
+              <button class="btn-panel-cta btn-panel-cta--outline" id="styleSaveLibraryBtn">
+                <span class="material-symbols-outlined">bookmark_add</span>
+                Save in library
+              </button>
+            </div>
+
+            <!-- Material preview -->
+            <div class="style-material-preview" id="styleMaterialPreview"></div>
+
+            <!-- Front / Fit texture toggle -->
+            <div class="style-texture-type-row">
+              <p class="section-label">Material Properties</p>
+              <div class="style-texture-btns">
+                <button class="style-texture-btn is-active" id="styleFrontTextureBtn">Front Texture</button>
+                <button class="style-texture-btn" id="styleFitTextureBtn">Fit Texture</button>
+              </div>
+            </div>
+
+            <!-- Width / Height + reset -->
+            <div class="style-dimension-row">
+              <div class="style-dimension-labels">
+                <label class="form-field-label" for="stylePropWidth">Width (inches)</label>
+                <label class="form-field-label" for="stylePropHeight">Height (inches)</label>
+              </div>
+              <div class="style-dimension-inputs">
+                <input class="form-input" id="stylePropWidth" type="number" value="1" step="0.1" min="0.1">
+                <input class="form-input" id="stylePropHeight" type="number" value="1" step="0.1" min="0.1">
+                <button class="style-dimension-reset" id="stylePropDimReset" aria-label="Reset dimensions">
+                  <span class="material-symbols-outlined">restart_alt</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Position X / Y -->
+            <div class="style-pos-grid">
+              <div class="form-field">
+                <label class="form-field-label" for="stylePropPosX">Position-X</label>
+                <input class="form-input" id="stylePropPosX" type="number" value="0" step="1">
+              </div>
+              <div class="form-field">
+                <label class="form-field-label" for="stylePropPosY">Position-Y</label>
+                <input class="form-input" id="stylePropPosY" type="number" value="0" step="1">
+              </div>
+            </div>
+
+            <!-- Rotation presets -->
+            <p class="section-label">Rotation</p>
+            <div class="style-rotation-btns">
+              <button class="style-rot-btn is-active" data-deg="0">0</button>
+              <button class="style-rot-btn" data-deg="90">90</button>
+              <button class="style-rot-btn" data-deg="180">180</button>
+              <button class="style-rot-btn" data-deg="270">270</button>
+            </div>
+
+            <!-- Glossy slider -->
+            <div class="form-slider-field">
+              <div class="form-slider-header">
+                <label class="form-field-label" for="styleGlossy">Glossy</label>
+                <span class="form-slider-val" id="styleGlossyVal">0.00</span>
+              </div>
+              <input class="form-range" id="styleGlossy" type="range" min="0" max="1" step="0.01" value="0">
+            </div>
+
+          </div>
+
+          </div><!-- /.style-panel-body -->
+
+        </div>
+
+        <!-- Images ── -->
+        <div class="panel" id="panel-images" hidden>
+          <div class="style-tabs" role="tablist">
+            <button class="style-tab is-active" id="imagesTabPreviews" data-images-tab="previews" role="tab" aria-selected="true">Previews</button>
+            <button class="style-tab" id="imagesTabRenders" data-images-tab="renders" role="tab" aria-selected="false">Renders</button>
+          </div>
+          <div class="panel-body panel-body--flush">
+            <div class="images-list" id="imagesList"></div>
+          </div>
+        </div>
+
+        <!-- Cameras ─ -->
+        <div class="panel" id="panel-cameras" hidden>
+          <div class="panel-header panel-header--visible">
+            <p class="panel-title">Cameras</p>
+          </div>
+          <div class="panel-cta-bar">
+            <button class="btn-panel-cta" id="cameraAddCurrentBtn">Add Current View</button>
+          </div>
+          <div class="panel-cta-bar">
+            <button class="btn-panel-cta btn-panel-cta--outline" id="cameraImportBtn">
+              <span class="material-symbols-outlined">upload</span>
+              Import Camera Presets
+            </button>
+          </div>
+          <div class="panel-search">
+            <label class="sr-only" for="cameraSearch">Search cameras</label>
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="cameraSearch" type="text" placeholder="Search camera" autocomplete="off">
+          </div>
+          <div class="panel-body panel-body--flush">
+            <div class="camera-list" id="cameraList"></div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- 3D Viewport ─────────────────────────────────────── -->
+      <main class="viewport" id="viewport" aria-label="3D mattress preview">
+        <div class="viewport-label" id="viewportLabel" aria-live="polite">King · 10" Profile</div>
+      </main>
+
+    </div>
+  </div>
+
+  <div class="app-modal" id="createImageModal" hidden>
+    <div class="app-modal__backdrop" data-close-modal="create-image"></div>
+    <div class="app-modal__dialog app-modal__dialog--dark app-modal__dialog--wide">
+      <div class="create-image-modal">
+
+        <!-- Header -->
+        <div class="create-image-modal__header">
+          <span class="create-image-modal__title">Export Image</span>
+          <button class="create-image-modal__close-btn" id="createImageCloseBtn" aria-label="Close export image modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="create-image-modal__body">
+
+          <!-- Left: Camera selection -->
+          <div class="create-image-cameras">
+            <p class="create-image-section-label">Cameras</p>
+            <label class="create-image-selectall">
+              <input type="checkbox" id="createImageSelectAll">
+              <span>Select all (<span id="createImageCameraCount">1</span> camera)</span>
+            </label>
+            <div class="create-image-camera-list" id="createImageCameraList"></div>
+          </div>
+
+          <!-- Right: Export settings -->
+          <div class="create-image-settings">
+
+            <!-- Mode toggle -->
+            <div class="create-image-setting-group create-image-setting-group--mode">
+              <div class="create-image-mode-tabs">
+                <button class="create-image-mode is-active" id="createModePreviewBtn" data-image-mode="preview">Preview</button>
+                <button class="create-image-mode" id="createModeHighResBtn" data-image-mode="highres">
+                  High Resolution
+                  <span class="material-symbols-outlined create-image-modal__crown">crown</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Resolution -->
+            <div class="create-image-setting-group">
+              <p class="create-image-section-label">Resolution</p>
+              <div class="create-image-resolution" id="createImageResolutionBtns">
+                <button class="create-image-res-btn is-active" data-resolution="1080p">1080p</button>
+                <button class="create-image-res-btn" data-resolution="1440p">1440p</button>
+                <button class="create-image-res-btn" data-resolution="4k">4k</button>
+              </div>
+            </div>
+
+            <!-- Dimensions -->
+            <div class="create-image-setting-group">
+              <p class="create-image-section-label">Dimensions</p>
+              <div class="create-image-dims">
+                <div class="form-field">
+                  <label class="form-field-label" for="createImageWidth">Width (px)</label>
+                  <input class="form-input" id="createImageWidth" type="number" min="320" step="1" value="1500">
+                </div>
+                <button class="create-image-aspect-lock is-locked" id="createImageAspectLock" aria-label="Lock aspect ratio">
+                  <span class="material-symbols-outlined">lock</span>
+                </button>
+                <div class="form-field">
+                  <label class="form-field-label" for="createImageHeight">Height (px)</label>
+                  <input class="form-input" id="createImageHeight" type="number" min="240" step="1" value="843">
+                </div>
+              </div>
+            </div>
+
+            <!-- File name + DPI -->
+            <div class="create-image-setting-group">
+              <p class="create-image-section-label">File name</p>
+              <div class="create-image-file-row">
+                <input class="form-input" id="createImageFilename" type="text" value="New Mattress_4-image1">
+                <select class="form-select" id="createImageDpi" hidden>
+                  <option value="72">72 DPI</option>
+                  <option value="96">96 DPI</option>
+                  <option value="150">150 DPI</option>
+                  <option value="300">300 DPI</option>
+                </select>
+                <select class="form-select create-image-format" id="createImageFormat">
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                </select>
+              </div>
+              <span class="create-image-dpi-size" id="createImageDpiSize" hidden>26.67in × 15in</span>
+            </div>
+
+            <!-- Render options -->
+            <div class="create-image-setting-group create-image-setting-group--last">
+              <p class="create-image-section-label">Render options</p>
+              <div class="create-image-options">
+                <label class="toggle-row create-image-option">
+                  <span class="toggle-label">Transparent background</span>
+                  <span class="toggle-switch">
+                    <input class="toggle-input" id="createImageTransparentBg" type="checkbox">
+                    <span class="toggle-track"></span>
+                  </span>
+                </label>
+                <label class="toggle-row create-image-option">
+                  <span class="toggle-label">Shadow on floor</span>
+                  <span class="toggle-switch">
+                    <input class="toggle-input" id="createImageShadowFloor" type="checkbox" checked>
+                    <span class="toggle-track"></span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="create-image-modal__footer">
+          <button class="btn-panel-cta create-image-submit" id="createImageSubmitBtn">Create Image</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="app-modal" id="libraryModal" hidden>
+    <div class="app-modal__backdrop" data-close-modal="library"></div>
+    <div class="app-modal__dialog app-modal__dialog--light">
+      <button class="app-modal__close app-modal__close--light" id="libraryCloseBtn" aria-label="Close add to library modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="library-modal">
+        <h2 class="library-modal__title">Add mattress to your library</h2>
+        <div class="library-modal__preview-wrap">
+          <img class="library-modal__preview" id="libraryPreviewImage" alt="Mattress preview">
+        </div>
+        <div class="form-field">
+          <label class="form-field-label library-modal__label" for="libraryMattressName">Mattress name</label>
+          <input class="form-input library-modal__input" id="libraryMattressName" type="text" placeholder="Enter mattress name">
+        </div>
+        <div class="library-modal__footer">
+          <p class="library-modal__availability">
+            <span class="material-symbols-outlined">help</span>
+            <span class="library-modal__availability-label">Models Available</span>
+            <span class="library-modal__availability-count" id="libraryAvailableCount">397</span>
+          </p>
+          <button class="btn-panel-cta library-modal__save" id="librarySaveBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-viewer" id="imageViewer" hidden>
+    <aside class="app-viewer__rail">
+      <div class="app-viewer__rail-head" id="imageViewerMeta"></div>
+      <div class="app-viewer__thumbs" id="imageViewerThumbs"></div>
+    </aside>
+    <div class="app-viewer__stage">
+      <button class="app-viewer__close" id="imageViewerCloseBtn" aria-label="Close image viewer">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <img class="app-viewer__image" id="imageViewerImage" alt="Generated mattress image">
+      <div class="app-viewer__caption" id="imageViewerCaption"></div>
+    </div>
+  </div>
+
+  <div class="app-toast" id="appToast" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+  <script type="module" src="viewport.js"></script>
+</body>
+</html>

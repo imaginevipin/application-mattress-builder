@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mattress Builder — imagine.io</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="tokens-dark.css">
+  <link rel="stylesheet" href="app.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── Top Bar ──────────────────────────────────────────── -->
+  <header class="topbar">
+
+    <div class="topbar-left">
+      <div class="brand-mark" role="img" aria-label="imagine.io logo">
+        <img src="../../assets/logos/Logo Mark.png" alt="" class="brand-mark__img">
+      </div>
+
+      <div class="file-menu">
+        <button class="btn-file" id="fileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="fileMenu">
+          File
+          <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
+        </button>
+        <div class="file-menu__panel" id="fileMenu" role="menu" aria-labelledby="fileMenuBtn" hidden>
+          <button class="file-menu__item" type="button" role="menuitem" data-file-action="save">
+            <span class="material-symbols-outlined">save</span><span>Save Project</span>
+          </button>
+          <button class="file-menu__item" type="button" role="menuitem" data-file-action="save-as-new">
+            <span class="material-symbols-outlined">add_circle</span><span>Save as New</span>
+          </button>
+          <button class="file-menu__item" type="button" role="menuitem" data-file-action="quit">
+            <span class="material-symbols-outlined">power_settings_new</span><span>Quit Project</span>
+          </button>
+          <button class="file-menu__item" type="button" role="menuitem" data-file-action="download-pdf">
+            <span class="material-symbols-outlined">picture_as_pdf</span><span>Download PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-file help-btn">Help</button>
+
+      <div class="mode-toggle" role="group" aria-label="Configuration mode">
+        <button class="mode-btn is-active" data-mode="external" aria-pressed="true">External</button>
+        <button class="mode-btn" data-mode="internal" aria-pressed="false">Internal</button>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <input class="mattress-name" type="text" value="New Mattress_4" spellcheck="false" aria-label="Mattress name">
+    </div>
+
+    <div class="topbar-right">
+      <button class="btn-action" id="requestPropBtn">Request Prop</button>
+      <button class="btn-action" id="addToLibraryBtn">Add to Library</button>
+      <button class="btn-action btn-action--primary" id="createImageBtn">Create Image</button>
+    </div>
+
+  </header>
+
+  <!-- ── App Body ─────────────────────────────────────────── -->
+  <div class="app-body">
+
+    <!-- Icon Strip ──────────────────────────────────────── -->
+    <nav class="icon-strip" aria-label="Section navigation">
+
+      <div class="nav-group" id="navExternal">
+        <button class="nav-item is-active" data-section="mattress" aria-current="page">
+          <span class="material-symbols-outlined">bed</span>
+          <span class="nav-label">Mattress</span>
+        </button>
+        <button class="nav-item" data-section="top">
+          <span class="material-symbols-outlined">vertical_align_top</span>
+          <span class="nav-label">Top</span>
+        </button>
+        <button class="nav-item" data-section="wall">
+          <span class="material-symbols-outlined">texture</span>
+          <span class="nav-label">Wall</span>
+        </button>
+        <button class="nav-item" data-section="bottom">
+          <span class="material-symbols-outlined">vertical_align_bottom</span>
+          <span class="nav-label">Bottom</span>
+        </button>
+        <button class="nav-item" data-section="accessories">
+          <span class="material-symbols-outlined">category</span>
+          <span class="nav-label">Accessories</span>
+        </button>
+        <button class="nav-item" data-section="images">
+          <span class="material-symbols-outlined">image</span>
+          <span class="nav-label">Images</span>
+        </button>
+      </div>
+
+      <div class="nav-group nav-group--hidden" id="navInternal">
+        <button class="nav-item" data-section="layers">
+          <span class="material-symbols-outlined">layers</span>
+          <span class="nav-label">Layers</span>
+        </button>
+        <button class="nav-item" data-section="layout">
+          <span class="material-symbols-outlined">dashboard_customize</span>
+          <span class="nav-label">Layout</span>
+        </button>
+        <button class="nav-item" data-section="images">
+          <span class="material-symbols-outlined">image</span>
+          <span class="nav-label">Images</span>
+        </button>
+      </div>
+
+    </nav>
+
+    <!-- Context Panel ──────────────────────────────────── -->
+    <aside class="context-panel" id="contextPanel">
+
+      <!-- ── MATTRESS (Size + Height) ─────────────────── -->
+      <div class="panel" id="panel-mattress">
+        <div class="panel-tabs" role="tablist">
+          <button class="panel-tab is-active" data-mattress-tab="size" role="tab" aria-selected="true">Size</button>
+          <button class="panel-tab" data-mattress-tab="height" role="tab" aria-selected="false">Height</button>
+        </div>
+
+        <div class="panel-tab-pane" id="mattressTabSize" role="tabpanel">
+          <div class="panel-search">
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="sizeSearch" type="text" placeholder="Search size" autocomplete="off">
+          </div>
+          <div class="panel-body">
+            <div class="asset-grid" id="sizeGrid"></div>
+          </div>
+        </div>
+
+        <div class="panel-tab-pane" id="mattressTabHeight" role="tabpanel" hidden>
+          <div class="panel-search">
+            <span class="material-symbols-outlined panel-search-icon">search</span>
+            <input class="panel-search-input" id="heightSearch" type="text" placeholder="Search height" autocomplete="off">
+          </div>
+          <div class="panel-body">
+            <div class="asset-grid" id="heightGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TOP ──────────────────────────────────────── -->
+      <div class="panel" id="panel-top" hidden>
+
+        <div class="panel-subview" id="topMain">
+          <div class="layer-stack" id="topLayerStack"></div>
+          <div class="add-links" id="topAddLinks"></div>
+        </div>
+
+        <div class="panel-subview" id="topPicker" hidden>
+          <div class="picker-header">
+            <button class="back-btn" id="topPickerBack">
+              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+            </button>
+            <button class="upload-btn">
+              <span class="material-symbols-outlined">upload</span>Upload
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
+          </div>
+          <div class="picker-tabs" id="topPickerTabStrip" role="tablist">
+            <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
+            <button class="picker-tab" data-tab="textures">Textures</button>
+            <button class="picker-tab" data-tab="materials">Materials</button>
+            <button class="picker-tab" data-tab="colors">Colors</button>
+          </div>
+          <div class="picker-search-wrap">
+            <span class="material-symbols-outlined">search</span>
+            <input class="picker-search-input" id="topPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+          </div>
+          <div class="picker-grid-wrap">
+            <div class="picker-grid" id="topPickerGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── WALL ─────────────────────────────────────── -->
+      <div class="panel" id="panel-wall" hidden>
+
+        <div class="panel-subview" id="wallMain">
+          <div class="empty-state" id="wallEmptyState">
+            <span class="material-symbols-outlined empty-state__icon">texture</span>
+            <p class="empty-state__title">No Quilting Pattern or Tufts!</p>
+            <p class="empty-state__body">You have not added any Quilting Pattern or Tufts to your mattress wall. Click below to add.</p>
+            <div class="empty-state__actions">
+              <button class="btn-outline" id="wallAddQuiltingEmpty">Add Quilting Pattern</button>
+              <button class="btn-outline" id="wallAddTuftsEmpty">Add Tufts</button>
+            </div>
+          </div>
+          <div class="layer-stack" id="wallLayerStack" hidden></div>
+          <div class="add-links" id="wallAddLinks" hidden></div>
+        </div>
+
+        <div class="panel-subview" id="wallPicker" hidden>
+          <div class="picker-header">
+            <button class="back-btn" id="wallPickerBack">
+              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+            </button>
+            <button class="upload-btn">
+              <span class="material-symbols-outlined">upload</span>Upload
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
+          </div>
+          <div class="picker-tabs" id="wallPickerTabStrip" role="tablist">
+            <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
+            <button class="picker-tab" data-tab="textures">Textures</button>
+            <button class="picker-tab" data-tab="materials">Materials</button>
+            <button class="picker-tab" data-tab="colors">Colors</button>
+          </div>
+          <div class="picker-search-wrap">
+            <span class="material-symbols-outlined">search</span>
+            <input class="picker-search-input" id="wallPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+          </div>
+          <div class="picker-grid-wrap">
+            <div class="picker-grid" id="wallPickerGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── BOTTOM ───────────────────────────────────── -->
+      <div class="panel" id="panel-bottom" hidden>
+
+        <div class="panel-subview" id="bottomMain">
+          <div class="toggle-row bottom-mirror-row">
+            <label class="toggle-label" for="bottomMirrorToggle">Mirror Top to Bottom</label>
+            <div class="toggle-switch">
+              <input class="toggle-input" type="checkbox" id="bottomMirrorToggle" role="switch" aria-checked="false">
+              <span class="toggle-track"></span>
+            </div>
+          </div>
+          <div class="layer-stack" id="bottomLayerStack"></div>
+        </div>
+
+        <div class="panel-subview" id="bottomPicker" hidden>
+          <div class="picker-header">
+            <button class="back-btn" id="bottomPickerBack">
+              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+            </button>
+            <button class="upload-btn">
+              <span class="material-symbols-outlined">upload</span>Upload
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
+          </div>
+          <div class="picker-tabs" id="bottomPickerTabStrip" role="tablist">
+            <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
+            <button class="picker-tab" data-tab="textures">Textures</button>
+            <button class="picker-tab" data-tab="materials">Materials</button>
+            <button class="picker-tab" data-tab="colors">Colors</button>
+          </div>
+          <div class="picker-search-wrap">
+            <span class="material-symbols-outlined">search</span>
+            <input class="picker-search-input" id="bottomPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+          </div>
+          <div class="picker-grid-wrap">
+            <div class="picker-grid" id="bottomPickerGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── ACCESSORIES (Tape / Label / Handle) ────── -->
+      <div class="panel" id="panel-accessories" hidden>
+
+        <div class="acc-tabs" role="tablist">
+          <button class="acc-tab is-active" data-acc-tab="tape" role="tab" aria-selected="true">Tape</button>
+          <button class="acc-tab" data-acc-tab="label" role="tab" aria-selected="false">Label</button>
+          <button class="acc-tab" data-acc-tab="handle" role="tab" aria-selected="false">Handle</button>
+        </div>
+
+        <!-- TAPE -->
+        <div class="acc-pane" id="accTabTape" role="tabpanel">
+          <div class="acc-subview" id="tapeMain">
+            <div class="empty-state" id="tapeEmptyState">
+              <span class="material-symbols-outlined empty-state__icon">horizontal_rule</span>
+              <p class="empty-state__title">No Tape Present</p>
+              <p class="empty-state__body">You have not added any tape to your mattress. Click below to add.</p>
+              <button class="btn-outline" id="tapeAddEmpty">Add New Tape</button>
+            </div>
+            <div class="layer-stack" id="tapeCardStack" hidden></div>
+            <div class="panel-cta-bar" id="tapeCta" hidden>
+              <button class="btn-primary" id="tapeAddNew">Add New Tape</button>
+            </div>
+          </div>
+          <div class="acc-subview" id="tapePicker" hidden>
+            <div class="picker-header">
+              <button class="back-btn" id="tapePickerBack">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+              </button>
+            </div>
+            <div class="picker-search-wrap">
+              <span class="material-symbols-outlined">search</span>
+              <input class="picker-search-input" id="tapePickerSearch" type="text" placeholder="Search tape..." autocomplete="off">
+            </div>
+            <div class="picker-grid-wrap">
+              <div class="picker-grid" id="tapePickerGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LABEL -->
+        <div class="acc-pane" id="accTabLabel" role="tabpanel" hidden>
+          <div class="acc-subview" id="labelMain">
+            <div class="empty-state" id="labelEmptyState">
+              <span class="material-symbols-outlined empty-state__icon">label</span>
+              <p class="empty-state__title">No Label Present</p>
+              <p class="empty-state__body">You have not added any label to your mattress. Click below to add.</p>
+              <button class="btn-outline" id="labelAddEmpty">Add New Label</button>
+            </div>
+            <div class="layer-stack" id="labelCardStack" hidden></div>
+            <div class="panel-cta-bar" id="labelCta" hidden>
+              <button class="btn-primary" id="labelAddNew">Add New Label</button>
+            </div>
+          </div>
+          <div class="acc-subview" id="labelPicker" hidden>
+            <div class="picker-header">
+              <button class="back-btn" id="labelPickerBack">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+              </button>
+            </div>
+            <div class="picker-search-wrap">
+              <span class="material-symbols-outlined">search</span>
+              <input class="picker-search-input" id="labelPickerSearch" type="text" placeholder="Search label..." autocomplete="off">
+            </div>
+            <div class="picker-grid-wrap">
+              <div class="picker-grid" id="labelPickerGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HANDLE -->
+        <div class="acc-pane" id="accTabHandle" role="tabpanel" hidden>
+          <div class="acc-subview" id="handleMain">
+            <div class="empty-state" id="handleEmptyState">
+              <span class="material-symbols-outlined empty-state__icon">drag_handle</span>
+              <p class="empty-state__title">No Handle Present</p>
+              <p class="empty-state__body">You have not added any handle to your mattress. Click below to add.</p>
+              <button class="btn-outline" id="handleAddEmpty">Add New Handle</button>
+            </div>
+            <div class="layer-stack" id="handleCardStack" hidden></div>
+            <div class="panel-cta-bar" id="handleCta" hidden>
+              <button class="btn-primary" id="handleAddNew">Add New Handle</button>
+            </div>
+          </div>
+          <div class="acc-subview" id="handlePicker" hidden>
+            <div class="picker-header">
+              <button class="back-btn" id="handlePickerBack">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+              </button>
+            </div>
+            <div class="picker-search-wrap">
+              <span class="material-symbols-outlined">search</span>
+              <input class="picker-search-input" id="handlePickerSearch" type="text" placeholder="Search handle..." autocomplete="off">
+            </div>
+            <div class="picker-grid-wrap">
+              <div class="picker-grid" id="handlePickerGrid"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── IMAGES ─────────────────────────────────── -->
+      <div class="panel" id="panel-images" hidden>
+        <div class="panel-tabs" role="tablist">
+          <button class="panel-tab is-active" data-images-tab="preview" role="tab" aria-selected="true">Preview</button>
+          <button class="panel-tab" data-images-tab="renders" role="tab" aria-selected="false">Renders</button>
+        </div>
+
+        <div class="panel-tab-pane" id="imagesTabPreview" role="tabpanel">
+          <div class="empty-state" id="imagesPreviewEmpty">
+            <span class="material-symbols-outlined empty-state__icon">image_not_supported</span>
+            <p class="empty-state__title">No Preview Available</p>
+            <p class="empty-state__body">You have not created any image yet.</p>
+          </div>
+          <div class="images-list" id="imagesPreviewList" hidden></div>
+        </div>
+
+        <div class="panel-tab-pane" id="imagesTabRenders" role="tabpanel" hidden>
+          <div class="empty-state" id="imagesRendersEmpty">
+            <span class="material-symbols-outlined empty-state__icon">image_not_supported</span>
+            <p class="empty-state__title">No Render Available</p>
+            <p class="empty-state__body">You have not created any image yet.</p>
+          </div>
+          <div class="images-list" id="imagesRendersList" hidden></div>
+        </div>
+      </div>
+
+      <!-- ── LAYERS (Internal) ──────────────────────── -->
+      <div class="panel" id="panel-layers" hidden>
+
+        <div class="panel-subview" id="layersMain">
+          <div class="panel-cta-bar">
+            <button class="btn-primary" id="layersAddBtn">Add New Layer</button>
+          </div>
+          <div class="layer-stack layer-stack--internal" id="layersStack"></div>
+        </div>
+
+        <div class="panel-subview" id="layersPicker" hidden>
+          <div class="picker-header">
+            <button class="back-btn" id="layersPickerBack">
+              <span class="material-symbols-outlined">arrow_back_ios_new</span>
+              <span class="back-breadcrumb">
+                <span class="breadcrumb-parent">Layers</span>
+                <span class="material-symbols-outlined breadcrumb-sep">chevron_right</span>
+                <span class="breadcrumb-current">Add new layer</span>
+              </span>
+            </button>
+          </div>
+          <div class="picker-search-wrap">
+            <span class="material-symbols-outlined">search</span>
+            <input class="picker-search-input" id="layersPickerSearch" type="text" placeholder="Search layer" autocomplete="off">
+          </div>
+          <div class="picker-grid-wrap">
+            <div class="picker-grid" id="layersPickerGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── LAYOUT (Internal) ─────────────────────── -->
+      <div class="panel" id="panel-layout" hidden>
+        <div class="panel-body panel-body--flush">
+          <div class="layout-accordion" id="layoutAccordion">
+
+            <section class="layout-section is-active" id="layoutSectionExploded">
+              <button class="layout-section__header" id="layoutExplodedBtn" aria-expanded="true">
+                <span class="layout-section__title-wrap">
+                  <span class="material-symbols-outlined">layers</span>
+                  <span class="layout-section__title">Exploded View</span>
+                </span>
+                <span class="material-symbols-outlined layout-section__chevron" id="layoutExplodedChevron">expand_less</span>
+              </button>
+              <div class="layout-section__body" id="layoutExplodedBody">
+                <div class="form-slider-field">
+                  <div class="form-slider-header">
+                    <label class="form-field-label" for="layoutExplodedGap">Layer Gap</label>
+                    <span class="form-slider-val" id="layoutExplodedGapVal">0.3</span>
+                  </div>
+                  <input class="form-range" id="layoutExplodedGap" type="range" min="0" max="1" step="0.05" value="0.3">
+                </div>
+              </div>
+            </section>
+
+            <section class="layout-section" id="layoutSectionInnerBuild">
+              <button class="layout-section__header layout-section__header--simple" id="layoutInnerBuildBtn">
+                <span class="layout-section__title-wrap">
+                  <span class="material-symbols-outlined">table_rows_narrow</span>
+                  <span class="layout-section__title">Inner Build View</span>
+                </span>
+              </button>
+            </section>
+
+            <section class="layout-section" id="layoutSectionCutaway">
+              <button class="layout-section__header" id="layoutCutawayBtn" aria-expanded="false">
+                <span class="layout-section__title-wrap">
+                  <span class="material-symbols-outlined">crop</span>
+                  <span class="layout-section__title">Cutaway View</span>
+                </span>
+                <span class="material-symbols-outlined layout-section__chevron" id="layoutCutawayChevron">expand_more</span>
+              </button>
+              <div class="layout-section__body" id="layoutCutawayBody" hidden>
+                <div class="form-field layout-cutaway-type">
+                  <label class="form-field-label" for="layoutCutawayType">Type</label>
+                  <select class="form-select" id="layoutCutawayType">
+                    <option value="square">Square</option>
+                    <option value="circle">Circle</option>
+                  </select>
+                </div>
+                <div id="layoutCutawayLayers"></div>
+              </div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- 3D Viewport ─────────────────────────────────────── -->
+    <main class="viewport" id="viewport" aria-label="3D mattress preview">
+      <div class="viewport-label" id="viewportLabel" aria-live="polite">King · 10" Profile</div>
+    </main>
+
+  </div>
+</div>
+
+<!-- ── Create Image Modal ─────────────────────────────── -->
+<div class="app-modal" id="createImageModal" hidden>
+  <div class="app-modal__backdrop" data-close-modal="create-image"></div>
+  <div class="app-modal__dialog app-modal__dialog--dark app-modal__dialog--wide">
+    <div class="create-image-modal">
+
+      <div class="create-image-modal__header">
+        <span class="create-image-modal__title">Export Image</span>
+        <button class="create-image-modal__close-btn" id="createImageCloseBtn" aria-label="Close">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="create-image-modal__body">
+
+        <div class="create-image-cameras">
+          <p class="create-image-section-label">Cameras</p>
+          <label class="create-image-selectall">
+            <input type="checkbox" id="createImageSelectAll">
+            <span>Select all (<span id="createImageCameraCount">1</span> camera)</span>
+          </label>
+          <div class="create-image-camera-list" id="createImageCameraList"></div>
+        </div>
+
+        <div class="create-image-settings">
+          <div class="create-image-setting-group create-image-setting-group--mode">
+            <div class="create-image-mode-tabs">
+              <button class="create-image-mode is-active" id="createModePreviewBtn" data-image-mode="preview">Preview</button>
+              <button class="create-image-mode" id="createModeHighResBtn" data-image-mode="highres">
+                High Resolution
+                <span class="material-symbols-outlined create-image-modal__crown">crown</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="create-image-setting-group">
+            <p class="create-image-section-label">Resolution</p>
+            <div class="create-image-resolution" id="createImageResolutionBtns">
+              <button class="create-image-res-btn is-active" data-resolution="1080p">1080p</button>
+              <button class="create-image-res-btn" data-resolution="1440p">1440p</button>
+              <button class="create-image-res-btn" data-resolution="4k">4k</button>
+            </div>
+          </div>
+
+          <div class="create-image-setting-group">
+            <p class="create-image-section-label">Dimensions</p>
+            <div class="create-image-dims">
+              <div class="form-field">
+                <label class="form-field-label" for="createImageWidth">Width (px)</label>
+                <input class="form-input" id="createImageWidth" type="number" min="320" step="1" value="1500">
+              </div>
+              <button class="create-image-aspect-lock is-locked" id="createImageAspectLock" aria-label="Lock aspect ratio">
+                <span class="material-symbols-outlined">lock</span>
+              </button>
+              <div class="form-field">
+                <label class="form-field-label" for="createImageHeight">Height (px)</label>
+                <input class="form-input" id="createImageHeight" type="number" min="240" step="1" value="843">
+              </div>
+            </div>
+          </div>
+
+          <div class="create-image-setting-group">
+            <p class="create-image-section-label">File name</p>
+            <div class="create-image-file-row">
+              <input class="form-input" id="createImageFilename" type="text" value="New Mattress_4-image1">
+              <select class="form-select create-image-format" id="createImageFormat">
+                <option value="jpg">JPG</option>
+                <option value="png">PNG</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="create-image-setting-group create-image-setting-group--last">
+            <p class="create-image-section-label">Render options</p>
+            <div class="create-image-options">
+              <label class="toggle-row create-image-option">
+                <span class="toggle-label">Transparent background</span>
+                <span class="toggle-switch">
+                  <input class="toggle-input" id="createImageTransparentBg" type="checkbox">
+                  <span class="toggle-track"></span>
+                </span>
+              </label>
+              <label class="toggle-row create-image-option">
+                <span class="toggle-label">Shadow on floor</span>
+                <span class="toggle-switch">
+                  <input class="toggle-input" id="createImageShadowFloor" type="checkbox" checked>
+                  <span class="toggle-track"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="create-image-modal__footer">
+        <button class="btn-primary create-image-submit" id="createImageSubmitBtn">Create Image</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Library Modal ──────────────────────────────────── -->
+<div class="app-modal" id="libraryModal" hidden>
+  <div class="app-modal__backdrop" data-close-modal="library"></div>
+  <div class="app-modal__dialog app-modal__dialog--light">
+    <button class="app-modal__close app-modal__close--light" id="libraryCloseBtn" aria-label="Close">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="library-modal">
+      <h2 class="library-modal__title">Add mattress to your library</h2>
+      <div class="library-modal__preview-wrap">
+        <img class="library-modal__preview" id="libraryPreviewImage" alt="Mattress preview">
+      </div>
+      <div class="form-field">
+        <label class="form-field-label library-modal__label" for="libraryMattressName">Mattress name</label>
+        <input class="form-input library-modal__input" id="libraryMattressName" type="text" placeholder="Enter mattress name">
+      </div>
+      <div class="library-modal__footer">
+        <p class="library-modal__availability">
+          <span class="material-symbols-outlined">help</span>
+          <span class="library-modal__availability-label">Models Available</span>
+          <span class="library-modal__availability-count" id="libraryAvailableCount">397</span>
+        </p>
+        <button class="btn-primary library-modal__save" id="librarySaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Image Viewer ───────────────────────────────────── -->
+<div class="app-viewer" id="imageViewer" hidden>
+  <aside class="app-viewer__rail">
+    <div class="app-viewer__rail-head" id="imageViewerMeta"></div>
+    <div class="app-viewer__thumbs" id="imageViewerThumbs"></div>
+  </aside>
+  <div class="app-viewer__stage">
+    <button class="app-viewer__close" id="imageViewerCloseBtn" aria-label="Close image viewer">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <img class="app-viewer__image" id="imageViewerImage" alt="Generated mattress image">
+    <div class="app-viewer__caption" id="imageViewerCaption"></div>
+  </div>
+</div>
+
+<div class="app-toast" id="appToast" aria-live="polite" hidden></div>
+
+<script src="app.js"></script>
+<script type="module" src="viewport.js"></script>
+</body>
+</html>
