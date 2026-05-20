@@ -163,6 +163,7 @@ function createDefaultState() {
     topPickerQuery: '',
     topBasePatternId: 'diamond',
     topBasePatternCss: 'ptn-diamond',
+    topBaseExpanded: true,
     topQuiltingAdded: false,
     topQuiltingPatternId: 'diamond',
     topQuiltingPatternCss: 'ptn-diamond',
@@ -536,7 +537,7 @@ function makeLayerCard({ id, thumbCss, label, value, showDelete, expanded, bodyH
         </div>
       </button>
       <div class="layer-card__actions">
-        <button class="icon-btn" title="Settings"><span class="material-symbols-outlined">settings</span></button>
+        <button class="icon-btn" data-open-picker-settings="${id}" title="Style"><span class="material-symbols-outlined">palette</span></button>
         ${showDelete ? `<button class="icon-btn icon-btn--danger" data-delete-card="${id}" title="Delete"><span class="material-symbols-outlined">delete</span></button>` : ''}
         <button class="icon-btn" data-toggle-card="${id}" aria-expanded="${expanded}" title="Expand">
           <span class="material-symbols-outlined">${expanded ? 'expand_less' : 'expand_more'}</span>
@@ -562,38 +563,26 @@ function renderTopMain() {
   const addLinks = document.getElementById('topAddLinks');
   if (!stack || !addLinks) return;
 
-  let cards = '';
-
-  // Mattress Top (always present)
-  cards += makeLayerCard({
-    id: 'topBase', thumbCss: state.topBasePatternCss,
-    label: 'Mattress Top', value: getPatternName(state.topBasePatternId),
-    showDelete: false, expanded: false, bodyHtml: '',
-  });
-
-  // Quilting
+  // Build sub-items that nest inside the Mattress Top card body
+  let subCardsHtml = '';
   if (state.topQuiltingAdded) {
-    cards += makeLayerCard({
+    subCardsHtml += makeLayerCard({
       id: 'topQuilting', thumbCss: state.topQuiltingPatternCss,
       label: 'Top Quilting', value: getPatternName(state.topQuiltingPatternId),
       showDelete: true, expanded: state.topQuiltingExpanded,
       bodyHtml: quiltingBodyHTML('topQuilting', state),
     });
   }
-
-  // Gusset Quilting
   if (state.topGussetAdded) {
-    cards += makeLayerCard({
+    subCardsHtml += makeLayerCard({
       id: 'topGusset', thumbCss: state.topGussetPatternCss,
       label: 'Gusset Quilting', value: getPatternName(state.topGussetPatternId),
       showDelete: true, expanded: state.topGussetExpanded,
       bodyHtml: quiltingBodyHTML('topGusset', state),
     });
   }
-
-  // Tufts
   if (state.topTuftsAdded) {
-    cards += makeLayerCard({
+    subCardsHtml += makeLayerCard({
       id: 'topTufts', thumbCss: 'ptn-buttons',
       label: 'Tufts', value: getTuftName(),
       showDelete: true, expanded: state.topTuftsExpanded,
@@ -601,24 +590,47 @@ function renderTopMain() {
     });
   }
 
-  stack.innerHTML = cards;
+  // Add links live inside the base card
+  const linkButtons = [];
+  if (!state.topQuiltingAdded) linkButtons.push(`<button class="add-link" id="topAddQuilting">+ Add Quilting</button>`);
+  if (state.topQuiltingAdded && !state.topGussetAdded) linkButtons.push(`<button class="add-link" id="topAddGusset">+ Add Gusset Quilting</button>`);
+  if (!state.topTuftsAdded) linkButtons.push(`<button class="add-link" id="topAddTufts">+ Add Tufts</button>`);
+  const addLinksHtml = linkButtons.length
+    ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
+    : '';
 
-  // Add links
-  const links = [];
-  if (!state.topQuiltingAdded) links.push(`<button class="add-link" id="topAddQuilting">+ Add Quilting</button>`);
-  if (state.topQuiltingAdded && !state.topGussetAdded) links.push(`<button class="add-link" id="topAddGusset">+ Add Gusset Quilting</button>`);
-  if (!state.topTuftsAdded) links.push(`<button class="add-link" id="topAddTufts">+ Add Tufts</button>`);
-  addLinks.innerHTML = links.join('');
+  const baseBodyHtml = `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`;
 
+  stack.innerHTML = makeLayerCard({
+    id: 'topBase', thumbCss: state.topBasePatternCss,
+    label: 'Mattress Top', value: getPatternName(state.topBasePatternId),
+    showDelete: false, expanded: state.topBaseExpanded, bodyHtml: baseBodyHtml,
+  });
+
+  addLinks.innerHTML = '';
   bindTopMainEvents();
 }
 
 function bindTopMainEvents() {
-  // Open picker
+  // Open picker — thumbnail click
   document.querySelectorAll('[data-open-picker]').forEach(btn => {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.openPicker;
+      if (id === 'topBase') state.topPickerCtx = 'base';
+      else if (id === 'topQuilting') state.topPickerCtx = 'quilting';
+      else if (id === 'topGusset') state.topPickerCtx = 'gusset';
+      else if (id === 'topTufts') state.topPickerCtx = 'tufts';
+      state.topSubView = 'picker';
+      renderTopPanel();
+    });
+  });
+
+  // Open picker — settings gear (same behaviour as thumbnail)
+  document.querySelectorAll('[data-open-picker-settings]').forEach(btn => {
+    if (!btn.closest('#panel-top')) return;
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.openPickerSettings;
       if (id === 'topBase') state.topPickerCtx = 'base';
       else if (id === 'topQuilting') state.topPickerCtx = 'quilting';
       else if (id === 'topGusset') state.topPickerCtx = 'gusset';
@@ -633,6 +645,7 @@ function bindTopMainEvents() {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.toggleCard;
+      if (id === 'topBase')     state.topBaseExpanded     = !state.topBaseExpanded;
       if (id === 'topQuilting') state.topQuiltingExpanded = !state.topQuiltingExpanded;
       if (id === 'topGusset')   state.topGussetExpanded   = !state.topGussetExpanded;
       if (id === 'topTufts')    state.topTuftsExpanded    = !state.topTuftsExpanded;
@@ -653,9 +666,16 @@ function bindTopMainEvents() {
   });
 
   // Add links
-  bindAddLink('topAddQuilting', () => { state.topQuiltingAdded = true; renderTopMain(); });
-  bindAddLink('topAddGusset',   () => { state.topGussetAdded   = true; renderTopMain(); });
-  bindAddLink('topAddTufts',    () => { state.topTuftsAdded    = true; renderTopMain(); });
+  bindAddLink('topAddQuilting', () => { state.topQuiltingAdded = true; state.topBaseExpanded = true; renderTopMain(); });
+  bindAddLink('topAddGusset',   () => { state.topGussetAdded   = true; state.topBaseExpanded = true; renderTopMain(); });
+  bindAddLink('topAddTufts',    () => { state.topTuftsAdded    = true; state.topBaseExpanded = true; renderTopMain(); });
+  bindAddLink('topAddLayerCta', () => {
+    if (!state.topQuiltingAdded) state.topQuiltingAdded = true;
+    else if (!state.topGussetAdded) state.topGussetAdded = true;
+    else if (!state.topTuftsAdded) state.topTuftsAdded = true;
+    state.topBaseExpanded = true;
+    renderTopMain();
+  });
 
   // Rotation pills
   document.querySelectorAll('.rot-pill').forEach(btn => {
@@ -1164,7 +1184,7 @@ function renderLayersMain() {
           </div>
         </button>
         <div class="layer-card__actions">
-          <button class="icon-btn" title="Settings"><span class="material-symbols-outlined">settings</span></button>
+          <button class="icon-btn" data-open-picker-settings="${id}" title="Style"><span class="material-symbols-outlined">palette</span></button>
           <button class="icon-btn icon-btn--danger" data-delete-layer="${layer.id}" title="Delete"><span class="material-symbols-outlined">delete</span></button>
           <button class="icon-btn" data-toggle-layer="${layer.id}" aria-expanded="${isExpanded}">
             <span class="material-symbols-outlined">${isExpanded ? 'expand_less' : 'expand_more'}</span>

@@ -49,7 +49,10 @@
         </div>
       </div>
 
-      <button class="btn-file help-btn">Help</button>
+      <button class="btn-file help-btn">
+        Help
+        <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
+      </button>
 
       <div class="mode-toggle" role="group" aria-label="Configuration mode">
         <button class="mode-btn is-active" data-mode="external" aria-pressed="true">External</button>
@@ -58,7 +61,7 @@
     </div>
 
     <div class="topbar-center">
-      <input class="mattress-name" type="text" value="New Mattress_4" spellcheck="false" aria-label="Mattress name">
+      <input class="mattress-name" type="text" value="File name" spellcheck="false" aria-label="Mattress name">
     </div>
 
     <div class="topbar-right">
@@ -77,27 +80,27 @@
 
       <div class="nav-group" id="navExternal">
         <button class="nav-item is-active" data-section="mattress" aria-current="page">
-          <span class="material-symbols-outlined">bed</span>
+          <span class="material-symbols-outlined">deployed_code</span>
           <span class="nav-label">Mattress</span>
         </button>
         <button class="nav-item" data-section="top">
-          <span class="material-symbols-outlined">vertical_align_top</span>
+          <span class="material-symbols-outlined">deployed_code</span>
           <span class="nav-label">Top</span>
         </button>
         <button class="nav-item" data-section="wall">
-          <span class="material-symbols-outlined">texture</span>
+          <span class="material-symbols-outlined">deployed_code</span>
           <span class="nav-label">Wall</span>
         </button>
         <button class="nav-item" data-section="bottom">
-          <span class="material-symbols-outlined">vertical_align_bottom</span>
+          <span class="material-symbols-outlined">deployed_code</span>
           <span class="nav-label">Bottom</span>
         </button>
         <button class="nav-item" data-section="accessories">
-          <span class="material-symbols-outlined">category</span>
+          <span class="material-symbols-outlined">deployed_code</span>
           <span class="nav-label">Accessories</span>
         </button>
         <button class="nav-item" data-section="images">
-          <span class="material-symbols-outlined">image</span>
+          <span class="material-symbols-outlined">deployed_code</span>
           <span class="nav-label">Images</span>
         </button>
       </div>
@@ -156,16 +159,15 @@
         <div class="panel-subview" id="topMain">
           <div class="layer-stack" id="topLayerStack"></div>
           <div class="add-links" id="topAddLinks"></div>
+          <div class="panel-cta-bar panel-cta-bar--bottom" id="topMainCta">
+            <button class="btn-primary" id="topAddLayerCta">Add New Layer</button>
+          </div>
         </div>
 
         <div class="panel-subview" id="topPicker" hidden>
           <div class="picker-header">
             <button class="back-btn" id="topPickerBack">
               <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
-            </button>
-            <button class="upload-btn">
-              <span class="material-symbols-outlined">upload</span>Upload
-              <span class="material-symbols-outlined">expand_more</span>
             </button>
           </div>
           <div class="picker-tabs" id="topPickerTabStrip" role="tablist">
@@ -174,9 +176,15 @@
             <button class="picker-tab" data-tab="materials">Materials</button>
             <button class="picker-tab" data-tab="colors">Colors</button>
           </div>
-          <div class="picker-search-wrap">
-            <span class="material-symbols-outlined">search</span>
-            <input class="picker-search-input" id="topPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+          <div class="picker-search-row">
+            <div class="picker-search-wrap">
+              <span class="material-symbols-outlined">search</span>
+              <input class="picker-search-input" id="topPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+              <button class="picker-filter-btn" title="Filter"><span class="material-symbols-outlined">tune</span></button>
+            </div>
+            <button class="upload-btn">
+              <span class="material-symbols-outlined">upload</span>Upload
+            </button>
           </div>
           <div class="picker-grid-wrap">
             <div class="picker-grid" id="topPickerGrid"></div>
@@ -192,7 +200,7 @@
           <div class="empty-state" id="wallEmptyState">
             <span class="material-symbols-outlined empty-state__icon">texture</span>
             <p class="empty-state__title">No Quilting Pattern or Tufts!</p>
-            <p class="empty-state__body">You have not added any Quilting Pattern or Tufts to your mattress wall. Click below to add.</p>
+            <p class="empty-state__body">You have not added any Quilting Pattern or Tufts to your mattress wall. Click on the button below to add any to your wall.</p>
             <div class="empty-state__actions">
               <button class="btn-outline" id="wallAddQuiltingEmpty">Add Quilting Pattern</button>
               <button class="btn-outline" id="wallAddTuftsEmpty">Add Tufts</button>
@@ -285,7 +293,7 @@
             <div class="empty-state" id="tapeEmptyState">
               <span class="material-symbols-outlined empty-state__icon">horizontal_rule</span>
               <p class="empty-state__title">No Tape Present</p>
-              <p class="empty-state__body">You have not added any tape to your mattress. Click below to add.</p>
+              <p class="empty-state__body">You have not added any Tape to your mattress. Click on the button below to add Tape to the mattress.</p>
               <button class="btn-outline" id="tapeAddEmpty">Add New Tape</button>
             </div>
             <div class="layer-stack" id="tapeCardStack" hidden></div>
@@ -315,7 +323,7 @@
             <div class="empty-state" id="labelEmptyState">
               <span class="material-symbols-outlined empty-state__icon">label</span>
               <p class="empty-state__title">No Label Present</p>
-              <p class="empty-state__body">You have not added any label to your mattress. Click below to add.</p>
+              <p class="empty-state__body">You have not added any Label to your mattress. Click on the button below to add Label to the mattress.</p>
               <button class="btn-outline" id="labelAddEmpty">Add New Label</button>
             </div>
             <div class="layer-stack" id="labelCardStack" hidden></div>
@@ -345,7 +353,7 @@
             <div class="empty-state" id="handleEmptyState">
               <span class="material-symbols-outlined empty-state__icon">drag_handle</span>
               <p class="empty-state__title">No Handle Present</p>
-              <p class="empty-state__body">You have not added any handle to your mattress. Click below to add.</p>
+              <p class="empty-state__body">You have not added any Handle to your mattress. Click on the button below to add Handle to the mattress.</p>
               <button class="btn-outline" id="handleAddEmpty">Add New Handle</button>
             </div>
             <div class="layer-stack" id="handleCardStack" hidden></div>
