@@ -241,6 +241,7 @@
       <div class="panel" id="panel-bottom" hidden>
 
         <div class="panel-subview" id="bottomMain">
+          <div id="bottomTypeRow"></div>
           <div class="toggle-row bottom-mirror-row">
             <label class="toggle-label" for="bottomMirrorToggle">Mirror Top to Bottom</label>
             <div class="toggle-switch">
@@ -256,10 +257,6 @@
             <button class="back-btn" id="bottomPickerBack">
               <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
             </button>
-            <button class="upload-btn">
-              <span class="material-symbols-outlined">upload</span>Upload
-              <span class="material-symbols-outlined">expand_more</span>
-            </button>
           </div>
           <div class="picker-tabs" id="bottomPickerTabStrip" role="tablist">
             <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
@@ -267,9 +264,16 @@
             <button class="picker-tab" data-tab="materials">Materials</button>
             <button class="picker-tab" data-tab="colors">Colors</button>
           </div>
-          <div class="picker-search-wrap">
-            <span class="material-symbols-outlined">search</span>
-            <input class="picker-search-input" id="bottomPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+          <div class="picker-search-row">
+            <div class="picker-search-wrap">
+              <span class="material-symbols-outlined">search</span>
+              <input class="picker-search-input" id="bottomPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+              <button class="picker-filter-btn" title="Filter"><span class="material-symbols-outlined">tune</span></button>
+            </div>
+            <button class="upload-btn">
+              <span class="material-symbols-outlined">upload</span>Upload
+              <span class="material-symbols-outlined">expand_more</span>
+            </button>
           </div>
           <div class="picker-grid-wrap">
             <div class="picker-grid" id="bottomPickerGrid"></div>

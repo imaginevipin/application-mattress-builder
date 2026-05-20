@@ -68,16 +68,23 @@ topBaseExpanded: true   // controls expand/collapse of the Mattress Top accordio
 
 ---
 
+## Recent Changes (May 20, 2026 — Evening Pass)
+
+### Bottom Panel — Design Token Parity Fix
+
+The Bottom panel layer card body had hardcoded hex overrides in `app.css` (`#panel-bottom .compact-*` rules) that bypassed the unified `compact-*` design-token system. This caused visual inconsistency: the Bottom panel rendered lighter grey inputs and smaller font sizes compared to the Top/Wall panels and the Figma reference design.
+
+**Fix:** Removed the `#panel-bottom .compact-body / .compact-row / .compact-label / .compact-input / .compact-rotation` overrides. The Bottom panel now inherits the same token-driven dark styles as Top/Wall.
+
+**Files changed:** `outputs/v2/app.css` (lines ~2273–2305 removed)
+
+---
+
 ## What's Next
 
-1. **Wall panel** — apply the same three changes:
-   - Sub-items (Wall Quilting, Tufts) nested inside the Wall layer card accordion
-   - Palette icon on gear (already done globally via `makeLayerCard`)
-   - Picker search row layout (Upload next to search, not inside it)
+1. **Accessories panel** — review for any similar hardcoded override patterns
 
-2. **Bottom panel** — same nesting/accordion treatment
-
-3. **Accessories panel** — review for any similar patterns
+2. **Wall panel** — verify accordion nesting parity with Top panel
 
 ---
 

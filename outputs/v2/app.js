@@ -70,6 +70,14 @@ const TOP_TYPES = [
   { id: 'euro-375',   name: 'Euro Top 3.75 Inch', css: 'ptn-scallop'  },
 ];
 
+const BOTTOM_TYPES = [
+  { id: 'flat',    name: 'Flat Bottom',          css: 'ptn-diamond'  },
+  { id: 'euro-15', name: 'Euro Bottom 1.5 Inch', css: 'ptn-xshape'   },
+  { id: 'euro-2',  name: 'Euro Bottom 2 Inch',   css: 'ptn-buttons'  },
+  { id: 'euro-25', name: 'Euro Bottom 2.5 Inch', css: 'ptn-rolling'  },
+  { id: 'euro-3',  name: 'Euro Bottom 3 Inch',   css: 'ptn-polkadot' },
+];
+
 const TAPE_STYLES = [
   { id: 'flat-sm',   name: '0.5" Wide Flat Tape',  css: 'tape-flat'  },
   { id: 'zipper-sm', name: '0.5" Zipper',          css: 'tape-piped' },
@@ -208,9 +216,12 @@ function createDefaultState() {
 
     // Bottom panel
     bottomSubView: 'main',
+    bottomPickerCtx: 'base',
     bottomPickerTab: 'pattern',
     bottomPickerQuery: '',
     bottomMirrored: false,
+    bottomTypeId: 'euro-2',
+    bottomTypeCss: 'ptn-buttons',
     bottomPatternId: 'diamond',
     bottomPatternCss: 'ptn-diamond',
     bottomExpanded: false,
@@ -503,24 +514,84 @@ function sliderRowHTML(label, id, min, max, step, val) {
 }
 
 function quiltingBodyHTML(prefix, s) {
-  return layerCardBodyHTML(`
-    ${propGroupHTML('Sizing', inputPairHTML('W', `${prefix}W`, s[`${prefix}W`], 'H', `${prefix}H`, s[`${prefix}H`]))}
-    ${propGroupHTML('Position', inputPairHTML('X', `${prefix}PosX`, s[`${prefix}PosX`], 'Y', `${prefix}PosY`, s[`${prefix}PosY`]))}
-    ${propGroupHTML('Rotation', rotationPillsHTML(prefix, s[`${prefix}Rotation`]))}
-    ${propGroupHTML('Depth', sliderRowHTML('Depth', `${prefix}Depth`, 0, 100, 1, s[`${prefix}Depth`]))}
-  `);
+  return `<div class="compact-body">
+    <div class="compact-row">
+      <span class="compact-label">Sizing</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">W</span><input class="compact-input" id="${prefix}W" type="number" value="${s[`${prefix}W`]}"></div>
+        <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
+        <div class="compact-field"><span class="compact-field-lbl">H</span><input class="compact-input" id="${prefix}H" type="number" value="${s[`${prefix}H`]}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Position</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${prefix}PosX" type="number" value="${s[`${prefix}PosX`]}"></div>
+        <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
+        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${prefix}PosY" type="number" value="${s[`${prefix}PosY`]}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Rotation</span>
+      <div class="compact-rotation">${[0,90,180,270].map(d =>
+        `<button class="rot-pill${s[`${prefix}Rotation`] === d ? ' is-active' : ''}" data-rot="${prefix}" data-deg="${d}">${d}</button>`
+      ).join('')}</div>
+    </div>
+    <div class="compact-depth-block">
+      <div class="compact-row">
+        <span class="compact-label">Depth</span>
+        <input class="compact-input compact-depth-num" id="${prefix}DepthNum" type="number" min="0" max="100" value="${s[`${prefix}Depth`]}">
+      </div>
+      <input class="form-range" id="${prefix}Depth" type="range" min="0" max="100" step="1" value="${s[`${prefix}Depth`]}">
+    </div>
+  </div>`;
 }
 
 function tuftsBodyHTML(prefix, s) {
-  return layerCardBodyHTML(`
-    ${propGroupHTML('Position', inputPairHTML('X', `${prefix}PosX`, s[`${prefix}PosX`], 'Y', `${prefix}PosY`, s[`${prefix}PosY`]))}
-    ${propGroupHTML('Column', inputPairHTML('Count', `${prefix}ColCount`, s[`${prefix}ColCount`], 'Gap', `${prefix}ColGap`, s[`${prefix}ColGap`]))}
-    ${propGroupHTML('Row', inputPairHTML('Count', `${prefix}RowCount`, s[`${prefix}RowCount`], 'Gap', `${prefix}RowGap`, s[`${prefix}RowGap`]))}
-    <div class="prop-group"><div class="prop-row"><span class="prop-label">Offset Alternate Rows</span><input class="form-input" id="${prefix}OffsetRows" type="number" value="${s[`${prefix}OffsetRows`]}"></div></div>
-    <div class="prop-group"><div class="prop-row"><span class="prop-label">Diameter Size</span><input class="form-input" id="${prefix}Diameter" type="number" value="${s[`${prefix}Diameter`]}" min="0.1" step="0.1"></div></div>
-    ${propGroupHTML('Comfort Depth', sliderRowHTML('Comfort Depth', `${prefix}Depth`, 0, 100, 1, s[`${prefix}Depth`]))}
+  return `<div class="compact-body">
+    <div class="compact-row">
+      <span class="compact-label">Position</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${prefix}PosX" type="number" value="${s[`${prefix}PosX`]}"></div>
+        <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
+        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${prefix}PosY" type="number" value="${s[`${prefix}PosY`]}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Column</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">Cnt</span><input class="compact-input" id="${prefix}ColCount" type="number" value="${s[`${prefix}ColCount`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Gap</span><input class="compact-input" id="${prefix}ColGap" type="number" value="${s[`${prefix}ColGap`]}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Row</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">Cnt</span><input class="compact-input" id="${prefix}RowCount" type="number" value="${s[`${prefix}RowCount`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Gap</span><input class="compact-input" id="${prefix}RowGap" type="number" value="${s[`${prefix}RowGap`]}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Alt Rows</span>
+      <div class="compact-fields">
+        <div class="compact-field"><input class="compact-input" id="${prefix}OffsetRows" type="number" value="${s[`${prefix}OffsetRows`]}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Diameter</span>
+      <div class="compact-fields">
+        <div class="compact-field"><input class="compact-input" id="${prefix}Diameter" type="number" min="0.1" step="0.1" value="${s[`${prefix}Diameter`]}"></div>
+      </div>
+    </div>
+    <div class="compact-depth-block">
+      <div class="compact-row">
+        <span class="compact-label">C. Depth</span>
+        <input class="compact-input compact-depth-num" id="${prefix}DepthNum" type="number" min="0" max="100" value="${s[`${prefix}Depth`]}">
+      </div>
+      <input class="form-range" id="${prefix}Depth" type="range" min="0" max="100" step="1" value="${s[`${prefix}Depth`]}">
+    </div>
     <div class="feedback-strip"><span class="material-symbols-outlined">info</span><span>This feature is still evolving. <span class="feedback-strip__link">Click here to share feedback.</span></span></div>
-  `);
+  </div>`;
 }
 
 function makeLayerCard({ id, thumbCss, label, value, showDelete, expanded, bodyHtml, showDrag = false }) {
@@ -544,8 +615,7 @@ function makeLayerCard({ id, thumbCss, label, value, showDelete, expanded, bodyH
         </button>
       </div>
     </div>
-    ${expanded && bodyHtml ? bodyHtml : `<div id="body-${id}" hidden>${bodyHtml || ''}</div>`}
-    ${!expanded && bodyHtml ? `<div id="body-${id}" hidden>${bodyHtml}</div>` : ''}
+    ${bodyHtml ? (expanded ? bodyHtml : `<div id="body-${id}" hidden>${bodyHtml}</div>`) : ''}
   </div>`;
 }
 
@@ -599,7 +669,10 @@ function renderTopMain() {
     ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
     : '';
 
-  const baseBodyHtml = `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`;
+  const hasContent = subCardsHtml || addLinksHtml;
+  const baseBodyHtml = hasContent
+    ? `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`
+    : '';
 
   stack.innerHTML = makeLayerCard({
     id: 'topBase', thumbCss: state.topBasePatternCss,
@@ -706,9 +779,9 @@ function bindTopMainEvents() {
   bindNumberInput('#panel-top', 'topTuftsRowGap',  v => { state.topTuftsRowGap = v; });
 
   // Sliders
-  bindSlider('#panel-top', 'topQuiltingDepth', v => { state.topQuiltingDepth = v; });
-  bindSlider('#panel-top', 'topGussetDepth',   v => { state.topGussetDepth   = v; });
-  bindSlider('#panel-top', 'topTuftsDepth',    v => { state.topTuftsDepth    = v; });
+  bindSlider('#panel-top', 'topQuiltingDepth', v => { state.topQuiltingDepth = v; const el = document.getElementById('topQuiltingDepthNum'); if (el) el.value = v; });
+  bindSlider('#panel-top', 'topGussetDepth',   v => { state.topGussetDepth   = v; const el = document.getElementById('topGussetDepthNum');   if (el) el.value = v; });
+  bindSlider('#panel-top', 'topTuftsDepth',    v => { state.topTuftsDepth    = v; const el = document.getElementById('topTuftsDepthNum');    if (el) el.value = v; });
 }
 
 function renderTopPickerGrid() {
@@ -844,8 +917,8 @@ function bindWallMainEvents() {
       renderWallMain();
     });
   });
-  bindSlider('#panel-wall', 'wallQuiltingDepth', v => { state.wallQuiltingDepth = v; });
-  bindSlider('#panel-wall', 'wallTuftsDepth',    v => { state.wallTuftsDepth    = v; });
+  bindSlider('#panel-wall', 'wallQuiltingDepth', v => { state.wallQuiltingDepth = v; const el = document.getElementById('wallQuiltingDepthNum'); if (el) el.value = v; });
+  bindSlider('#panel-wall', 'wallTuftsDepth',    v => { state.wallTuftsDepth    = v; const el = document.getElementById('wallTuftsDepthNum');    if (el) el.value = v; });
 }
 
 function renderWallPickerGrid() {
@@ -864,6 +937,41 @@ function renderWallPickerGrid() {
 
 // ── Bottom panel ──────────────────────────────────────────
 
+function bottomCompactBodyHTML() {
+  const s = state;
+  return `<div class="compact-body">
+    <div class="compact-row">
+      <span class="compact-label">Sizing</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">W</span><input class="compact-input" id="bottomW" type="number" value="${s.bottomW}"></div>
+        <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
+        <div class="compact-field"><span class="compact-field-lbl">H</span><input class="compact-input" id="bottomH" type="number" value="${s.bottomH}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Position</span>
+      <div class="compact-fields">
+        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="bottomPosX" type="number" value="${s.bottomPosX}"></div>
+        <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
+        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="bottomPosY" type="number" value="${s.bottomPosY}"></div>
+      </div>
+    </div>
+    <div class="compact-row">
+      <span class="compact-label">Rotation</span>
+      <div class="compact-rotation">${[0,90,180,270].map(d =>
+        `<button class="rot-pill${s.bottomRotation === d ? ' is-active' : ''}" data-rot="bottom" data-deg="${d}">${d}</button>`
+      ).join('')}</div>
+    </div>
+    <div class="compact-depth-block">
+      <div class="compact-row">
+        <span class="compact-label">Depth</span>
+        <input class="compact-input compact-depth-num" id="bottomDepthNum" type="number" min="0" max="100" value="${s.bottomDepth}">
+      </div>
+      <input class="form-range" id="bottomDepth" type="range" min="0" max="100" step="1" value="${s.bottomDepth}">
+    </div>
+  </div>`;
+}
+
 function renderBottomPanel() {
   showSubView('bottom', state.bottomSubView);
   if (state.bottomSubView === 'main') renderBottomMain();
@@ -871,12 +979,38 @@ function renderBottomPanel() {
 }
 
 function renderBottomMain() {
+  // Type selector row
+  const typeRow = document.getElementById('bottomTypeRow');
+  const bt = BOTTOM_TYPES.find(t => t.id === state.bottomTypeId) || BOTTOM_TYPES[2];
+  if (typeRow) {
+    typeRow.innerHTML = `<button class="bottom-type-btn" id="bottomTypeBtn">
+      <div class="layer-card__thumb ${bt.css} bottom-type-thumb"></div>
+      <div class="bottom-type-info">
+        <span class="bottom-type-label">Size</span>
+        <span class="bottom-type-value">${bt.name}</span>
+      </div>
+      <span class="material-symbols-outlined bottom-type-chevron">chevron_right</span>
+    </button>`;
+    document.getElementById('bottomTypeBtn').addEventListener('click', () => {
+      state.bottomPickerCtx = 'type';
+      state.bottomSubView = 'picker';
+      renderBottomPanel();
+    });
+  }
+
+  // Mirror toggle
   const toggle = document.getElementById('bottomMirrorToggle');
   if (toggle) {
     toggle.checked = state.bottomMirrored;
     toggle.setAttribute('aria-checked', String(state.bottomMirrored));
+    toggle.onchange = () => {
+      state.bottomMirrored = toggle.checked;
+      toggle.setAttribute('aria-checked', String(toggle.checked));
+      renderBottomMain();
+    };
   }
 
+  // Layer card
   const stack = document.getElementById('bottomLayerStack');
   if (!stack) return;
 
@@ -884,31 +1018,68 @@ function renderBottomMain() {
     id: 'bottomBase', thumbCss: state.bottomPatternCss,
     label: 'Mattress Bottom', value: getPatternName(state.bottomPatternId),
     showDelete: false, expanded: state.bottomExpanded,
-    bodyHtml: quiltingBodyHTML('bottom', state),
+    bodyHtml: bottomCompactBodyHTML(),
   });
 
   if (state.bottomMirrored) {
-    const card = stack.querySelector('.layer-card');
-    if (card) card.classList.add('layer-card--dimmed');
+    const wrap = stack.querySelector('.layer-card-wrap');
+    if (wrap) wrap.classList.add('layer-card--dimmed');
   }
 
-  // Bind events
-  const openBtn = stack.querySelector('[data-open-picker="bottomBase"]');
-  if (openBtn && !state.bottomMirrored) {
-    openBtn.addEventListener('click', () => { state.bottomSubView = 'picker'; renderBottomPanel(); });
+  if (!state.bottomMirrored) {
+    stack.querySelectorAll('[data-open-picker="bottomBase"]').forEach(btn => {
+      btn.addEventListener('click', () => { state.bottomPickerCtx = 'base'; state.bottomSubView = 'picker'; renderBottomPanel(); });
+    });
+    stack.querySelectorAll('[data-open-picker-settings="bottomBase"]').forEach(btn => {
+      btn.addEventListener('click', () => { state.bottomPickerCtx = 'base'; state.bottomSubView = 'picker'; renderBottomPanel(); });
+    });
   }
+
   const toggleBtn = stack.querySelector('[data-toggle-card="bottomBase"]');
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => { state.bottomExpanded = !state.bottomExpanded; renderBottomMain(); });
   }
+
   document.querySelectorAll('.rot-pill').forEach(btn => {
     if (!btn.closest('#panel-bottom')) return;
     btn.addEventListener('click', () => { state.bottomRotation = Number(btn.dataset.deg); renderBottomMain(); });
   });
-  bindSlider('#panel-bottom', 'bottomDepth', v => { state.bottomDepth = v; });
+
+  bindSlider('#panel-bottom', 'bottomDepth', v => {
+    state.bottomDepth = v;
+    const numEl = document.getElementById('bottomDepthNum');
+    if (numEl) numEl.value = v;
+  });
+
+  bindNumberInput('#panel-bottom', 'bottomW',    v => { state.bottomW = v; });
+  bindNumberInput('#panel-bottom', 'bottomH',    v => { state.bottomH = v; });
+  bindNumberInput('#panel-bottom', 'bottomPosX', v => { state.bottomPosX = v; });
+  bindNumberInput('#panel-bottom', 'bottomPosY', v => { state.bottomPosY = v; });
 }
 
 function renderBottomPickerGrid() {
+  const isType = state.bottomPickerCtx === 'type';
+  if (isType) {
+    // Show type list (no tabs needed)
+    syncPickerTabs('bottomPickerTabStrip', 'pattern');
+    const grid = document.getElementById('bottomPickerGrid');
+    if (!grid) return;
+    grid.innerHTML = BOTTOM_TYPES.map(t => `
+      <button class="picker-tile${t.id === state.bottomTypeId ? ' is-active' : ''}" data-pick="${t.id}" data-css="${t.css}">
+        <span class="picker-tile__dot"></span>
+        <div class="picker-tile__preview ${t.css}"></div>
+        <span class="picker-tile__name">${t.name}</span>
+      </button>`).join('');
+    grid.querySelectorAll('.picker-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        state.bottomTypeId  = tile.dataset.pick;
+        state.bottomTypeCss = tile.dataset.css;
+        grid.querySelectorAll('.picker-tile').forEach(t => t.classList.toggle('is-active', t.dataset.pick === tile.dataset.pick));
+      });
+    });
+    return;
+  }
+
   renderGenericPickerGrid('bottomPickerGrid', 'bottomPickerTabStrip', state.bottomPickerTab, state.bottomPickerQuery, state.bottomPatternId, (id, css) => {
     state.bottomPatternId  = id;
     state.bottomPatternCss = css;
