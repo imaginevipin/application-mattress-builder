@@ -1176,7 +1176,6 @@ input:focus-visible, select:focus-visible { outline: none; }
 .create-image-camera-item { display: flex; align-items: center; gap: var(--s-200); font-size: var(--text-small-size); color: var(--text-default-body); cursor: pointer; }
 
 .create-image-setting-group { display: flex; flex-direction: column; }
-.create-image-setting-group--mode { }
 
 .create-image-mode-tabs { display: flex; background: var(--surface-default-secondary); border-radius: var(--br-100); padding: 3px; gap: 2px; }
 .create-image-mode {
