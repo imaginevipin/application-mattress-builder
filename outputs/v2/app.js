@@ -150,6 +150,21 @@ function createCamera(name, snapshot = null, isCurrent = false) {
   return { id: isCurrent ? 'current-camera' : `camera-${cameraUid}`, name, snapshot, isCurrent, createdAt: new Date().toISOString() };
 }
 
+function makeDefaultTopLayer() {
+  return {
+    patternId: 'diamond', patternCss: 'ptn-diamond', expanded: true,
+    quiltingAdded: false, quiltingPatternId: 'diamond', quiltingPatternCss: 'ptn-diamond',
+    quiltingExpanded: false, quiltingW: 50, quiltingH: 50,
+    quiltingPosX: 0, quiltingPosY: 0, quiltingRotation: 0, quiltingDepth: 25,
+    gussetAdded: false, gussetPatternId: 'buttons', gussetPatternCss: 'ptn-buttons',
+    gussetExpanded: false, gussetW: 50, gussetH: 50,
+    gussetPosX: 0, gussetPosY: 0, gussetRotation: 0, gussetDepth: 25,
+    tuftsAdded: false, tuftsExpanded: false, tuftTypeIndex: 0,
+    tuftsPosX: 0, tuftsPosY: 0, tuftsColCount: 6, tuftsColGap: 14,
+    tuftsRowCount: 6, tuftsRowGap: 14, tuftsOffsetRows: 0, tuftsDiameter: 1, tuftsDepth: 25,
+  };
+}
+
 function createDefaultState() {
   const defaultLayers = [createLayer('pocket-coil'), createLayer('hole-punch')];
   const defaultCamera = createCamera('Current Camera', null, true);
@@ -165,34 +180,12 @@ function createDefaultState() {
     heightQuery: '',
 
     // Top panel
-    topSubView: 'main',       // 'main' | 'picker'
-    topPickerCtx: null,       // 'base' | 'quilting' | 'gusset'
+    topSubView: 'main',
+    topPickerCtx: null,
+    topPickerLayerIdx: 0,
     topPickerTab: 'pattern',
     topPickerQuery: '',
-    topBasePatternId: 'diamond',
-    topBasePatternCss: 'ptn-diamond',
-    topBaseExpanded: true,
-    topQuiltingAdded: false,
-    topQuiltingPatternId: 'diamond',
-    topQuiltingPatternCss: 'ptn-diamond',
-    topQuiltingExpanded: false,
-    topQuiltingW: 50, topQuiltingH: 50,
-    topQuiltingPosX: 0, topQuiltingPosY: 0,
-    topQuiltingRotation: 0, topQuiltingDepth: 25,
-    topGussetAdded: false,
-    topGussetPatternId: 'buttons',
-    topGussetPatternCss: 'ptn-buttons',
-    topGussetExpanded: false,
-    topGussetW: 50, topGussetH: 50,
-    topGussetPosX: 0, topGussetPosY: 0,
-    topGussetRotation: 0, topGussetDepth: 25,
-    topTuftsAdded: false,
-    topTuftTypeIndex: 0,
-    topTuftsExpanded: false,
-    topTuftsPosX: 0, topTuftsPosY: 0,
-    topTuftsColCount: 6, topTuftsColGap: 14,
-    topTuftsRowCount: 6, topTuftsRowGap: 14,
-    topTuftsOffsetRows: 0, topTuftsDiameter: 1, topTuftsDepth: 25,
+    topLayers: [makeDefaultTopLayer()],
 
     // Wall panel
     wallSubView: 'main',
@@ -319,8 +312,8 @@ function getPatternName(id) {
   return (PATTERNS.find(p => p.id === id) || {}).name || 'Pattern 1';
 }
 
-function getTuftName() {
-  return TUFT_TYPES[state.topTuftTypeIndex] || 'Classic Tuft';
+function getTuftName(layer) {
+  return TUFT_TYPES[(layer || {}).tuftTypeIndex || 0] || 'Classic Tuft';
 }
 
 function getWallTuftName() {
@@ -513,82 +506,82 @@ function sliderRowHTML(label, id, min, max, step, val) {
   </div>`;
 }
 
-function quiltingBodyHTML(prefix, s) {
+function quiltingBodyHTML(idPrefix, vals) {
   return `<div class="compact-body">
     <div class="compact-row">
       <span class="compact-label">Sizing</span>
       <div class="compact-fields">
-        <div class="compact-field"><span class="compact-field-lbl">W</span><input class="compact-input" id="${prefix}W" type="number" value="${s[`${prefix}W`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">W</span><input class="compact-input" id="${idPrefix}W" type="number" value="${vals.W}"></div>
         <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
-        <div class="compact-field"><span class="compact-field-lbl">H</span><input class="compact-input" id="${prefix}H" type="number" value="${s[`${prefix}H`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">H</span><input class="compact-input" id="${idPrefix}H" type="number" value="${vals.H}"></div>
       </div>
     </div>
     <div class="compact-row">
       <span class="compact-label">Position</span>
       <div class="compact-fields">
-        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${prefix}PosX" type="number" value="${s[`${prefix}PosX`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${idPrefix}PosX" type="number" value="${vals.PosX}"></div>
         <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
-        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${prefix}PosY" type="number" value="${s[`${prefix}PosY`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${idPrefix}PosY" type="number" value="${vals.PosY}"></div>
       </div>
     </div>
     <div class="compact-row">
       <span class="compact-label">Rotation</span>
       <div class="compact-rotation">${[0,90,180,270].map(d =>
-        `<button class="rot-pill${s[`${prefix}Rotation`] === d ? ' is-active' : ''}" data-rot="${prefix}" data-deg="${d}">${d}</button>`
+        `<button class="rot-pill${vals.Rotation === d ? ' is-active' : ''}" data-rot="${idPrefix}" data-deg="${d}">${d}</button>`
       ).join('')}</div>
     </div>
     <div class="compact-depth-block">
       <div class="compact-row">
         <span class="compact-label">Depth</span>
-        <input class="compact-input compact-depth-num" id="${prefix}DepthNum" type="number" min="0" max="100" value="${s[`${prefix}Depth`]}">
+        <input class="compact-input compact-depth-num" id="${idPrefix}DepthNum" type="number" min="0" max="100" value="${vals.Depth}">
       </div>
-      <input class="form-range" id="${prefix}Depth" type="range" min="0" max="100" step="1" value="${s[`${prefix}Depth`]}">
+      <input class="form-range" id="${idPrefix}Depth" type="range" min="0" max="100" step="1" value="${vals.Depth}">
     </div>
   </div>`;
 }
 
-function tuftsBodyHTML(prefix, s) {
+function tuftsBodyHTML(idPrefix, vals) {
   return `<div class="compact-body">
     <div class="compact-row">
       <span class="compact-label">Position</span>
       <div class="compact-fields">
-        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${prefix}PosX" type="number" value="${s[`${prefix}PosX`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${idPrefix}PosX" type="number" value="${vals.PosX}"></div>
         <button class="lock-btn compact-lock" title="Link"><span class="material-symbols-outlined">lock_open</span></button>
-        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${prefix}PosY" type="number" value="${s[`${prefix}PosY`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${idPrefix}PosY" type="number" value="${vals.PosY}"></div>
       </div>
     </div>
     <div class="compact-row">
       <span class="compact-label">Column</span>
       <div class="compact-fields">
-        <div class="compact-field"><span class="compact-field-lbl">Cnt</span><input class="compact-input" id="${prefix}ColCount" type="number" value="${s[`${prefix}ColCount`]}"></div>
-        <div class="compact-field"><span class="compact-field-lbl">Gap</span><input class="compact-input" id="${prefix}ColGap" type="number" value="${s[`${prefix}ColGap`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Cnt</span><input class="compact-input" id="${idPrefix}ColCount" type="number" value="${vals.ColCount}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Gap</span><input class="compact-input" id="${idPrefix}ColGap" type="number" value="${vals.ColGap}"></div>
       </div>
     </div>
     <div class="compact-row">
       <span class="compact-label">Row</span>
       <div class="compact-fields">
-        <div class="compact-field"><span class="compact-field-lbl">Cnt</span><input class="compact-input" id="${prefix}RowCount" type="number" value="${s[`${prefix}RowCount`]}"></div>
-        <div class="compact-field"><span class="compact-field-lbl">Gap</span><input class="compact-input" id="${prefix}RowGap" type="number" value="${s[`${prefix}RowGap`]}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Cnt</span><input class="compact-input" id="${idPrefix}RowCount" type="number" value="${vals.RowCount}"></div>
+        <div class="compact-field"><span class="compact-field-lbl">Gap</span><input class="compact-input" id="${idPrefix}RowGap" type="number" value="${vals.RowGap}"></div>
       </div>
     </div>
     <div class="compact-row">
       <span class="compact-label">Alt Rows</span>
       <div class="compact-fields">
-        <div class="compact-field"><input class="compact-input" id="${prefix}OffsetRows" type="number" value="${s[`${prefix}OffsetRows`]}"></div>
+        <div class="compact-field"><input class="compact-input" id="${idPrefix}OffsetRows" type="number" value="${vals.OffsetRows}"></div>
       </div>
     </div>
     <div class="compact-row">
       <span class="compact-label">Diameter</span>
       <div class="compact-fields">
-        <div class="compact-field"><input class="compact-input" id="${prefix}Diameter" type="number" min="0.1" step="0.1" value="${s[`${prefix}Diameter`]}"></div>
+        <div class="compact-field"><input class="compact-input" id="${idPrefix}Diameter" type="number" min="0.1" step="0.1" value="${vals.Diameter}"></div>
       </div>
     </div>
     <div class="compact-depth-block">
       <div class="compact-row">
         <span class="compact-label">C. Depth</span>
-        <input class="compact-input compact-depth-num" id="${prefix}DepthNum" type="number" min="0" max="100" value="${s[`${prefix}Depth`]}">
+        <input class="compact-input compact-depth-num" id="${idPrefix}DepthNum" type="number" min="0" max="100" value="${vals.Depth}">
       </div>
-      <input class="form-range" id="${prefix}Depth" type="range" min="0" max="100" step="1" value="${s[`${prefix}Depth`]}">
+      <input class="form-range" id="${idPrefix}Depth" type="range" min="0" max="100" step="1" value="${vals.Depth}">
     </div>
     <div class="feedback-strip"><span class="material-symbols-outlined">info</span><span>This feature is still evolving. <span class="feedback-strip__link">Click here to share feedback.</span></span></div>
   </div>`;
@@ -597,7 +590,7 @@ function tuftsBodyHTML(prefix, s) {
 function makeLayerCard({ id, thumbCss, label, value, showDelete, expanded, bodyHtml, showDrag = false }) {
   const dragHtml = showDrag ? `<span class="layer-card__drag material-symbols-outlined">drag_indicator</span>` : '';
   return `
-  <div class="layer-card-wrap" id="wrap-${id}">
+  <div class="layer-card-wrap" id="wrap-${id}"${showDrag ? ' draggable="true"' : ''}>
     <div class="layer-card">
       ${dragHtml}
       <button class="layer-card__trigger" data-open-picker="${id}">
@@ -633,81 +626,104 @@ function renderTopMain() {
   const addLinks = document.getElementById('topAddLinks');
   if (!stack || !addLinks) return;
 
-  // Build sub-items that nest inside the Mattress Top card body
-  let subCardsHtml = '';
-  if (state.topQuiltingAdded) {
-    subCardsHtml += makeLayerCard({
-      id: 'topQuilting', thumbCss: state.topQuiltingPatternCss,
-      label: 'Top Quilting', value: getPatternName(state.topQuiltingPatternId),
-      showDelete: true, expanded: state.topQuiltingExpanded,
-      bodyHtml: quiltingBodyHTML('topQuilting', state),
-    });
-  }
-  if (state.topGussetAdded) {
-    subCardsHtml += makeLayerCard({
-      id: 'topGusset', thumbCss: state.topGussetPatternCss,
-      label: 'Gusset Quilting', value: getPatternName(state.topGussetPatternId),
-      showDelete: true, expanded: state.topGussetExpanded,
-      bodyHtml: quiltingBodyHTML('topGusset', state),
-    });
-  }
-  if (state.topTuftsAdded) {
-    subCardsHtml += makeLayerCard({
-      id: 'topTufts', thumbCss: 'ptn-buttons',
-      label: 'Tufts', value: getTuftName(),
-      showDelete: true, expanded: state.topTuftsExpanded,
-      bodyHtml: tuftsBodyHTML('topTufts', state),
-    });
-  }
+  stack.innerHTML = state.topLayers.map((layer, idx) => {
+    const pfx = `topL${idx}`;
+    let subCardsHtml = '';
 
-  // Add links live inside the base card
-  const linkButtons = [];
-  if (!state.topQuiltingAdded) linkButtons.push(`<button class="add-link" id="topAddQuilting">+ Add Quilting</button>`);
-  if (state.topQuiltingAdded && !state.topGussetAdded) linkButtons.push(`<button class="add-link" id="topAddGusset">+ Add Gusset Quilting</button>`);
-  if (!state.topTuftsAdded) linkButtons.push(`<button class="add-link" id="topAddTufts">+ Add Tufts</button>`);
-  const addLinksHtml = linkButtons.length
-    ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
-    : '';
+    if (layer.quiltingAdded) {
+      subCardsHtml += makeLayerCard({
+        id: `${pfx}Quilting`, thumbCss: layer.quiltingPatternCss,
+        label: 'Top Quilting', value: getPatternName(layer.quiltingPatternId),
+        showDelete: true, expanded: layer.quiltingExpanded,
+        bodyHtml: quiltingBodyHTML(`${pfx}Quilting`, {
+          W: layer.quiltingW, H: layer.quiltingH,
+          PosX: layer.quiltingPosX, PosY: layer.quiltingPosY,
+          Rotation: layer.quiltingRotation, Depth: layer.quiltingDepth,
+        }),
+      });
+    }
+    if (layer.gussetAdded) {
+      subCardsHtml += makeLayerCard({
+        id: `${pfx}Gusset`, thumbCss: layer.gussetPatternCss,
+        label: 'Gusset Quilting', value: getPatternName(layer.gussetPatternId),
+        showDelete: true, expanded: layer.gussetExpanded,
+        bodyHtml: quiltingBodyHTML(`${pfx}Gusset`, {
+          W: layer.gussetW, H: layer.gussetH,
+          PosX: layer.gussetPosX, PosY: layer.gussetPosY,
+          Rotation: layer.gussetRotation, Depth: layer.gussetDepth,
+        }),
+      });
+    }
+    if (layer.tuftsAdded) {
+      subCardsHtml += makeLayerCard({
+        id: `${pfx}Tufts`, thumbCss: 'ptn-buttons',
+        label: 'Tufts', value: getTuftName(layer),
+        showDelete: true, expanded: layer.tuftsExpanded,
+        bodyHtml: tuftsBodyHTML(`${pfx}Tufts`, {
+          PosX: layer.tuftsPosX, PosY: layer.tuftsPosY,
+          ColCount: layer.tuftsColCount, ColGap: layer.tuftsColGap,
+          RowCount: layer.tuftsRowCount, RowGap: layer.tuftsRowGap,
+          OffsetRows: layer.tuftsOffsetRows, Diameter: layer.tuftsDiameter, Depth: layer.tuftsDepth,
+        }),
+      });
+    }
 
-  const hasContent = subCardsHtml || addLinksHtml;
-  const baseBodyHtml = hasContent
-    ? `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`
-    : '';
+    const linkButtons = [];
+    if (!layer.quiltingAdded) linkButtons.push(`<button class="add-link" data-top-add="quilting" data-idx="${idx}">+ Add Quilting</button>`);
+    if (layer.quiltingAdded && !layer.gussetAdded) linkButtons.push(`<button class="add-link" data-top-add="gusset" data-idx="${idx}">+ Add Gusset Quilting</button>`);
+    if (!layer.tuftsAdded) linkButtons.push(`<button class="add-link" data-top-add="tufts" data-idx="${idx}">+ Add Tufts</button>`);
+    const addLinksHtml = linkButtons.length
+      ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
+      : '';
 
-  stack.innerHTML = makeLayerCard({
-    id: 'topBase', thumbCss: state.topBasePatternCss,
-    label: 'Mattress Top', value: getPatternName(state.topBasePatternId),
-    showDelete: false, expanded: state.topBaseExpanded, bodyHtml: baseBodyHtml,
-  });
+    const hasContent = subCardsHtml || addLinksHtml;
+    const baseBodyHtml = hasContent
+      ? `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`
+      : '';
+
+    const layerLabel = state.topLayers.length > 1 ? `Mattress Top ${idx + 1}` : 'Mattress Top';
+    return makeLayerCard({
+      id: `${pfx}Base`, thumbCss: layer.patternCss,
+      label: layerLabel, value: getPatternName(layer.patternId),
+      showDelete: idx > 0, expanded: layer.expanded, bodyHtml: baseBodyHtml,
+    });
+  }).join('');
 
   addLinks.innerHTML = '';
   bindTopMainEvents();
 }
 
 function bindTopMainEvents() {
+  function layerIdxFromId(id) {
+    const m = id.match(/^topL(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
   // Open picker — thumbnail click
   document.querySelectorAll('[data-open-picker]').forEach(btn => {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.openPicker;
-      if (id === 'topBase') state.topPickerCtx = 'base';
-      else if (id === 'topQuilting') state.topPickerCtx = 'quilting';
-      else if (id === 'topGusset') state.topPickerCtx = 'gusset';
-      else if (id === 'topTufts') state.topPickerCtx = 'tufts';
+      state.topPickerLayerIdx = layerIdxFromId(id);
+      if (id.endsWith('Base'))          state.topPickerCtx = 'base';
+      else if (id.endsWith('Quilting')) state.topPickerCtx = 'quilting';
+      else if (id.endsWith('Gusset'))   state.topPickerCtx = 'gusset';
+      else if (id.endsWith('Tufts'))    state.topPickerCtx = 'tufts';
       state.topSubView = 'picker';
       renderTopPanel();
     });
   });
 
-  // Open picker — settings gear (same behaviour as thumbnail)
+  // Open picker — settings gear
   document.querySelectorAll('[data-open-picker-settings]').forEach(btn => {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.openPickerSettings;
-      if (id === 'topBase') state.topPickerCtx = 'base';
-      else if (id === 'topQuilting') state.topPickerCtx = 'quilting';
-      else if (id === 'topGusset') state.topPickerCtx = 'gusset';
-      else if (id === 'topTufts') state.topPickerCtx = 'tufts';
+      state.topPickerLayerIdx = layerIdxFromId(id);
+      if (id.endsWith('Base'))          state.topPickerCtx = 'base';
+      else if (id.endsWith('Quilting')) state.topPickerCtx = 'quilting';
+      else if (id.endsWith('Gusset'))   state.topPickerCtx = 'gusset';
+      else if (id.endsWith('Tufts'))    state.topPickerCtx = 'tufts';
       state.topSubView = 'picker';
       renderTopPanel();
     });
@@ -718,10 +734,13 @@ function bindTopMainEvents() {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.toggleCard;
-      if (id === 'topBase')     state.topBaseExpanded     = !state.topBaseExpanded;
-      if (id === 'topQuilting') state.topQuiltingExpanded = !state.topQuiltingExpanded;
-      if (id === 'topGusset')   state.topGussetExpanded   = !state.topGussetExpanded;
-      if (id === 'topTufts')    state.topTuftsExpanded    = !state.topTuftsExpanded;
+      const idx = layerIdxFromId(id);
+      const layer = state.topLayers[idx];
+      if (!layer) return;
+      if (id.endsWith('Base'))          layer.expanded         = !layer.expanded;
+      else if (id.endsWith('Quilting')) layer.quiltingExpanded = !layer.quiltingExpanded;
+      else if (id.endsWith('Gusset'))   layer.gussetExpanded   = !layer.gussetExpanded;
+      else if (id.endsWith('Tufts'))    layer.tuftsExpanded    = !layer.tuftsExpanded;
       renderTopMain();
     });
   });
@@ -731,57 +750,81 @@ function bindTopMainEvents() {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.deleteCard;
-      if (id === 'topQuilting') { state.topQuiltingAdded = false; state.topQuiltingExpanded = false; }
-      if (id === 'topGusset')   { state.topGussetAdded   = false; state.topGussetExpanded   = false; }
-      if (id === 'topTufts')    { state.topTuftsAdded    = false; state.topTuftsExpanded    = false; }
+      const idx = layerIdxFromId(id);
+      const layer = state.topLayers[idx];
+      if (!layer) return;
+      if (id.endsWith('Base'))          { state.topLayers.splice(idx, 1); }
+      else if (id.endsWith('Quilting')) { layer.quiltingAdded = false; layer.quiltingExpanded = false; }
+      else if (id.endsWith('Gusset'))   { layer.gussetAdded   = false; layer.gussetExpanded   = false; }
+      else if (id.endsWith('Tufts'))    { layer.tuftsAdded    = false; layer.tuftsExpanded    = false; }
       renderTopMain();
     });
   });
 
-  // Add links
-  bindAddLink('topAddQuilting', () => { state.topQuiltingAdded = true; state.topBaseExpanded = true; renderTopMain(); });
-  bindAddLink('topAddGusset',   () => { state.topGussetAdded   = true; state.topBaseExpanded = true; renderTopMain(); });
-  bindAddLink('topAddTufts',    () => { state.topTuftsAdded    = true; state.topBaseExpanded = true; renderTopMain(); });
-  bindAddLink('topAddLayerCta', () => {
-    if (!state.topQuiltingAdded) state.topQuiltingAdded = true;
-    else if (!state.topGussetAdded) state.topGussetAdded = true;
-    else if (!state.topTuftsAdded) state.topTuftsAdded = true;
-    state.topBaseExpanded = true;
-    renderTopMain();
+  // Add sub-items (quilting / gusset / tufts) via data-top-add + data-idx
+  document.querySelectorAll('[data-top-add]').forEach(btn => {
+    if (!btn.closest('#panel-top')) return;
+    btn.addEventListener('click', () => {
+      const kind = btn.dataset.topAdd;
+      const idx  = parseInt(btn.dataset.idx, 10);
+      const layer = state.topLayers[idx];
+      if (!layer) return;
+      if (kind === 'quilting') { layer.quiltingAdded = true; layer.expanded = true; }
+      else if (kind === 'gusset') { layer.gussetAdded = true; layer.expanded = true; }
+      else if (kind === 'tufts')  { layer.tuftsAdded  = true; layer.expanded = true; }
+      renderTopMain();
+    });
   });
+
+  // Add New Layer CTA — use onclick to prevent listener accumulation across re-renders
+  const ctaBtn = document.getElementById('topAddLayerCta');
+  if (ctaBtn) ctaBtn.onclick = () => {
+    state.topLayers.push(makeDefaultTopLayer());
+    renderTopMain();
+  };
 
   // Rotation pills
   document.querySelectorAll('.rot-pill').forEach(btn => {
     if (!btn.closest('#panel-top')) return;
     btn.addEventListener('click', () => {
-      const prefix = btn.dataset.rot;
-      const deg    = Number(btn.dataset.deg);
-      if (prefix === 'topQuilting') state.topQuiltingRotation = deg;
-      if (prefix === 'topGusset')   state.topGussetRotation   = deg;
+      const idPrefix = btn.dataset.rot;
+      const deg      = Number(btn.dataset.deg);
+      const idx      = layerIdxFromId(idPrefix);
+      const layer    = state.topLayers[idx];
+      if (!layer) return;
+      if (idPrefix.endsWith('Quilting')) layer.quiltingRotation = deg;
+      else if (idPrefix.endsWith('Gusset')) layer.gussetRotation = deg;
       renderTopMain();
     });
   });
 
-  // Number inputs
-  bindNumberInput('#panel-top', 'topQuiltingW',    v => { state.topQuiltingW = v; });
-  bindNumberInput('#panel-top', 'topQuiltingH',    v => { state.topQuiltingH = v; });
-  bindNumberInput('#panel-top', 'topQuiltingPosX', v => { state.topQuiltingPosX = v; });
-  bindNumberInput('#panel-top', 'topQuiltingPosY', v => { state.topQuiltingPosY = v; });
-  bindNumberInput('#panel-top', 'topGussetW',      v => { state.topGussetW = v; });
-  bindNumberInput('#panel-top', 'topGussetH',      v => { state.topGussetH = v; });
-  bindNumberInput('#panel-top', 'topGussetPosX',   v => { state.topGussetPosX = v; });
-  bindNumberInput('#panel-top', 'topGussetPosY',   v => { state.topGussetPosY = v; });
-  bindNumberInput('#panel-top', 'topTuftsPosX',    v => { state.topTuftsPosX = v; });
-  bindNumberInput('#panel-top', 'topTuftsPosY',    v => { state.topTuftsPosY = v; });
-  bindNumberInput('#panel-top', 'topTuftsColCount',v => { state.topTuftsColCount = v; });
-  bindNumberInput('#panel-top', 'topTuftsColGap',  v => { state.topTuftsColGap = v; });
-  bindNumberInput('#panel-top', 'topTuftsRowCount',v => { state.topTuftsRowCount = v; });
-  bindNumberInput('#panel-top', 'topTuftsRowGap',  v => { state.topTuftsRowGap = v; });
-
-  // Sliders
-  bindSlider('#panel-top', 'topQuiltingDepth', v => { state.topQuiltingDepth = v; const el = document.getElementById('topQuiltingDepthNum'); if (el) el.value = v; });
-  bindSlider('#panel-top', 'topGussetDepth',   v => { state.topGussetDepth   = v; const el = document.getElementById('topGussetDepthNum');   if (el) el.value = v; });
-  bindSlider('#panel-top', 'topTuftsDepth',    v => { state.topTuftsDepth    = v; const el = document.getElementById('topTuftsDepthNum');    if (el) el.value = v; });
+  // Number inputs and sliders — scoped per layer
+  state.topLayers.forEach((layer, idx) => {
+    const pfx = `topL${idx}`;
+    if (layer.quiltingAdded) {
+      bindNumberInput('#panel-top', `${pfx}QuiltingW`,    v => { layer.quiltingW    = v; });
+      bindNumberInput('#panel-top', `${pfx}QuiltingH`,    v => { layer.quiltingH    = v; });
+      bindNumberInput('#panel-top', `${pfx}QuiltingPosX`, v => { layer.quiltingPosX = v; });
+      bindNumberInput('#panel-top', `${pfx}QuiltingPosY`, v => { layer.quiltingPosY = v; });
+      bindSlider('#panel-top', `${pfx}QuiltingDepth`, v => { layer.quiltingDepth = v; const el = document.getElementById(`${pfx}QuiltingDepthNum`); if (el) el.value = v; });
+    }
+    if (layer.gussetAdded) {
+      bindNumberInput('#panel-top', `${pfx}GussetW`,    v => { layer.gussetW    = v; });
+      bindNumberInput('#panel-top', `${pfx}GussetH`,    v => { layer.gussetH    = v; });
+      bindNumberInput('#panel-top', `${pfx}GussetPosX`, v => { layer.gussetPosX = v; });
+      bindNumberInput('#panel-top', `${pfx}GussetPosY`, v => { layer.gussetPosY = v; });
+      bindSlider('#panel-top', `${pfx}GussetDepth`, v => { layer.gussetDepth = v; const el = document.getElementById(`${pfx}GussetDepthNum`); if (el) el.value = v; });
+    }
+    if (layer.tuftsAdded) {
+      bindNumberInput('#panel-top', `${pfx}TuftsPosX`,    v => { layer.tuftsPosX    = v; });
+      bindNumberInput('#panel-top', `${pfx}TuftsPosY`,    v => { layer.tuftsPosY    = v; });
+      bindNumberInput('#panel-top', `${pfx}TuftsColCount`,v => { layer.tuftsColCount = v; });
+      bindNumberInput('#panel-top', `${pfx}TuftsColGap`,  v => { layer.tuftsColGap  = v; });
+      bindNumberInput('#panel-top', `${pfx}TuftsRowCount`,v => { layer.tuftsRowCount = v; });
+      bindNumberInput('#panel-top', `${pfx}TuftsRowGap`,  v => { layer.tuftsRowGap  = v; });
+      bindSlider('#panel-top', `${pfx}TuftsDepth`, v => { layer.tuftsDepth = v; const el = document.getElementById(`${pfx}TuftsDepthNum`); if (el) el.value = v; });
+    }
+  });
 }
 
 function renderTopPickerGrid() {
@@ -800,9 +843,10 @@ function renderTopPickerGrid() {
   const q = state.topPickerQuery.toLowerCase().trim();
   const visible = q ? allItems.filter(i => i.name.toLowerCase().includes(q)) : allItems;
 
-  let activeId = state.topBasePatternId;
-  if (state.topPickerCtx === 'quilting') activeId = state.topQuiltingPatternId;
-  if (state.topPickerCtx === 'gusset')   activeId = state.topGussetPatternId;
+  const activeLayer = state.topLayers[state.topPickerLayerIdx] || state.topLayers[0];
+  let activeId = activeLayer.patternId;
+  if (state.topPickerCtx === 'quilting') activeId = activeLayer.quiltingPatternId;
+  if (state.topPickerCtx === 'gusset')   activeId = activeLayer.gussetPatternId;
 
   const grid = document.getElementById('topPickerGrid');
   if (!grid) return;
@@ -817,9 +861,10 @@ function renderTopPickerGrid() {
     tile.addEventListener('click', () => {
       const id  = tile.dataset.pick;
       const css = tile.dataset.css;
-      if (state.topPickerCtx === 'base')     { state.topBasePatternId = id; state.topBasePatternCss = css; }
-      if (state.topPickerCtx === 'quilting') { state.topQuiltingPatternId = id; state.topQuiltingPatternCss = css; }
-      if (state.topPickerCtx === 'gusset')   { state.topGussetPatternId  = id; state.topGussetPatternCss  = css; }
+      const layer = state.topLayers[state.topPickerLayerIdx] || state.topLayers[0];
+      if (state.topPickerCtx === 'base')     { layer.patternId = id; layer.patternCss = css; }
+      if (state.topPickerCtx === 'quilting') { layer.quiltingPatternId = id; layer.quiltingPatternCss = css; }
+      if (state.topPickerCtx === 'gusset')   { layer.gussetPatternId   = id; layer.gussetPatternCss   = css; }
       grid.querySelectorAll('.picker-tile').forEach(t => t.classList.toggle('is-active', t.dataset.pick === id));
     });
   });
