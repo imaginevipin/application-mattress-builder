@@ -1,6 +1,6 @@
 # Mattress Builder — Work Context
 
-**Date:** 2026-05-20
+**Date:** 2026-05-21
 **Working directory:** `outputs/v2/` (the active v2 build)
 **Files being edited:** `outputs/v2/index.html`, `outputs/v2/app.css`, `outputs/v2/app.js`
 
@@ -16,39 +16,93 @@ The project has two versioned outputs:
 
 ---
 
-## Current Work Pass: UI Consistency — Top Panel
+## Version Switcher (V1 / V2 toggle bar)
 
-We are aligning `outputs/v2/` to match the new Figma-exported reference screens. The work is section-by-section starting with **Top**, then Wall, Bottom, etc.
+A version switcher bar sits above the topbar, allowing the product team to demo two distinct modes without separate URLs. It uses `.version-bar` / `.version-pill` CSS and `switchVersion(v)` in `app.js`.
 
-### Changes Completed (Top panel)
+- **Version 1** — standard configurator. "Request Props" button in topbar (no request panel).
+- **Version 2** — configurator + "My Requests" button that opens the catalog marketplace panel.
 
-#### 1. Picker Sub-View Layout
-- **Upload button** moved out of the picker header and into the search row, as a sibling of the search field (not inside it)
-- A new **`.picker-search-row`** wrapper holds the search field + upload button side-by-side
-- **Filter icon** (`tune`) added inside the search field
-- **Back button** header made more compact (`min-height: 36px`)
-
-#### 2. Settings → Palette Icon
-- The settings gear icon on all layer cards changed to a **palette** icon (`palette`) to match Figma
-- Both the thumbnail click and the palette icon click now open the picker (same behaviour)
-
-#### 3. Sub-items Nested Inside Base Card Accordion
-- Previously: "Top Quilting", "Tufts" cards appeared as separate sibling cards at the same level as "Mattress Top"
-- Now: They are nested **inside** the Mattress Top card's accordion body
-- Add links ("+ Add Quilting", "+ Add Tufts") also live inside the accordion, not outside
-- The Mattress Top card has its own expand/collapse toggle (`topBaseExpanded`, defaults to `true`)
-- Sub-card `min-height` inflation (inherited from `#panel-top .layer-card-wrap { min-height: 104px }`) fixed with higher-specificity override
-
-#### 4. Add Link Button Style
-- Buttons changed from orange outline → gray filled pills matching Figma (`background: #6a6a6a`, white text, `min-height: 24px`)
-- Row layout (`flex-direction: row`, `gap: 4px`) matching Figma side-by-side layout
-
-#### 5. Upload Button Style
-- Upload button in picker search row now uses filled `#6a6a6a` style, no visible border — matches Figma
+Switching from V2→V1 automatically closes the request panel and reverts the button label.
 
 ---
 
-## Key State Fields Added
+## Imagine Assistant (AI Chat Widget)
+
+A floating chat assistant (FAB + sliding panel) docked at the bottom-right of the viewport. Relevant only in **Version 1**; the FAB is hidden when Version 2 is active.
+
+- **FAB:** `#aiFab` — 44px papaya circle, `z-index` above viewport
+- **Panel:** `#aiPanel` — 380px wide, slides in via `opacity` + `transform` transition, class `.is-open`
+- **Chat:** `#aiPanelBody` — scrolling message list; `appendMessage(text, role)` adds bubbles
+- **Suggestion chips:** `.ai-chip` — clicking pre-fills the input
+- **Input:** `#aiInputField` + `#aiInputSend`
+- **Close:** `#aiPanelClose`
+- All wired in `initAssistant()` in `app.js`
+
+---
+
+## My Requests — Catalog Marketplace Panel
+
+A right-side `aside.request-panel` (300px) toggled by the "My Requests" topbar button in Version 2. Contains two tabs: **Browse** and **My Requests**.
+
+### Browse tab
+- Category filter strip (`#reqCatStrip`) with pills: All / Texture / Pattern / Material / Model / Accessory
+- Catalog list (`#reqCatalog`) — JS-rendered from the `CATALOG` array in `initAssistant()`
+- Each row: colored category dot, item name, meta description, price, `+` add button
+- Clicking `+` adds the item to the My Requests board, dims the catalog row, shows a toast
+
+### My Requests tab
+- Board (`#reqBoard`) — real raised cards (`background: #373737`, `border-radius: 6px`) with `gap: 8px`
+- Each board card: category dot + uppercase label, item name, "Just now · Pending review" note, status badge + purchase/quote link
+- Confirming purchase flips badge to "Confirmed" and removes the link
+- Custom request input (`#reqInput` + `#reqSend`) — free-text submissions become `custom` category cards
+- Tab count badge (`#reqCount`) shows live board card count
+
+### Category colour system
+| Category | Colour |
+|---|---|
+| Texture | `#9b7afc` |
+| Pattern | `#f24b0b` |
+| Material | `#4db8e0` |
+| Model | `#5abe8a` |
+| Accessory | `#f0a440` |
+| Custom | `#888` |
+
+### JS entry point
+`initAssistant()` in `app.js` — handles chat panel, catalog rendering, category filtering, tab switching, board card creation, version switching, and My Requests button toggle.
+
+---
+
+## Card Style (Global)
+
+All grid cards (size picker, height picker, picker tiles) share a unified dark card style defined in the Figma-parity override block at the bottom of `app.css`:
+
+- **Preview area:** `background: var(--figma-card)` = `#555555`
+- **Label bar:** `background: #666666`, white text `#f0f0f0`, dims text `#b0b0b0`
+- **Border:** `1px solid #606060` default, `#888` on hover, `2px solid #f24b0b` when active
+- **Border-radius:** `8px` (all cards and `layer-card-wrap` rows)
+
+---
+
+## UI Consistency Passes Completed
+
+### Top Panel (May 20)
+- Upload button moved into search row (sibling of search field)
+- Settings gear → palette icon on all layer cards
+- Sub-items (Top Quilting, Tufts) nested inside Mattress Top accordion
+- Add link buttons: orange outline → gray filled pills (`#6a6a6a`)
+
+### Bottom Panel — Design Token Parity (May 20 evening)
+- Removed hardcoded `#panel-bottom .compact-*` overrides that bypassed the unified token system
+- Bottom panel now inherits the same dark styles as Top/Wall
+
+### Request Panel contrast fix (May 21)
+- All secondary text brought up to `#999` minimum, primary labels at `#e0e0e0`
+- Empty state icon: `#333` → `#666`; placeholder: `#4a4a4a` → `#777`
+
+---
+
+## Key State Fields
 
 ```javascript
 // in createDefaultState():
@@ -57,34 +111,33 @@ topBaseExpanded: true   // controls expand/collapse of the Mattress Top accordio
 
 ---
 
-## Key CSS Classes Added
+## Key CSS Classes
 
 | Class | Purpose |
 |---|---|
+| `.version-bar` / `.version-pill` | Top-of-app version switcher |
+| `.ai-assistant` / `.ai-fab` / `.ai-panel` | Floating chat assistant |
+| `.request-panel` | Right-side catalog marketplace panel |
+| `.req-panel__tabs` / `.req-panel__tab` | Browse / My Requests tab bar |
+| `.req-cat-strip` / `.req-cat` | Category filter pills |
+| `.req-item` / `.req-item__dot` | Catalog row + category dot |
+| `.req-board` / `.req-card` | My Requests board + cards |
+| `.req-input-bar` / `.req-input` | Custom request text input bar |
+| `.btn-action--active` | Active state for My Requests topbar button |
 | `.picker-search-row` | Outer flex row wrapping search field + upload btn |
-| `.picker-filter-btn` | Filter icon button inside search field |
 | `.layer-card__nested-body` | Container for sub-cards inside a base card accordion |
 | `.add-links--in-card` | Row of gray pill add-link buttons inside the accordion |
 
 ---
 
-## Recent Changes (May 20, 2026 — Evening Pass)
+## Architecture Notes
 
-### Bottom Panel — Design Token Parity Fix
-
-The Bottom panel layer card body had hardcoded hex overrides in `app.css` (`#panel-bottom .compact-*` rules) that bypassed the unified `compact-*` design-token system. This caused visual inconsistency: the Bottom panel rendered lighter grey inputs and smaller font sizes compared to the Top/Wall panels and the Figma reference design.
-
-**Fix:** Removed the `#panel-bottom .compact-body / .compact-row / .compact-label / .compact-input / .compact-rotation` overrides. The Bottom panel now inherits the same token-driven dark styles as Top/Wall.
-
-**Files changed:** `outputs/v2/app.css` (lines ~2273–2305 removed)
-
----
-
-## What's Next
-
-1. **Accessories panel** — review for any similar hardcoded override patterns
-
-2. **Wall panel** — verify accordion nesting parity with Top panel
+- No build tooling — raw HTML/CSS/JS, open directly in browser
+- CSS token system: `tokens.css` (light defaults) → `tokens-dark.css` (dark overrides) → `app.css` (component styles)
+- The Figma-parity overrides live at the **bottom** of `app.css` (around line 1580+) and use `--figma-*` custom properties and hardcoded hex values from the Figma export
+- `makeLayerCard()` in `app.js` is the shared layer card builder used by Top, Wall, Bottom, and Accessories panels
+- `initAssistant()` in `app.js` handles all chat + request panel logic, called from `initApp()`
+- Picker open logic is in `bindTopMainEvents()` / `bindWallMainEvents()` etc. — each panel has its own bind function
 
 ---
 
@@ -95,13 +148,3 @@ Figma-exported reference PNGs are in:
 - `new-internal-screens/` — Internal mode screens (Layers, Layout)
 
 When in doubt about intended UI, compare against these PNG exports.
-
----
-
-## Architecture Notes
-
-- No build tooling — raw HTML/CSS/JS, open directly in browser
-- CSS token system: `tokens.css` (light defaults) → `tokens-dark.css` (dark overrides) → `app.css` (component styles)
-- The Figma-parity overrides live at the **bottom** of `app.css` (around line 1580+) and use hardcoded hex values from the Figma export
-- `makeLayerCard()` in `app.js` is the shared layer card builder used by Top, Wall, Bottom, and Accessories panels
-- Picker open logic is in `bindTopMainEvents()` / `bindWallMainEvents()` etc. — each panel has its own bind function

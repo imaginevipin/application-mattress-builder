@@ -20,6 +20,15 @@
 <body>
 <div class="app">
 
+  <!-- ── Version Bar ───────────────────────────────────────── -->
+  <div class="version-bar">
+    <span class="version-bar__label">Version</span>
+    <div class="version-bar__pills" role="group" aria-label="Select version">
+      <button class="version-pill is-active" data-version="1" aria-pressed="true">Version 1</button>
+      <button class="version-pill" data-version="2" aria-pressed="false">Version 2</button>
+    </div>
+  </div>
+
   <!-- ── Top Bar ──────────────────────────────────────────── -->
   <header class="topbar">
 
@@ -65,7 +74,7 @@
     </div>
 
     <div class="topbar-right">
-      <button class="btn-action" id="requestPropBtn">Request Prop</button>
+      <button class="btn-action" id="requestPropBtn">Request Props</button>
       <button class="btn-action" id="addToLibraryBtn">Add to Library</button>
       <button class="btn-action btn-action--primary" id="createImageBtn">Create Image</button>
     </div>
@@ -505,6 +514,49 @@
       <div class="viewport-label" id="viewportLabel" aria-live="polite">King · 10" Profile</div>
     </main>
 
+    <!-- ── Request Panel ───────────────────────────────────── -->
+    <aside class="request-panel" id="requestPanel" hidden>
+
+      <!-- Tabs -->
+      <div class="req-panel__tabs">
+        <button class="req-panel__tab is-active" data-tab="browse" role="tab" aria-selected="true">Browse</button>
+        <button class="req-panel__tab" data-tab="requests" role="tab" aria-selected="false">
+          My Requests
+          <span class="req-tab-count" id="reqCount">0</span>
+        </button>
+      </div>
+
+      <!-- Browse view -->
+      <div class="req-view" id="reqViewBrowse">
+        <div class="req-cat-strip" id="reqCatStrip" role="group" aria-label="Filter by category">
+          <button class="req-cat is-active" data-cat="all">All</button>
+          <button class="req-cat" data-cat="texture">Texture</button>
+          <button class="req-cat" data-cat="pattern">Pattern</button>
+          <button class="req-cat" data-cat="material">Material</button>
+          <button class="req-cat" data-cat="model">Model</button>
+          <button class="req-cat" data-cat="accessory">Accessory</button>
+        </div>
+        <div class="req-catalog" id="reqCatalog"></div>
+      </div>
+
+      <!-- My Requests view -->
+      <div class="req-view" id="reqViewRequests" hidden>
+        <div class="req-board" id="reqBoard">
+          <div class="req-board__empty" id="reqBoardEmpty">
+            <span class="material-symbols-outlined">inbox</span>
+            <p>No requests yet. Browse the catalog or describe what you need below.</p>
+          </div>
+        </div>
+        <div class="req-input-bar">
+          <input class="req-input" id="reqInput" type="text" placeholder="Describe a custom request..." autocomplete="off">
+          <button class="req-input__send" id="reqSend" type="button" aria-label="Submit request">
+            <span class="material-symbols-outlined">arrow_upward</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
   </div>
 </div>
 
@@ -651,6 +703,47 @@
     <img class="app-viewer__image" id="imageViewerImage" alt="Generated mattress image">
     <div class="app-viewer__caption" id="imageViewerCaption"></div>
   </div>
+</div>
+
+<!-- ── AI Assistant ────────────────────────────────────── -->
+<div class="ai-assistant" id="aiAssistant">
+  <div class="ai-panel" id="aiPanel" role="dialog" aria-label="Imagine Assistant" aria-modal="true">
+    <div class="ai-panel__header">
+      <img src="../../assets/logos/Logo Mark.png" alt="" class="ai-panel__logo">
+      <span class="ai-panel__title">Imagine Assistant</span>
+      <button class="ai-panel__close" id="aiPanelClose" aria-label="Close assistant">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <!-- View: Chat (Version 1) -->
+    <div class="ai-view ai-view--chat" id="aiViewChat">
+      <div class="ai-panel__body" id="aiPanelBody">
+        <div class="ai-message ai-message--assistant">
+          <p class="ai-greeting__head">Hey there! 👋</p>
+          <p class="ai-greeting__sub">How can I assist you today?</p>
+        </div>
+      </div>
+      <div class="ai-panel__chips">
+        <button class="ai-chip" type="button">Change the fabric</button>
+        <button class="ai-chip" type="button">Switch to quilted top</button>
+        <button class="ai-chip" type="button">Add a border tape</button>
+        <button class="ai-chip" type="button">Change wall color</button>
+      </div>
+    </div>
+
+    <div class="ai-panel__input-bar">
+      <button class="ai-input-attach" type="button" aria-label="Attach file">
+        <span class="material-symbols-outlined">add</span>
+      </button>
+      <input class="ai-input-field" id="aiInputField" type="text" placeholder="Ask to configure..." autocomplete="off">
+      <button class="ai-input-send" id="aiInputSend" type="button" aria-label="Send message">
+        <span class="material-symbols-outlined">arrow_upward</span>
+      </button>
+    </div>
+  </div>
+  <button class="ai-fab" id="aiFab" aria-label="Open Imagine Assistant" aria-expanded="false">
+    <span class="material-symbols-outlined">auto_awesome</span>
+  </button>
 </div>
 
 <div class="app-toast" id="appToast" aria-live="polite" hidden></div>

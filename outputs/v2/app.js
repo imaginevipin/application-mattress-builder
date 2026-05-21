@@ -1974,6 +1974,317 @@ function wireGlobalEvents() {
     document.getElementById('createImageAspectLock').classList.toggle('is-locked', state.createImageAspectLocked);
     document.getElementById('createImageAspectLock').querySelector('.material-symbols-outlined').textContent = state.createImageAspectLocked ? 'lock' : 'lock_open';
   });
+
+  initAssistant();
+}
+
+// ── AI Assistant ─────────────────────────────────────────
+function initAssistant() {
+  const fab           = document.getElementById('aiFab');
+  const panel         = document.getElementById('aiPanel');
+  const closeBtn      = document.getElementById('aiPanelClose');
+  const chatBody      = document.getElementById('aiPanelBody');
+  const chatInput     = document.getElementById('aiInputField');
+  const chatSend      = document.getElementById('aiInputSend');
+  const chips         = document.querySelectorAll('.ai-chip');
+  const versionPills  = document.querySelectorAll('.version-pill');
+  const requestPanel  = document.getElementById('requestPanel');
+  const reqBoard      = document.getElementById('reqBoard');
+  const reqBoardEmpty = document.getElementById('reqBoardEmpty');
+  const reqCatalog    = document.getElementById('reqCatalog');
+  const reqCatStrip   = document.getElementById('reqCatStrip');
+  const reqInput      = document.getElementById('reqInput');
+  const reqSend       = document.getElementById('reqSend');
+  const reqCount      = document.getElementById('reqCount');
+  const myRequestsBtn = document.getElementById('requestPropBtn');
+
+  const CATALOG = [
+    { id: 'tx1', cat: 'texture',   name: 'Velvet',           meta: 'Soft pile · 18 colorways',        price: '$49'   },
+    { id: 'tx2', cat: 'texture',   name: 'Jacquard Weave',   meta: 'Woven pattern · 8 colorways',     price: '$65'   },
+    { id: 'tx3', cat: 'texture',   name: 'Linen Blend',      meta: 'Natural texture · 6 colorways',   price: '$38'   },
+    { id: 'tx4', cat: 'texture',   name: 'Microfiber',       meta: 'Ultra-soft · 15 colorways',       price: '$42'   },
+    { id: 'pa1', cat: 'pattern',   name: 'Diamond Quilt',    meta: 'Classic stitch · 3 depths',       price: '$29'   },
+    { id: 'pa2', cat: 'pattern',   name: 'Box Quilt',        meta: 'Grid stitch · 2 depths',          price: '$25'   },
+    { id: 'pa3', cat: 'pattern',   name: 'Floral Embroidery',meta: 'Hand-stitched look',              price: '$89'   },
+    { id: 'pa4', cat: 'pattern',   name: 'Tufting Grid',     meta: 'Button-top · 4 spacings',         price: '$45'   },
+    { id: 'ma1', cat: 'material',  name: 'Gel Memory Foam',  meta: '2" layer · medium feel',          price: '$120'  },
+    { id: 'ma2', cat: 'material',  name: 'Latex Core',       meta: 'Natural latex · firm',            price: '$180'  },
+    { id: 'ma3', cat: 'material',  name: 'Pocket Springs',   meta: '1000-count · zoned support',      price: '$95'   },
+    { id: 'ma4', cat: 'material',  name: 'HR Foam Base',     meta: 'High resilience · 6" core',       price: '$75'   },
+    { id: 'mo1', cat: 'model',     name: 'King XL',          meta: '80" × 84" · extended length',     price: 'Quote' },
+    { id: 'mo2', cat: 'model',     name: 'Round Bed',        meta: 'Ø72" standard diameter',          price: 'Quote' },
+    { id: 'mo3', cat: 'model',     name: 'Split King',       meta: 'Dual Twin XL · adjustable',       price: 'Quote' },
+    { id: 'ac1', cat: 'accessory', name: 'Rope Handle',      meta: 'Cotton braid · 4 positions',      price: '$18'   },
+    { id: 'ac2', cat: 'accessory', name: 'Logo Label',       meta: 'Woven brand label',               price: '$12'   },
+    { id: 'ac3', cat: 'accessory', name: 'Decorative Tape',  meta: 'Border trim · 24 colors',         price: '$22'   },
+    { id: 'ac4', cat: 'accessory', name: 'Zipper Border',    meta: 'Full-perimeter zipper',           price: '$35'   },
+  ];
+
+  const CAT_COLORS = {
+    texture: '#9b7afc', pattern: '#f24b0b', material: '#4db8e0',
+    model: '#5abe8a', accessory: '#f0a440', custom: '#888'
+  };
+
+  const addedIds = new Set();
+
+  const MOCK_REPLIES = [
+    "I'll help you with that. Let me pull up the relevant options.",
+    "Sure! I'm navigating to those settings now.",
+    "Got it. Here are the configuration options you can explore.",
+    "On it! I've highlighted the relevant section in the panel.",
+  ];
+
+  // ── Chat panel ──────────────────────────────────────────
+  function openPanel() {
+    panel.classList.add('is-open');
+    fab.setAttribute('aria-expanded', 'true');
+  }
+
+  function closePanel() {
+    panel.classList.remove('is-open');
+    fab.setAttribute('aria-expanded', 'false');
+  }
+
+  function appendMessage(text, role) {
+    const el = document.createElement('div');
+    el.className = `ai-message ai-message--${role}`;
+    el.textContent = text;
+    chatBody.appendChild(el);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    chatInput.value = '';
+    appendMessage(text, 'user');
+    const reply = MOCK_REPLIES[Math.floor(Math.random() * MOCK_REPLIES.length)];
+    setTimeout(() => appendMessage(reply, 'assistant-reply'), 600);
+  }
+
+  fab.addEventListener('click', () => {
+    panel.classList.contains('is-open') ? closePanel() : openPanel();
+  });
+  closeBtn.addEventListener('click', closePanel);
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => { chatInput.value = chip.textContent; chatInput.focus(); });
+  });
+  chatSend.addEventListener('click', sendChatMessage);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChatMessage(); }
+  });
+  document.addEventListener('click', e => {
+    if (panel.classList.contains('is-open') && !document.getElementById('aiAssistant').contains(e.target)) {
+      closePanel();
+    }
+  });
+
+  // ── Catalog ──────────────────────────────────────────────
+  let activeFilter = 'all';
+
+  function renderCatalog(filter) {
+    reqCatalog.innerHTML = '';
+    const items = filter === 'all' ? CATALOG : CATALOG.filter(i => i.cat === filter);
+    items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'req-item' + (addedIds.has(item.id) ? ' is-added' : '');
+      row.dataset.id = item.id;
+
+      const dot = document.createElement('span');
+      dot.className = 'req-item__dot';
+      dot.style.cssText = `width:8px;height:8px;border-radius:50%;background:${CAT_COLORS[item.cat]};flex-shrink:0;`;
+
+      const info = document.createElement('div');
+      info.style.cssText = 'flex:1;min-width:0;';
+      const name = document.createElement('p');
+      name.className = 'req-item__name';
+      name.textContent = item.name;
+      const meta = document.createElement('p');
+      meta.className = 'req-item__meta';
+      meta.textContent = item.meta;
+      info.appendChild(name);
+      info.appendChild(meta);
+
+      const price = document.createElement('span');
+      price.className = 'req-item__price';
+      price.textContent = item.price;
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'req-item__add';
+      addBtn.type = 'button';
+      addBtn.setAttribute('aria-label', `Add ${item.name} to requests`);
+      addBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">add</span>';
+      addBtn.addEventListener('click', () => addToBoard(item, row, addBtn));
+
+      row.appendChild(dot);
+      row.appendChild(info);
+      row.appendChild(price);
+      row.appendChild(addBtn);
+      reqCatalog.appendChild(row);
+    });
+  }
+
+  // ── Board ────────────────────────────────────────────────
+  function updateReqCount() {
+    const n = reqBoard.querySelectorAll('.req-card').length;
+    if (n > 0) {
+      reqCount.textContent = n;
+      reqCount.classList.add('has-items');
+    } else {
+      reqCount.textContent = '';
+      reqCount.classList.remove('has-items');
+    }
+  }
+
+  function wirePurchaseBtn(btn, item) {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.req-card');
+      const badge = card.querySelector('.req-card__badge');
+      badge.textContent = 'Confirmed';
+      badge.classList.add('req-card__badge--confirmed');
+      btn.remove();
+      showToast('Request submitted');
+    });
+  }
+
+  function addBoardCard(title, cat, price) {
+    if (reqBoardEmpty) reqBoardEmpty.hidden = true;
+    const card = document.createElement('div');
+    card.className = 'req-card';
+
+    const catRow = document.createElement('div');
+    catRow.className = 'req-card__cat';
+    const dot = document.createElement('span');
+    dot.className = 'req-card__cat-dot';
+    dot.style.background = CAT_COLORS[cat] || CAT_COLORS.custom;
+    const catLabel = document.createElement('span');
+    catLabel.className = 'req-card__cat-label';
+    catLabel.textContent = cat;
+    catRow.appendChild(dot);
+    catRow.appendChild(catLabel);
+
+    const titleEl = document.createElement('p');
+    titleEl.className = 'req-card__title';
+    titleEl.textContent = title;
+
+    const noteEl = document.createElement('p');
+    noteEl.className = 'req-card__note';
+    noteEl.textContent = 'Just now · Pending review';
+
+    const footer = document.createElement('div');
+    footer.className = 'req-card__footer';
+    const badge = document.createElement('span');
+    badge.className = 'req-card__badge';
+    badge.textContent = 'Pending';
+    const purchaseBtn = document.createElement('button');
+    purchaseBtn.className = 'req-card__purchase';
+    purchaseBtn.type = 'button';
+    purchaseBtn.textContent = price && price !== 'Quote' ? `Purchase · ${price}` : 'Request quote';
+    footer.appendChild(badge);
+    footer.appendChild(purchaseBtn);
+
+    card.appendChild(catRow);
+    card.appendChild(titleEl);
+    card.appendChild(noteEl);
+    card.appendChild(footer);
+    wirePurchaseBtn(purchaseBtn);
+    reqBoard.insertBefore(card, reqBoard.firstChild);
+    updateReqCount();
+  }
+
+  function addToBoard(item, row, addBtn) {
+    if (addedIds.has(item.id)) return;
+    addedIds.add(item.id);
+    row.classList.add('is-added');
+    addBtn.disabled = true;
+    addBoardCard(item.name, item.cat, item.price);
+    showToast(`${item.name} added to requests`);
+  }
+
+  // ── Category filter ──────────────────────────────────────
+  reqCatStrip.addEventListener('click', e => {
+    const btn = e.target.closest('.req-cat');
+    if (!btn) return;
+    activeFilter = btn.dataset.cat;
+    reqCatStrip.querySelectorAll('.req-cat').forEach(b => b.classList.toggle('is-active', b === btn));
+    renderCatalog(activeFilter);
+  });
+
+  // ── Panel tabs ───────────────────────────────────────────
+  const tabBrowse   = document.querySelector('.req-panel__tab[data-tab="browse"]');
+  const tabRequests = document.querySelector('.req-panel__tab[data-tab="requests"]');
+  const viewBrowse  = document.getElementById('reqViewBrowse');
+  const viewRequests= document.getElementById('reqViewRequests');
+
+  function switchTab(tab) {
+    const isBrowse = tab === 'browse';
+    tabBrowse.classList.toggle('is-active', isBrowse);
+    tabRequests.classList.toggle('is-active', !isBrowse);
+    tabBrowse.setAttribute('aria-selected', isBrowse);
+    tabRequests.setAttribute('aria-selected', !isBrowse);
+    viewBrowse.hidden = !isBrowse;
+    viewRequests.hidden = isBrowse;
+  }
+
+  tabBrowse.addEventListener('click', () => switchTab('browse'));
+  tabRequests.addEventListener('click', () => switchTab('requests'));
+
+  // ── Custom request input ─────────────────────────────────
+  function sendRequest() {
+    const text = reqInput.value.trim();
+    if (!text) return;
+    reqInput.value = '';
+    addBoardCard(text, 'custom', null);
+    switchTab('requests');
+  }
+
+  reqSend.addEventListener('click', sendRequest);
+  reqInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendRequest(); }
+  });
+
+  // ── My Requests button toggle ────────────────────────────
+  function openRequestPanel() {
+    requestPanel.hidden = false;
+    myRequestsBtn.classList.add('btn-action--active');
+  }
+
+  function closeRequestPanel() {
+    requestPanel.hidden = true;
+    myRequestsBtn.classList.remove('btn-action--active');
+  }
+
+  myRequestsBtn.addEventListener('click', () => {
+    if (activeVersion !== 2) return;
+    requestPanel.hidden ? openRequestPanel() : closeRequestPanel();
+  });
+
+  // ── Version switching ────────────────────────────────────
+  let activeVersion = 1;
+
+  function switchVersion(v) {
+    activeVersion = v;
+    fab.style.display = v === 2 ? 'none' : '';
+    if (v === 1 && panel.classList.contains('is-open')) closePanel();
+    if (v === 1) {
+      myRequestsBtn.textContent = 'Request Props';
+      closeRequestPanel();
+    } else {
+      myRequestsBtn.textContent = 'My Requests';
+    }
+    versionPills.forEach(p => {
+      const active = Number(p.dataset.version) === v;
+      p.classList.toggle('is-active', active);
+      p.setAttribute('aria-pressed', active);
+    });
+  }
+
+  versionPills.forEach(pill => {
+    pill.addEventListener('click', () => switchVersion(Number(pill.dataset.version)));
+  });
+
+  // ── Init ─────────────────────────────────────────────────
+  renderCatalog('all');
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
