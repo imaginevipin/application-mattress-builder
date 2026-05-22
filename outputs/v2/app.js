@@ -2043,6 +2043,24 @@ function initAssistant() {
   const reqCount      = document.getElementById('reqCount');
   const myRequestsBtn = document.getElementById('requestPropBtn');
 
+  // V3 panel elements
+  const v3PanelEl       = document.getElementById('requestPanelV3');
+  const v3ViewBoard     = document.getElementById('v3ViewBoard');
+  const v3ViewForm      = document.getElementById('v3ViewForm');
+  const v3Board         = document.getElementById('v3Board');
+  const v3BoardEmpty    = document.getElementById('v3BoardEmpty');
+  const v3NewReqBtn     = document.getElementById('v3NewReqBtn');
+  const v3BackBtn       = document.getElementById('v3BackBtn');
+  const v3CloseBtnBoard = document.getElementById('v3CloseBtnBoard');
+  const v3CloseBtnForm  = document.getElementById('v3CloseBtnForm');
+  const v3TypeList      = document.getElementById('v3TypeList');
+  const v3UploadSection = document.getElementById('v3UploadSection');
+  const v3UploadInput   = document.getElementById('v3UploadInput');
+  const v3UploadName    = document.getElementById('v3UploadName');
+  const v3CheckoutBtn   = document.getElementById('v3CheckoutBtn');
+  const v3TotalRow      = document.getElementById('v3TotalRow');
+  const v3TotalPrice    = document.getElementById('v3TotalPrice');
+
   const CATALOG = [
     { id: 'tx1', cat: 'texture',   name: 'Velvet',           meta: 'Soft pile · 18 colorways',        price: '$49'   },
     { id: 'tx2', cat: 'texture',   name: 'Jacquard Weave',   meta: 'Woven pattern · 8 colorways',     price: '$65'   },
@@ -2071,6 +2089,19 @@ function initAssistant() {
   };
 
   const addedIds = new Set();
+
+  const V3_TYPES = [
+    { id: 'quilting-map',        label: 'Quilting Map',        price: 100, checkoutUrl: 'https://imagine.io/checkout?item=quilting-map' },
+    { id: 'seamless-fabrics',    label: 'Seamless fabrics',    price: 100, checkoutUrl: 'https://imagine.io/checkout?item=seamless-fabrics' },
+    { id: 'handles',             label: 'Handles',             price: 100, checkoutUrl: 'https://imagine.io/checkout?item=handles' },
+    { id: 'custom-labels',       label: 'Custom labels',       price: 100, checkoutUrl: 'https://imagine.io/checkout?item=custom-labels' },
+    { id: 'custom-tape',         label: 'Custom tape',         price: 100, checkoutUrl: 'https://imagine.io/checkout?item=custom-tape' },
+    { id: 'internal-components', label: 'Internal components', price: 100, checkoutUrl: 'https://imagine.io/checkout?item=internal-components' },
+  ];
+
+  let v3SelectedType = null;
+  let v3UploadedFile = null;
+  const v3Requests   = [];
 
   const MOCK_REPLIES = [
     "I'll help you with that. Let me pull up the relevant options.",
@@ -2288,6 +2319,128 @@ function initAssistant() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendRequest(); }
   });
 
+  // ── V3 Panel ─────────────────────────────────────────────
+  function openV3Panel() {
+    v3PanelEl.hidden = false;
+    myRequestsBtn.classList.add('btn-action--active');
+    showV3Board();
+  }
+
+  function closeV3Panel() {
+    v3PanelEl.hidden = true;
+    myRequestsBtn.classList.remove('btn-action--active');
+  }
+
+  function showV3Board() {
+    v3ViewBoard.hidden = false;
+    v3ViewForm.hidden = true;
+    renderV3Board();
+  }
+
+  function showV3Form() {
+    v3ViewBoard.hidden = true;
+    v3ViewForm.hidden = false;
+    v3SelectedType = null;
+    v3UploadedFile = null;
+    v3UploadName.textContent = 'Choose file…';
+    v3UploadInput.value = '';
+    v3UploadSection.hidden = true;
+    v3TotalRow.hidden = true;
+    v3CheckoutBtn.disabled = true;
+    v3TypeList.querySelectorAll('.v3-type-row').forEach(r => r.classList.remove('is-selected'));
+    v3TypeList.querySelectorAll('.v3-type-radio').forEach(r => { r.checked = false; });
+  }
+
+  function renderV3Board() {
+    v3Board.querySelectorAll('.v3-card').forEach(c => c.remove());
+    v3BoardEmpty.hidden = v3Requests.length > 0;
+    v3Requests.slice().reverse().forEach(req => v3Board.appendChild(makeV3Card(req)));
+  }
+
+  function makeV3Card(req) {
+    const card = document.createElement('div');
+    card.className = 'v3-card';
+    const fileStr = req.filename || 'No file attached';
+    card.innerHTML = `
+      <div class="v3-card__type">Form Request</div>
+      <p class="v3-card__title">${req.label}</p>
+      <p class="v3-card__meta">${fileStr} · Just now</p>
+      <div class="v3-card__footer">
+        <span class="v3-card__badge">Submitted</span>
+        <button class="v3-card__checkout" type="button">Checkout <span class="material-symbols-outlined">open_in_new</span></button>
+      </div>
+    `;
+    card.querySelector('.v3-card__checkout').addEventListener('click', () => {
+      window.open(req.checkoutUrl, '_blank');
+    });
+    return card;
+  }
+
+  function initV3TypeList() {
+    V3_TYPES.forEach(type => {
+      const row = document.createElement('label');
+      row.className = 'v3-type-row';
+
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'v3RequestType';
+      radio.value = type.id;
+      radio.className = 'v3-type-radio';
+
+      const radioUi = document.createElement('span');
+      radioUi.className = 'v3-type-radio-ui';
+
+      const label = document.createElement('span');
+      label.className = 'v3-type-name';
+      label.textContent = type.label;
+
+      const price = document.createElement('span');
+      price.className = 'v3-type-price';
+      price.textContent = `$${type.price}`;
+
+      row.appendChild(radio);
+      row.appendChild(radioUi);
+      row.appendChild(label);
+      row.appendChild(price);
+
+      radio.addEventListener('change', () => {
+        v3SelectedType = type;
+        v3TotalPrice.textContent = `$${type.price}`;
+        v3TotalRow.hidden = false;
+        v3UploadSection.hidden = false;
+        v3CheckoutBtn.disabled = false;
+        v3UploadedFile = null;
+        v3UploadName.textContent = 'Choose file…';
+        v3UploadInput.value = '';
+        v3TypeList.querySelectorAll('.v3-type-row').forEach(r => r.classList.remove('is-selected'));
+        row.classList.add('is-selected');
+      });
+
+      v3TypeList.appendChild(row);
+    });
+  }
+
+  v3UploadInput.addEventListener('change', () => {
+    if (v3UploadInput.files.length > 0) {
+      v3UploadedFile = v3UploadInput.files[0];
+      v3UploadName.textContent = v3UploadedFile.name;
+    }
+  });
+
+  v3CheckoutBtn.addEventListener('click', () => {
+    if (!v3SelectedType) return;
+    const req = { ...v3SelectedType, filename: v3UploadedFile ? v3UploadedFile.name : null };
+    v3Requests.push(req);
+    window.open(req.checkoutUrl, '_blank');
+    showV3Board();
+    showToast(`${req.label} request submitted`);
+  });
+
+  v3NewReqBtn.addEventListener('click', showV3Form);
+  v3BackBtn.addEventListener('click', showV3Board);
+  v3CloseBtnBoard.addEventListener('click', closeV3Panel);
+  v3CloseBtnForm.addEventListener('click', closeV3Panel);
+
   // ── My Requests button toggle ────────────────────────────
   function openRequestPanel() {
     requestPanel.hidden = false;
@@ -2300,8 +2453,11 @@ function initAssistant() {
   }
 
   myRequestsBtn.addEventListener('click', () => {
-    if (activeVersion !== 2) return;
-    requestPanel.hidden ? openRequestPanel() : closeRequestPanel();
+    if (activeVersion === 2) {
+      requestPanel.hidden ? openRequestPanel() : closeRequestPanel();
+    } else if (activeVersion === 3) {
+      v3PanelEl.hidden ? openV3Panel() : closeV3Panel();
+    }
   });
 
   // ── Version switching ────────────────────────────────────
@@ -2309,14 +2465,11 @@ function initAssistant() {
 
   function switchVersion(v) {
     activeVersion = v;
-    fab.style.display = v === 2 ? 'none' : '';
+    fab.style.display = (v === 2 || v === 3) ? 'none' : '';
     if (v === 1 && panel.classList.contains('is-open')) closePanel();
-    if (v === 1) {
-      myRequestsBtn.textContent = 'Request Props';
-      closeRequestPanel();
-    } else {
-      myRequestsBtn.textContent = 'My Requests';
-    }
+    if (v !== 2) closeRequestPanel();
+    if (v !== 3) closeV3Panel();
+    myRequestsBtn.textContent = v === 2 ? 'My Requests' : 'Request Props';
     versionPills.forEach(p => {
       const active = Number(p.dataset.version) === v;
       p.classList.toggle('is-active', active);
@@ -2330,6 +2483,7 @@ function initAssistant() {
 
   // ── Init ─────────────────────────────────────────────────
   renderCatalog('all');
+  initV3TypeList();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);

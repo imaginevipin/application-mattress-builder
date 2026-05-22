@@ -26,6 +26,7 @@
     <div class="version-bar__pills" role="group" aria-label="Select version">
       <button class="version-pill is-active" data-version="1" aria-pressed="true">Version 1</button>
       <button class="version-pill" data-version="2" aria-pressed="false">Version 2</button>
+      <button class="version-pill" data-version="3" aria-pressed="false">Version 3</button>
     </div>
   </div>
 
@@ -551,6 +552,69 @@
           <input class="req-input" id="reqInput" type="text" placeholder="Describe a custom request..." autocomplete="off">
           <button class="req-input__send" id="reqSend" type="button" aria-label="Submit request">
             <span class="material-symbols-outlined">arrow_upward</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── Request Panel V3 ──────────────────────────────────── -->
+    <aside class="request-panel" id="requestPanelV3" hidden>
+
+      <!-- Board view (default) -->
+      <div class="v3-view" id="v3ViewBoard">
+        <div class="v3-header">
+          <span class="v3-header__title">My Requests</span>
+          <button class="v3-header__close" id="v3CloseBtnBoard" aria-label="Close">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="v3-board" id="v3Board">
+          <div class="v3-board-empty" id="v3BoardEmpty">
+            <span class="material-symbols-outlined">inbox</span>
+            <p>No requests yet.</p>
+            <span class="v3-board-empty__sub">Hit "New Request" to get started.</span>
+          </div>
+        </div>
+        <div class="v3-board-footer">
+          <button class="v3-new-req-btn" id="v3NewReqBtn" type="button">
+            <span class="material-symbols-outlined">add</span>
+            New Request
+          </button>
+        </div>
+      </div>
+
+      <!-- Form view -->
+      <div class="v3-view" id="v3ViewForm" hidden>
+        <div class="v3-header">
+          <button class="v3-back-btn" id="v3BackBtn" type="button">
+            <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            New Request
+          </button>
+          <button class="v3-header__close" id="v3CloseBtnForm" aria-label="Close">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="v3-form-body">
+          <p class="v3-section-label">Select type</p>
+          <div class="v3-type-list" id="v3TypeList"></div>
+          <div class="v3-upload-section" id="v3UploadSection" hidden>
+            <p class="v3-section-label">Upload file</p>
+            <label class="v3-upload-row">
+              <span class="material-symbols-outlined">upload_file</span>
+              <span class="v3-upload-name" id="v3UploadName">Choose file…</span>
+              <input class="v3-upload-input" id="v3UploadInput" type="file">
+            </label>
+          </div>
+        </div>
+        <div class="v3-form-footer">
+          <div class="v3-total-row" id="v3TotalRow" hidden>
+            <span class="v3-total-label">Total</span>
+            <span class="v3-total-price" id="v3TotalPrice">$100</span>
+          </div>
+          <button class="v3-checkout-btn" id="v3CheckoutBtn" type="button" disabled>
+            Checkout to Buy
+            <span class="material-symbols-outlined">open_in_new</span>
           </button>
         </div>
       </div>
