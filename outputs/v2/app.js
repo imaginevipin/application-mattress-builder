@@ -2365,8 +2365,8 @@ function initAssistant() {
     const dots = v3StepDots.querySelectorAll('.v3-dot');
     dots.forEach((d, i) => d.classList.toggle('is-active', i < step));
     if (step === 1) v3BackLabel.textContent = 'New Request';
-    if (step === 2) {
-      v3BackLabel.textContent = v3SelectedType ? v3SelectedType.label : 'Select type';
+    if (step === 2 && v3SelectedType) {
+      v3BackLabel.textContent = v3SelectedType.label;
       v3SelectedCard.innerHTML = `
         <div class="v3-sel-card">
           <span class="material-symbols-outlined v3-sel-card__icon">${v3SelectedType.icon}</span>
@@ -2374,7 +2374,7 @@ function initAssistant() {
           <span class="v3-sel-card__price">$${v3SelectedType.price}</span>
         </div>`;
     }
-    if (step === 3) {
+    if (step === 3 && v3SelectedType) {
       v3BackLabel.textContent = 'Upload file';
       const fileStr = v3UploadedFile ? v3UploadedFile.name : 'No file attached';
       v3TotalPrice.textContent = `$${v3SelectedType.price}`;
@@ -2428,7 +2428,7 @@ function initAssistant() {
         v3SelectedType = type;
         v3TypeCards.querySelectorAll('.v3-type-card').forEach(c => c.classList.remove('is-selected'));
         card.classList.add('is-selected');
-        setTimeout(() => goToStep(2), 150);
+        goToStep(2);
       });
       v3TypeCards.appendChild(card);
     });
@@ -2449,7 +2449,10 @@ function initAssistant() {
     v3FilePreview.hidden = true;
   });
 
-  v3ContinueBtn.addEventListener('click', () => goToStep(3));
+  v3ContinueBtn.addEventListener('click', () => {
+    if (!v3SelectedType) return;
+    goToStep(3);
+  });
 
   v3CheckoutBtn.addEventListener('click', () => {
     if (!v3SelectedType) return;
