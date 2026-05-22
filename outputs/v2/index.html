@@ -584,39 +584,77 @@
         </div>
       </div>
 
-      <!-- Form view -->
+      <!-- Form view — multi-step -->
       <div class="v3-view" id="v3ViewForm" hidden>
+
         <div class="v3-header">
           <button class="v3-back-btn" id="v3BackBtn" type="button">
             <span class="material-symbols-outlined">arrow_back_ios_new</span>
-            New Request
+            <span id="v3BackLabel">New Request</span>
           </button>
+          <div class="v3-step-dots" id="v3StepDots">
+            <span class="v3-dot is-active"></span>
+            <span class="v3-dot"></span>
+            <span class="v3-dot"></span>
+          </div>
           <button class="v3-header__close" id="v3CloseBtnForm" aria-label="Close">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-        <div class="v3-form-body">
-          <p class="v3-section-label">Select type</p>
-          <div class="v3-type-list" id="v3TypeList"></div>
-          <div class="v3-upload-section" id="v3UploadSection" hidden>
+
+        <!-- Step 1: Select type -->
+        <div class="v3-step-view" id="v3Step1">
+          <div class="v3-step-body">
+            <p class="v3-section-label">Select type</p>
+            <div class="v3-type-cards" id="v3TypeCards"></div>
+          </div>
+        </div>
+
+        <!-- Step 2: Upload file -->
+        <div class="v3-step-view" id="v3Step2" hidden>
+          <div class="v3-step-body">
+            <div class="v3-selected-card" id="v3SelectedCard"></div>
             <p class="v3-section-label">Upload file</p>
-            <label class="v3-upload-row">
+            <label class="v3-upload-zone">
               <span class="material-symbols-outlined">upload_file</span>
-              <span class="v3-upload-name" id="v3UploadName">Choose file…</span>
+              <span class="v3-upload-zone__text">Click to upload</span>
+              <span class="v3-upload-zone__hint">Any file type · Optional</span>
               <input class="v3-upload-input" id="v3UploadInput" type="file">
             </label>
+            <div class="v3-file-preview" id="v3FilePreview" hidden>
+              <span class="material-symbols-outlined">description</span>
+              <span class="v3-file-name" id="v3FileName">—</span>
+              <button class="v3-file-remove" id="v3FileRemove" type="button" aria-label="Remove file">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+          </div>
+          <div class="v3-step-footer">
+            <button class="v3-continue-btn" id="v3ContinueBtn" type="button">
+              Continue
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
           </div>
         </div>
-        <div class="v3-form-footer">
-          <div class="v3-total-row" id="v3TotalRow" hidden>
-            <span class="v3-total-label">Total</span>
-            <span class="v3-total-price" id="v3TotalPrice">$100</span>
+
+        <!-- Step 3: Review & Checkout -->
+        <div class="v3-step-view" id="v3Step3" hidden>
+          <div class="v3-step-body">
+            <p class="v3-section-label">Review your request</p>
+            <div class="v3-review-card" id="v3ReviewCard"></div>
           </div>
-          <button class="v3-checkout-btn" id="v3CheckoutBtn" type="button" disabled>
-            Checkout to Buy
-            <span class="material-symbols-outlined">open_in_new</span>
-          </button>
+          <div class="v3-step-footer">
+            <div class="v3-total-row">
+              <span class="v3-total-label">Total</span>
+              <span class="v3-total-price" id="v3TotalPrice">$100</span>
+            </div>
+            <button class="v3-checkout-btn" id="v3CheckoutBtn" type="button">
+              Checkout to Buy
+              <span class="material-symbols-outlined">open_in_new</span>
+            </button>
+          </div>
         </div>
+
       </div>
 
     </aside>

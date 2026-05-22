@@ -2053,12 +2053,20 @@ function initAssistant() {
   const v3BackBtn       = document.getElementById('v3BackBtn');
   const v3CloseBtnBoard = document.getElementById('v3CloseBtnBoard');
   const v3CloseBtnForm  = document.getElementById('v3CloseBtnForm');
-  const v3TypeList      = document.getElementById('v3TypeList');
-  const v3UploadSection = document.getElementById('v3UploadSection');
+  const v3BackLabel     = document.getElementById('v3BackLabel');
+  const v3StepDots      = document.getElementById('v3StepDots');
+  const v3Step1         = document.getElementById('v3Step1');
+  const v3Step2         = document.getElementById('v3Step2');
+  const v3Step3         = document.getElementById('v3Step3');
+  const v3TypeCards     = document.getElementById('v3TypeCards');
+  const v3SelectedCard  = document.getElementById('v3SelectedCard');
   const v3UploadInput   = document.getElementById('v3UploadInput');
-  const v3UploadName    = document.getElementById('v3UploadName');
+  const v3FilePreview   = document.getElementById('v3FilePreview');
+  const v3FileName      = document.getElementById('v3FileName');
+  const v3FileRemove    = document.getElementById('v3FileRemove');
+  const v3ContinueBtn   = document.getElementById('v3ContinueBtn');
+  const v3ReviewCard    = document.getElementById('v3ReviewCard');
   const v3CheckoutBtn   = document.getElementById('v3CheckoutBtn');
-  const v3TotalRow      = document.getElementById('v3TotalRow');
   const v3TotalPrice    = document.getElementById('v3TotalPrice');
 
   const CATALOG = [
@@ -2091,14 +2099,15 @@ function initAssistant() {
   const addedIds = new Set();
 
   const V3_TYPES = [
-    { id: 'quilting-map',        label: 'Quilting Map',        price: 100, checkoutUrl: 'https://imagine.io/checkout?item=quilting-map' },
-    { id: 'seamless-fabrics',    label: 'Seamless fabrics',    price: 100, checkoutUrl: 'https://imagine.io/checkout?item=seamless-fabrics' },
-    { id: 'handles',             label: 'Handles',             price: 100, checkoutUrl: 'https://imagine.io/checkout?item=handles' },
-    { id: 'custom-labels',       label: 'Custom labels',       price: 100, checkoutUrl: 'https://imagine.io/checkout?item=custom-labels' },
-    { id: 'custom-tape',         label: 'Custom tape',         price: 100, checkoutUrl: 'https://imagine.io/checkout?item=custom-tape' },
-    { id: 'internal-components', label: 'Internal components', price: 100, checkoutUrl: 'https://imagine.io/checkout?item=internal-components' },
+    { id: 'quilting-map',        label: 'Quilting Map',        icon: 'grid_view',             price: 100, checkoutUrl: 'https://imagine.io/checkout?item=quilting-map' },
+    { id: 'seamless-fabrics',    label: 'Seamless fabrics',    icon: 'texture',               price: 100, checkoutUrl: 'https://imagine.io/checkout?item=seamless-fabrics' },
+    { id: 'handles',             label: 'Handles',             icon: 'drag_handle',           price: 100, checkoutUrl: 'https://imagine.io/checkout?item=handles' },
+    { id: 'custom-labels',       label: 'Custom labels',       icon: 'label',                 price: 100, checkoutUrl: 'https://imagine.io/checkout?item=custom-labels' },
+    { id: 'custom-tape',         label: 'Custom tape',         icon: 'cut',                   price: 100, checkoutUrl: 'https://imagine.io/checkout?item=custom-tape' },
+    { id: 'internal-components', label: 'Internal components', icon: 'developer_board',       price: 100, checkoutUrl: 'https://imagine.io/checkout?item=internal-components' },
   ];
 
+  let v3CurrentStep  = 1;
   let v3SelectedType = null;
   let v3UploadedFile = null;
   const v3Requests   = [];
@@ -2342,13 +2351,42 @@ function initAssistant() {
     v3ViewForm.hidden = false;
     v3SelectedType = null;
     v3UploadedFile = null;
-    v3UploadName.textContent = 'Choose file…';
     v3UploadInput.value = '';
-    v3UploadSection.hidden = true;
-    v3TotalRow.hidden = true;
-    v3CheckoutBtn.disabled = true;
-    v3TypeList.querySelectorAll('.v3-type-row').forEach(r => r.classList.remove('is-selected'));
-    v3TypeList.querySelectorAll('.v3-type-radio').forEach(r => { r.checked = false; });
+    v3FilePreview.hidden = true;
+    v3TypeCards.querySelectorAll('.v3-type-card').forEach(c => c.classList.remove('is-selected'));
+    goToStep(1);
+  }
+
+  function goToStep(step) {
+    v3CurrentStep = step;
+    v3Step1.hidden = step !== 1;
+    v3Step2.hidden = step !== 2;
+    v3Step3.hidden = step !== 3;
+    const dots = v3StepDots.querySelectorAll('.v3-dot');
+    dots.forEach((d, i) => d.classList.toggle('is-active', i < step));
+    if (step === 1) v3BackLabel.textContent = 'New Request';
+    if (step === 2) {
+      v3BackLabel.textContent = v3SelectedType ? v3SelectedType.label : 'Select type';
+      v3SelectedCard.innerHTML = `
+        <div class="v3-sel-card">
+          <span class="material-symbols-outlined v3-sel-card__icon">${v3SelectedType.icon}</span>
+          <span class="v3-sel-card__label">${v3SelectedType.label}</span>
+          <span class="v3-sel-card__price">$${v3SelectedType.price}</span>
+        </div>`;
+    }
+    if (step === 3) {
+      v3BackLabel.textContent = 'Upload file';
+      const fileStr = v3UploadedFile ? v3UploadedFile.name : 'No file attached';
+      v3TotalPrice.textContent = `$${v3SelectedType.price}`;
+      v3ReviewCard.innerHTML = `
+        <div class="v3-review-row">
+          <span class="material-symbols-outlined">${v3SelectedType.icon}</span>
+          <div class="v3-review-info">
+            <span class="v3-review-name">${v3SelectedType.label}</span>
+            <span class="v3-review-file">${fileStr}</span>
+          </div>
+        </div>`;
+    }
   }
 
   function renderV3Board() {
@@ -2376,56 +2414,42 @@ function initAssistant() {
     return card;
   }
 
-  function initV3TypeList() {
+  function initV3TypeCards() {
     V3_TYPES.forEach(type => {
-      const row = document.createElement('label');
-      row.className = 'v3-type-row';
-
-      const radio = document.createElement('input');
-      radio.type = 'radio';
-      radio.name = 'v3RequestType';
-      radio.value = type.id;
-      radio.className = 'v3-type-radio';
-
-      const radioUi = document.createElement('span');
-      radioUi.className = 'v3-type-radio-ui';
-
-      const label = document.createElement('span');
-      label.className = 'v3-type-name';
-      label.textContent = type.label;
-
-      const price = document.createElement('span');
-      price.className = 'v3-type-price';
-      price.textContent = `$${type.price}`;
-
-      row.appendChild(radio);
-      row.appendChild(radioUi);
-      row.appendChild(label);
-      row.appendChild(price);
-
-      radio.addEventListener('change', () => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'v3-type-card';
+      card.dataset.id = type.id;
+      card.innerHTML = `
+        <span class="material-symbols-outlined v3-type-card__icon">${type.icon}</span>
+        <span class="v3-type-card__name">${type.label}</span>
+        <span class="v3-type-card__price">$${type.price}</span>`;
+      card.addEventListener('click', () => {
         v3SelectedType = type;
-        v3TotalPrice.textContent = `$${type.price}`;
-        v3TotalRow.hidden = false;
-        v3UploadSection.hidden = false;
-        v3CheckoutBtn.disabled = false;
-        v3UploadedFile = null;
-        v3UploadName.textContent = 'Choose file…';
-        v3UploadInput.value = '';
-        v3TypeList.querySelectorAll('.v3-type-row').forEach(r => r.classList.remove('is-selected'));
-        row.classList.add('is-selected');
+        v3TypeCards.querySelectorAll('.v3-type-card').forEach(c => c.classList.remove('is-selected'));
+        card.classList.add('is-selected');
+        setTimeout(() => goToStep(2), 150);
       });
-
-      v3TypeList.appendChild(row);
+      v3TypeCards.appendChild(card);
     });
   }
 
   v3UploadInput.addEventListener('change', () => {
     if (v3UploadInput.files.length > 0) {
       v3UploadedFile = v3UploadInput.files[0];
-      v3UploadName.textContent = v3UploadedFile.name;
+      v3FileName.textContent = v3UploadedFile.name;
+      v3FilePreview.hidden = false;
     }
   });
+
+  v3FileRemove.addEventListener('click', e => {
+    e.preventDefault();
+    v3UploadedFile = null;
+    v3UploadInput.value = '';
+    v3FilePreview.hidden = true;
+  });
+
+  v3ContinueBtn.addEventListener('click', () => goToStep(3));
 
   v3CheckoutBtn.addEventListener('click', () => {
     if (!v3SelectedType) return;
@@ -2437,7 +2461,10 @@ function initAssistant() {
   });
 
   v3NewReqBtn.addEventListener('click', showV3Form);
-  v3BackBtn.addEventListener('click', showV3Board);
+  v3BackBtn.addEventListener('click', () => {
+    if (v3CurrentStep === 1) showV3Board();
+    else goToStep(v3CurrentStep - 1);
+  });
   v3CloseBtnBoard.addEventListener('click', closeV3Panel);
   v3CloseBtnForm.addEventListener('click', closeV3Panel);
 
@@ -2483,7 +2510,7 @@ function initAssistant() {
 
   // ── Init ─────────────────────────────────────────────────
   renderCatalog('all');
-  initV3TypeList();
+  initV3TypeCards();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
