@@ -1,0 +1,4 @@
+{
+  "outputDirectory": "outputs/v2",
+  "buildCommand": "cp -r assets outputs/v2/assets"
+}
