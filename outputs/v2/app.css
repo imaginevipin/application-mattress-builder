@@ -3689,6 +3689,10 @@ body {
   font-weight: 500;
   border-radius: var(--br-100);
 }
+.camera-cta-btn.btn-outline:hover {
+  border-color: #787878;
+  color: #ffffff;
+}
 
 .camera-card-wrap {
   border-radius: 8px;
