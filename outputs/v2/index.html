@@ -59,15 +59,6 @@
         </div>
       </div>
 
-      <button class="btn-file help-btn">
-        Help
-        <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
-      </button>
-
-      <div class="mode-toggle" role="group" aria-label="Configuration mode">
-        <button class="mode-btn is-active" data-mode="external" aria-pressed="true">External</button>
-        <button class="mode-btn" data-mode="internal" aria-pressed="false">Internal</button>
-      </div>
     </div>
 
     <div class="topbar-center">
@@ -88,43 +79,32 @@
     <!-- Icon Strip ──────────────────────────────────────── -->
     <nav class="icon-strip" aria-label="Section navigation">
 
-      <div class="nav-group" id="navExternal">
+      <div class="nav-group" id="navMain">
         <button class="nav-item is-active" data-section="mattress" aria-current="page">
           <span class="material-symbols-outlined">king_bed</span>
           <span class="nav-label">Mattress</span>
         </button>
-        <button class="nav-item" data-section="top">
-          <span class="material-symbols-outlined">border_top</span>
-          <span class="nav-label">Top</span>
-        </button>
-        <button class="nav-item" data-section="wall">
+        <button class="nav-item" data-section="external" aria-current="false">
           <span class="material-symbols-outlined">border_outer</span>
-          <span class="nav-label">Wall</span>
+          <span class="nav-label">External</span>
         </button>
-        <button class="nav-item" data-section="bottom">
-          <span class="material-symbols-outlined">border_bottom</span>
-          <span class="nav-label">Bottom</span>
-        </button>
-        <button class="nav-item" data-section="accessories">
+        <button class="nav-item" data-section="details" aria-current="false">
           <span class="material-symbols-outlined">category</span>
-          <span class="nav-label">Accessories</span>
+          <span class="nav-label">Details</span>
         </button>
-        <button class="nav-item" data-section="images">
-          <span class="material-symbols-outlined">photo_library</span>
-          <span class="nav-label">Images</span>
-        </button>
-      </div>
-
-      <div class="nav-group nav-group--hidden" id="navInternal">
-        <button class="nav-item" data-section="layers">
+        <button class="nav-item" data-section="internal" aria-current="false">
           <span class="material-symbols-outlined">layers</span>
-          <span class="nav-label">Layers</span>
+          <span class="nav-label">Internal</span>
         </button>
-        <button class="nav-item" data-section="layout">
+        <button class="nav-item" data-section="layout" aria-current="false">
           <span class="material-symbols-outlined">tune</span>
-          <span class="nav-label">Layout</span>
+          <span class="nav-label">Layouts</span>
         </button>
-        <button class="nav-item" data-section="images">
+        <button class="nav-item" data-section="camera" aria-current="false">
+          <span class="material-symbols-outlined">videocam</span>
+          <span class="nav-label">Camera</span>
+        </button>
+        <button class="nav-item" data-section="images" aria-current="false">
           <span class="material-symbols-outlined">photo_library</span>
           <span class="nav-label">Images</span>
         </button>
@@ -163,137 +143,140 @@
         </div>
       </div>
 
-      <!-- ── TOP ──────────────────────────────────────── -->
-      <div class="panel" id="panel-top" hidden>
-
-        <div class="panel-subview" id="topMain">
-          <div class="layer-stack" id="topLayerStack"></div>
-          <div class="add-links" id="topAddLinks"></div>
-          <div class="panel-cta-bar panel-cta-bar--bottom" id="topMainCta">
-            <button class="btn-primary" id="topAddLayerCta">Add New Layer</button>
-          </div>
+      <!-- ── EXTERNAL (Top / Wall / Bottom) ─────────────────── -->
+      <div class="panel" id="panel-external" hidden>
+        <div class="panel-tabs" role="tablist">
+          <button class="panel-tab is-active" data-external-tab="top" role="tab" aria-selected="true">Top</button>
+          <button class="panel-tab" data-external-tab="wall" role="tab" aria-selected="false">Wall</button>
+          <button class="panel-tab" data-external-tab="bottom" role="tab" aria-selected="false">Bottom</button>
         </div>
 
-        <div class="panel-subview" id="topPicker" hidden>
-          <div class="picker-header">
-            <button class="back-btn" id="topPickerBack">
-              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
-            </button>
-          </div>
-          <div class="picker-tabs" id="topPickerTabStrip" role="tablist">
-            <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
-            <button class="picker-tab" data-tab="textures">Textures</button>
-            <button class="picker-tab" data-tab="materials">Materials</button>
-            <button class="picker-tab" data-tab="colors">Colors</button>
-          </div>
-          <div class="picker-search-row">
-            <div class="picker-search-wrap">
-              <span class="material-symbols-outlined">search</span>
-              <input class="picker-search-input" id="topPickerSearch" type="text" placeholder="Search..." autocomplete="off">
-              <button class="picker-filter-btn" title="Filter"><span class="material-symbols-outlined">tune</span></button>
+        <div class="panel-tab-pane external-tab-pane" id="externalTabTop" role="tabpanel">
+          <div id="panel-top">
+            <div class="panel-subview" id="topMain">
+              <div class="layer-stack" id="topLayerStack"></div>
+              <div class="add-links" id="topAddLinks"></div>
+              <div class="panel-cta-bar panel-cta-bar--bottom" id="topMainCta">
+                <button class="btn-primary" id="topAddLayerCta">Add New Layer</button>
+              </div>
             </div>
-            <button class="upload-btn">
-              <span class="material-symbols-outlined">upload</span>Upload
-            </button>
-          </div>
-          <div class="picker-grid-wrap">
-            <div class="picker-grid" id="topPickerGrid"></div>
+            <div class="panel-subview" id="topPicker" hidden>
+              <div class="picker-header">
+                <button class="back-btn" id="topPickerBack">
+                  <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+                </button>
+              </div>
+              <div class="picker-tabs" id="topPickerTabStrip" role="tablist">
+                <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
+                <button class="picker-tab" data-tab="textures">Textures</button>
+                <button class="picker-tab" data-tab="materials">Materials</button>
+                <button class="picker-tab" data-tab="colors">Colors</button>
+              </div>
+              <div class="picker-search-row">
+                <div class="picker-search-wrap">
+                  <span class="material-symbols-outlined">search</span>
+                  <input class="picker-search-input" id="topPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+                  <button class="picker-filter-btn" title="Filter"><span class="material-symbols-outlined">tune</span></button>
+                </div>
+                <button class="upload-btn">
+                  <span class="material-symbols-outlined">upload</span>Upload
+                </button>
+              </div>
+              <div class="picker-grid-wrap">
+                <div class="picker-grid" id="topPickerGrid"></div>
+              </div>
+            </div>
           </div>
         </div>
 
+        <div class="panel-tab-pane external-tab-pane" id="externalTabWall" role="tabpanel" hidden>
+          <div id="panel-wall">
+            <div class="panel-subview" id="wallMain">
+              <div class="empty-state" id="wallEmptyState">
+                <span class="material-symbols-outlined empty-state__icon">texture</span>
+                <p class="empty-state__title">No Quilting Pattern or Tufts!</p>
+                <p class="empty-state__body">You have not added any Quilting Pattern or Tufts to your mattress wall. Click on the button below to add any to your wall.</p>
+                <div class="empty-state__actions">
+                  <button class="btn-outline" id="wallAddQuiltingEmpty">Add Quilting Pattern</button>
+                  <button class="btn-outline" id="wallAddTuftsEmpty">Add Tufts</button>
+                </div>
+              </div>
+              <div class="layer-stack" id="wallLayerStack" hidden></div>
+              <div class="add-links" id="wallAddLinks" hidden></div>
+            </div>
+            <div class="panel-subview" id="wallPicker" hidden>
+              <div class="picker-header">
+                <button class="back-btn" id="wallPickerBack">
+                  <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+                </button>
+                <button class="upload-btn">
+                  <span class="material-symbols-outlined">upload</span>Upload
+                  <span class="material-symbols-outlined">expand_more</span>
+                </button>
+              </div>
+              <div class="picker-tabs" id="wallPickerTabStrip" role="tablist">
+                <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
+                <button class="picker-tab" data-tab="textures">Textures</button>
+                <button class="picker-tab" data-tab="materials">Materials</button>
+                <button class="picker-tab" data-tab="colors">Colors</button>
+              </div>
+              <div class="picker-search-wrap">
+                <span class="material-symbols-outlined">search</span>
+                <input class="picker-search-input" id="wallPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+              </div>
+              <div class="picker-grid-wrap">
+                <div class="picker-grid" id="wallPickerGrid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-tab-pane external-tab-pane" id="externalTabBottom" role="tabpanel" hidden>
+          <div id="panel-bottom">
+            <div class="panel-subview" id="bottomMain">
+              <div id="bottomTypeRow"></div>
+              <div class="toggle-row bottom-mirror-row">
+                <label class="toggle-label" for="bottomMirrorToggle">Mirror Top to Bottom</label>
+                <div class="toggle-switch">
+                  <input class="toggle-input" type="checkbox" id="bottomMirrorToggle" role="switch" aria-checked="false">
+                  <span class="toggle-track"></span>
+                </div>
+              </div>
+              <div class="layer-stack" id="bottomLayerStack"></div>
+            </div>
+            <div class="panel-subview" id="bottomPicker" hidden>
+              <div class="picker-header">
+                <button class="back-btn" id="bottomPickerBack">
+                  <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+                </button>
+              </div>
+              <div class="picker-tabs" id="bottomPickerTabStrip" role="tablist">
+                <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
+                <button class="picker-tab" data-tab="textures">Textures</button>
+                <button class="picker-tab" data-tab="materials">Materials</button>
+                <button class="picker-tab" data-tab="colors">Colors</button>
+              </div>
+              <div class="picker-search-row">
+                <div class="picker-search-wrap">
+                  <span class="material-symbols-outlined">search</span>
+                  <input class="picker-search-input" id="bottomPickerSearch" type="text" placeholder="Search..." autocomplete="off">
+                  <button class="picker-filter-btn" title="Filter"><span class="material-symbols-outlined">tune</span></button>
+                </div>
+                <button class="upload-btn">
+                  <span class="material-symbols-outlined">upload</span>Upload
+                  <span class="material-symbols-outlined">expand_more</span>
+                </button>
+              </div>
+              <div class="picker-grid-wrap">
+                <div class="picker-grid" id="bottomPickerGrid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- ── WALL ─────────────────────────────────────── -->
-      <div class="panel" id="panel-wall" hidden>
-
-        <div class="panel-subview" id="wallMain">
-          <div class="empty-state" id="wallEmptyState">
-            <span class="material-symbols-outlined empty-state__icon">texture</span>
-            <p class="empty-state__title">No Quilting Pattern or Tufts!</p>
-            <p class="empty-state__body">You have not added any Quilting Pattern or Tufts to your mattress wall. Click on the button below to add any to your wall.</p>
-            <div class="empty-state__actions">
-              <button class="btn-outline" id="wallAddQuiltingEmpty">Add Quilting Pattern</button>
-              <button class="btn-outline" id="wallAddTuftsEmpty">Add Tufts</button>
-            </div>
-          </div>
-          <div class="layer-stack" id="wallLayerStack" hidden></div>
-          <div class="add-links" id="wallAddLinks" hidden></div>
-        </div>
-
-        <div class="panel-subview" id="wallPicker" hidden>
-          <div class="picker-header">
-            <button class="back-btn" id="wallPickerBack">
-              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
-            </button>
-            <button class="upload-btn">
-              <span class="material-symbols-outlined">upload</span>Upload
-              <span class="material-symbols-outlined">expand_more</span>
-            </button>
-          </div>
-          <div class="picker-tabs" id="wallPickerTabStrip" role="tablist">
-            <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
-            <button class="picker-tab" data-tab="textures">Textures</button>
-            <button class="picker-tab" data-tab="materials">Materials</button>
-            <button class="picker-tab" data-tab="colors">Colors</button>
-          </div>
-          <div class="picker-search-wrap">
-            <span class="material-symbols-outlined">search</span>
-            <input class="picker-search-input" id="wallPickerSearch" type="text" placeholder="Search..." autocomplete="off">
-          </div>
-          <div class="picker-grid-wrap">
-            <div class="picker-grid" id="wallPickerGrid"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ── BOTTOM ───────────────────────────────────── -->
-      <div class="panel" id="panel-bottom" hidden>
-
-        <div class="panel-subview" id="bottomMain">
-          <div id="bottomTypeRow"></div>
-          <div class="toggle-row bottom-mirror-row">
-            <label class="toggle-label" for="bottomMirrorToggle">Mirror Top to Bottom</label>
-            <div class="toggle-switch">
-              <input class="toggle-input" type="checkbox" id="bottomMirrorToggle" role="switch" aria-checked="false">
-              <span class="toggle-track"></span>
-            </div>
-          </div>
-          <div class="layer-stack" id="bottomLayerStack"></div>
-        </div>
-
-        <div class="panel-subview" id="bottomPicker" hidden>
-          <div class="picker-header">
-            <button class="back-btn" id="bottomPickerBack">
-              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
-            </button>
-          </div>
-          <div class="picker-tabs" id="bottomPickerTabStrip" role="tablist">
-            <button class="picker-tab is-active" data-tab="pattern">Pattern</button>
-            <button class="picker-tab" data-tab="textures">Textures</button>
-            <button class="picker-tab" data-tab="materials">Materials</button>
-            <button class="picker-tab" data-tab="colors">Colors</button>
-          </div>
-          <div class="picker-search-row">
-            <div class="picker-search-wrap">
-              <span class="material-symbols-outlined">search</span>
-              <input class="picker-search-input" id="bottomPickerSearch" type="text" placeholder="Search..." autocomplete="off">
-              <button class="picker-filter-btn" title="Filter"><span class="material-symbols-outlined">tune</span></button>
-            </div>
-            <button class="upload-btn">
-              <span class="material-symbols-outlined">upload</span>Upload
-              <span class="material-symbols-outlined">expand_more</span>
-            </button>
-          </div>
-          <div class="picker-grid-wrap">
-            <div class="picker-grid" id="bottomPickerGrid"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- ── ACCESSORIES (Tape / Label / Handle) ────── -->
-      <div class="panel" id="panel-accessories" hidden>
+      <!-- ── DETAILS (Tape / Label / Handle) ────── -->
+      <div class="panel" id="panel-details" hidden>
 
         <div class="acc-tabs" role="tablist">
           <button class="acc-tab is-active" data-acc-tab="tape" role="tab" aria-selected="true">Tape</button>
@@ -393,6 +376,64 @@
 
       </div>
 
+      <!-- ── CAMERA ─────────────────────────────────── -->
+      <div class="panel" id="panel-camera" hidden>
+
+        <div class="panel-subview" id="cameraMain">
+          <div class="camera-list" id="cameraList">
+            <div class="camera-empty" id="cameraEmpty">
+              <span class="material-symbols-outlined camera-empty__icon">videocam_off</span>
+              <p class="camera-empty__title">No cameras yet</p>
+              <p class="camera-empty__body">Create a custom camera or import a preset to save a view.</p>
+            </div>
+          </div>
+          <div class="camera-cta-group">
+            <button class="btn-outline camera-cta-btn" id="cameraImportPresetBtn">
+              <span class="material-symbols-outlined">download</span>
+              Import Camera Preset
+            </button>
+            <button class="btn-primary camera-cta-btn" id="cameraCreateBtn">
+              <span class="material-symbols-outlined">add</span>
+              Create New Camera
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-subview" id="cameraCreate" hidden>
+          <div class="picker-header">
+            <button class="back-btn" id="cameraCreateBack">
+              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+            </button>
+          </div>
+          <div class="camera-form">
+            <div class="form-field">
+              <label class="form-field-label" for="cameraNameInput">Camera name</label>
+              <input class="form-input" id="cameraNameInput" type="text" placeholder="e.g. Front angle" autocomplete="off">
+            </div>
+            <p class="camera-form__hint">Position the 3D view to your desired angle, then save.</p>
+          </div>
+          <div class="panel-cta-bar--bottom">
+            <button class="btn-primary" id="cameraSaveBtn">Save Camera</button>
+          </div>
+        </div>
+
+        <div class="panel-subview" id="cameraPresets" hidden>
+          <div class="picker-header">
+            <button class="back-btn" id="cameraPresetsBack">
+              <span class="material-symbols-outlined">arrow_back_ios_new</span>Back
+            </button>
+          </div>
+          <div class="picker-search-wrap">
+            <span class="material-symbols-outlined">search</span>
+            <input class="picker-search-input" id="cameraPresetSearch" type="text" placeholder="Search presets..." autocomplete="off">
+          </div>
+          <div class="picker-grid-wrap">
+            <div class="picker-grid" id="cameraPresetGrid"></div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- ── IMAGES ─────────────────────────────────── -->
       <div class="panel" id="panel-images" hidden>
         <div class="panel-tabs" role="tablist">
@@ -419,17 +460,17 @@
         </div>
       </div>
 
-      <!-- ── LAYERS (Internal) ──────────────────────── -->
-      <div class="panel" id="panel-layers" hidden>
+      <!-- ── INTERNAL (Layers) ─────────────────────── -->
+      <div class="panel" id="panel-internal" hidden>
 
-        <div class="panel-subview" id="layersMain">
+        <div class="panel-subview" id="internalMain">
           <div class="layer-stack layer-stack--internal" id="layersStack"></div>
           <div class="panel-cta-bar--bottom">
             <button class="btn-primary" id="layersAddBtn">Add New Layer</button>
           </div>
         </div>
 
-        <div class="panel-subview" id="layersPicker" hidden>
+        <div class="panel-subview" id="internalPicker" hidden>
           <div class="picker-header">
             <button class="back-btn" id="layersPickerBack">
               <span class="material-symbols-outlined">arrow_back_ios_new</span>

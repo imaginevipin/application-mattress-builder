@@ -115,6 +115,17 @@ const LAYER_TEMPLATES = [
   { id: 'foam-slab',     name: 'Foam Slab',                css: 'lt-foam-slab',    thickness: 2.0,   color: '#7eb26d' },
 ];
 
+const CAMERA_PRESETS = [
+  { id: 'front',     name: 'Front View' },
+  { id: 'back',      name: 'Back View' },
+  { id: 'left',      name: 'Left Side' },
+  { id: 'right',     name: 'Right Side' },
+  { id: 'top-view',  name: 'Top View' },
+  { id: 'iso-left',  name: 'Isometric Left' },
+  { id: 'iso-right', name: 'Isometric Right' },
+  { id: 'corner',    name: 'Corner View' },
+];
+
 const IMAGE_RESOLUTION_PRESETS = {
   preview: {
     '1080p': { width: 1500, height: 843 },
@@ -169,7 +180,6 @@ function createDefaultState() {
   const defaultLayers = [createLayer('pocket-coil'), createLayer('hole-punch')];
   const defaultCamera = createCamera('Current Camera', null, true);
   return {
-    mode: 'external',
     section: 'mattress',
 
     // Mattress
@@ -286,6 +296,13 @@ function createDefaultState() {
     pickerH: 0,
     pickerS: 0,
     pickerV: 100,
+
+    // External tab
+    externalTab: 'top',
+
+    // Camera panel
+    cameraSubView: 'main',
+    cameraPresetQuery: '',
   };
 }
 
@@ -329,7 +346,8 @@ function updateViewportLabel() {
   const size   = SIZES.find(s => s.id === state.sizeId);
   const height = HEIGHTS.find(h => h.id === state.heightId);
   if (!size || !height) return;
-  if (state.mode === 'internal') {
+  const isInternalSection = ['internal', 'layout', 'camera'].includes(state.section);
+  if (isInternalSection) {
     el.textContent = `${size.name} · ${state.layers.length} Layers · ${height.inches}" Profile`;
   } else {
     el.textContent = `${size.name} · ${height.inches}" Profile`;
@@ -339,9 +357,10 @@ function updateViewportLabel() {
 function syncViewport() {
   if (window.viewportSetSize)   window.viewportSetSize(state.sizeId);
   if (window.viewportSetHeight) window.viewportSetHeight(Number(state.heightId));
+  const vMode = ['internal', 'layout', 'camera'].includes(state.section) ? 'internal' : 'external';
   if (window.viewportSyncState) {
     window.viewportSyncState({
-      mode: state.mode,
+      mode: vMode,
       layers: state.layers,
       nextView: {
         exploded: state.activeLayout === 'exploded',
@@ -352,27 +371,8 @@ function syncViewport() {
       },
     });
   } else if (window.viewportSetMode) {
-    window.viewportSetMode(state.mode);
+    window.viewportSetMode(vMode);
   }
-}
-
-
-// ── Mode switch ───────────────────────────────────────────
-
-function setMode(mode) {
-  state.mode = mode;
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    const active = btn.dataset.mode === mode;
-    btn.classList.toggle('is-active', active);
-    btn.setAttribute('aria-pressed', String(active));
-  });
-  document.getElementById('navExternal').classList.toggle('nav-group--hidden', mode !== 'external');
-  document.getElementById('navInternal').classList.toggle('nav-group--hidden', mode !== 'internal');
-
-  const section = mode === 'external' ? 'mattress' : 'layers';
-  setSection(section);
-  updateViewportLabel();
-  if (window.viewportSetMode) window.viewportSetMode(mode);
 }
 
 
@@ -388,19 +388,36 @@ function setSection(section) {
   document.querySelectorAll('.panel').forEach(p => { p.hidden = true; });
   const panel = document.getElementById(`panel-${section}`);
   if (panel) panel.hidden = false;
+  const vMode = ['internal', 'layout', 'camera'].includes(section) ? 'internal' : 'external';
+  if (window.viewportSetMode) window.viewportSetMode(vMode);
   renderPanel(section);
 }
 
 function renderPanel(section) {
   switch (section) {
-    case 'mattress':    renderMattressPanel();    break;
-    case 'top':         renderTopPanel();         break;
-    case 'wall':        renderWallPanel();        break;
-    case 'bottom':      renderBottomPanel();      break;
-    case 'accessories': renderAccessoriesPanel(); break;
-    case 'images':      renderImagesPanel();      break;
-    case 'layers':      renderLayersPanel();      break;
-    case 'layout':      renderLayoutPanel();      break;
+    case 'mattress':  renderMattressPanel();    break;
+    case 'external':  renderExternalPanel();    break;
+    case 'details':   renderAccessoriesPanel(); break;
+    case 'internal':  renderLayersPanel();      break;
+    case 'layout':    renderLayoutPanel();      break;
+    case 'camera':    renderCameraPanel();      break;
+    case 'images':    renderImagesPanel();      break;
+  }
+}
+
+function renderExternalPanel() {
+  ['top', 'wall', 'bottom'].forEach(tab => {
+    const pane = document.getElementById(`externalTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+    if (pane) pane.hidden = tab !== state.externalTab;
+  });
+  document.querySelectorAll('[data-external-tab]').forEach(btn => {
+    btn.classList.toggle('is-active', btn.dataset.externalTab === state.externalTab);
+    btn.setAttribute('aria-selected', String(btn.dataset.externalTab === state.externalTab));
+  });
+  switch (state.externalTab) {
+    case 'top':    renderTopPanel();    break;
+    case 'wall':   renderWallPanel();   break;
+    case 'bottom': renderBottomPanel(); break;
   }
 }
 
@@ -1194,7 +1211,7 @@ function renderTapeTab() {
       });
       const delBtn = stack.querySelector('[data-delete-card="tapeCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.tapeAdded = false; renderTapeTab(); });
-      bindSlider('#panel-accessories', 'tapePosition', v => { state.tapePosition = v; });
+      bindSlider('#panel-details', 'tapePosition', v => { state.tapePosition = v; });
     }
   } else {
     renderAccPickerGrid('tapePickerGrid', TAPE_STYLES, state.tapePickerQuery, state.tapeStyleId, (id, css) => {
@@ -1244,8 +1261,8 @@ function renderLabelTab() {
       });
       const delBtn = stack.querySelector('[data-delete-card="labelCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.labelAdded = false; renderLabelTab(); });
-      bindCheckbox('#panel-accessories', 'labelAdjacent', v => { state.labelAdjacent = v; });
-      bindCheckbox('#panel-accessories', 'labelMirror',   v => { state.labelMirror   = v; });
+      bindCheckbox('#panel-details', 'labelAdjacent', v => { state.labelAdjacent = v; });
+      bindCheckbox('#panel-details', 'labelMirror',   v => { state.labelMirror   = v; });
     }
   } else {
     renderAccPickerGrid('labelPickerGrid', LABEL_TYPES, state.labelPickerQuery, state.labelTypeId, (id, css) => {
@@ -1295,8 +1312,8 @@ function renderHandleTab() {
       });
       const delBtn = stack.querySelector('[data-delete-card="handleCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.handleAdded = false; renderHandleTab(); });
-      bindCheckbox('#panel-accessories', 'handleAdjacent', v => { state.handleAdjacent = v; });
-      bindCheckbox('#panel-accessories', 'handleMirror',   v => { state.handleMirror   = v; });
+      bindCheckbox('#panel-details', 'handleAdjacent', v => { state.handleAdjacent = v; });
+      bindCheckbox('#panel-details', 'handleMirror',   v => { state.handleMirror   = v; });
     }
   } else {
     renderAccPickerGrid('handlePickerGrid', HANDLE_TYPES, state.handlePickerQuery, state.handleTypeId, (id, css) => {
@@ -1378,7 +1395,7 @@ function relativeTime(iso) {
 // ── Layers panel (internal) ───────────────────────────────
 
 function renderLayersPanel() {
-  showSubView('layers', state.layersSubView);
+  showSubView('internal', state.layersSubView);
   if (state.layersSubView === 'main') renderLayersMain();
   else renderLayersPickerGrid();
 }
@@ -1473,6 +1490,79 @@ function renderLayersPickerGrid() {
       renderLayersPanel();
       updateViewportLabel();
       syncViewport();
+    });
+  });
+}
+
+
+// ── Camera panel ──────────────────────────────────────────
+
+function renderCameraPanel() {
+  const main    = document.getElementById('cameraMain');
+  const create  = document.getElementById('cameraCreate');
+  const presets = document.getElementById('cameraPresets');
+  if (main)    main.hidden    = state.cameraSubView !== 'main';
+  if (create)  create.hidden  = state.cameraSubView !== 'create';
+  if (presets) presets.hidden = state.cameraSubView !== 'presets';
+  if (state.cameraSubView === 'main')    renderCameraMain();
+  if (state.cameraSubView === 'presets') renderCameraPresetGrid();
+}
+
+function renderCameraMain() {
+  const list  = document.getElementById('cameraList');
+  const empty = document.getElementById('cameraEmpty');
+  if (!list) return;
+
+  if (state.cameras.length === 0) {
+    list.innerHTML = '';
+    if (empty) { empty.hidden = false; list.appendChild(empty); }
+    return;
+  }
+
+  if (empty) empty.hidden = true;
+  const cards = state.cameras.map(cam => `
+    <div class="camera-card-wrap" id="cam-wrap-${cam.id}">
+      <div class="camera-card">
+        <span class="material-symbols-outlined camera-card__icon">videocam</span>
+        <div class="camera-card__info">
+          <span class="camera-card__name">${cam.name}</span>
+          <span class="camera-card__type">${cam.preset ? 'Preset · ' + cam.preset : 'Custom'}</span>
+        </div>
+        <div class="camera-card__actions">
+          <button class="icon-btn icon-btn--danger" data-delete-camera="${cam.id}" title="Delete">
+            <span class="material-symbols-outlined">delete</span>
+          </button>
+        </div>
+      </div>
+    </div>`).join('');
+  list.innerHTML = cards;
+  list.querySelectorAll('[data-delete-camera]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.cameras = state.cameras.filter(c => c.id !== btn.dataset.deleteCamera);
+      renderCameraMain();
+    });
+  });
+}
+
+function renderCameraPresetGrid() {
+  const grid = document.getElementById('cameraPresetGrid');
+  if (!grid) return;
+  const q = state.cameraPresetQuery.toLowerCase().trim();
+  const visible = q ? CAMERA_PRESETS.filter(p => p.name.toLowerCase().includes(q)) : CAMERA_PRESETS;
+  grid.innerHTML = visible.map(p => `
+    <button class="picker-tile" data-preset-id="${p.id}">
+      <div class="picker-tile__preview camera-preset-icon">
+        <span class="material-symbols-outlined">videocam</span>
+      </div>
+      <span class="picker-tile__name">${p.name}</span>
+    </button>`).join('');
+  grid.querySelectorAll('.picker-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const preset = CAMERA_PRESETS.find(p => p.id === tile.dataset.presetId);
+      if (!preset) return;
+      state.cameras.push({ id: `cam-${Date.now()}`, name: preset.name, preset: preset.name });
+      state.cameraSubView = 'main';
+      renderCameraPanel();
     });
   });
 }
@@ -1859,25 +1949,22 @@ function initApp() {
 }
 
 function syncModeAndNav() {
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    const active = btn.dataset.mode === state.mode;
-    btn.classList.toggle('is-active', active);
-    btn.setAttribute('aria-pressed', String(active));
-  });
-  document.getElementById('navExternal').classList.toggle('nav-group--hidden', state.mode !== 'external');
-  document.getElementById('navInternal').classList.toggle('nav-group--hidden', state.mode !== 'internal');
+  // Mode toggle removed — nav is now a unified single group
 }
 
 function wireGlobalEvents() {
 
-  // Mode toggle
-  document.querySelectorAll('.mode-btn').forEach(btn => {
-    btn.addEventListener('click', () => setMode(btn.dataset.mode));
-  });
-
   // Nav items
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => setSection(btn.dataset.section));
+  });
+
+  // External tabs
+  document.querySelectorAll('[data-external-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.externalTab = btn.dataset.externalTab;
+      renderExternalPanel();
+    });
   });
 
   // Mattress tabs
@@ -2018,6 +2105,38 @@ function wireGlobalEvents() {
     state.createImageAspectLocked = !state.createImageAspectLocked;
     document.getElementById('createImageAspectLock').classList.toggle('is-locked', state.createImageAspectLocked);
     document.getElementById('createImageAspectLock').querySelector('.material-symbols-outlined').textContent = state.createImageAspectLocked ? 'lock' : 'lock_open';
+  });
+
+  // Camera
+  document.getElementById('cameraCreateBtn').addEventListener('click', () => {
+    state.cameraSubView = 'create';
+    const input = document.getElementById('cameraNameInput');
+    if (input) input.value = '';
+    renderCameraPanel();
+  });
+  document.getElementById('cameraCreateBack').addEventListener('click', () => {
+    state.cameraSubView = 'main';
+    renderCameraPanel();
+  });
+  document.getElementById('cameraSaveBtn').addEventListener('click', () => {
+    const input = document.getElementById('cameraNameInput');
+    const name = (input ? input.value.trim() : '') || 'Custom Camera';
+    state.cameras.push({ id: `cam-${Date.now()}`, name, preset: null });
+    state.cameraSubView = 'main';
+    renderCameraPanel();
+  });
+  document.getElementById('cameraImportPresetBtn').addEventListener('click', () => {
+    state.cameraSubView = 'presets';
+    state.cameraPresetQuery = '';
+    renderCameraPanel();
+  });
+  document.getElementById('cameraPresetsBack').addEventListener('click', () => {
+    state.cameraSubView = 'main';
+    renderCameraPanel();
+  });
+  document.getElementById('cameraPresetSearch').addEventListener('input', e => {
+    state.cameraPresetQuery = e.target.value;
+    renderCameraPresetGrid();
   });
 
   initAssistant();
