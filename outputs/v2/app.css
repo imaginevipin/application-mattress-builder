@@ -2048,7 +2048,8 @@ body {
   background: var(--figma-panel);
 }
 
-#topLayerStack {
+#topLayerStack,
+#layersStack {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
