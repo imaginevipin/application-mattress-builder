@@ -2099,7 +2099,8 @@ body {
 #panel-top .layer-card-wrap,
 #panel-wall .layer-card-wrap,
 #panel-bottom .layer-card-wrap,
-#panel-accessories .layer-card-wrap {
+#panel-details .layer-card-wrap,
+#panel-internal .layer-card-wrap {
   background: #555555;
 }
 
@@ -2134,7 +2135,8 @@ body {
 #panel-top .layer-card,
 #panel-wall .layer-card,
 #panel-bottom .layer-card,
-#panel-accessories .layer-card {
+#panel-details .layer-card,
+#panel-internal .layer-card {
   min-height: 58px;
   align-items: flex-start;
   border-bottom: 1px solid rgba(255,255,255,0.12);
@@ -2149,7 +2151,8 @@ body {
 #panel-top .layer-card__thumb,
 #panel-wall .layer-card__thumb,
 #panel-bottom .layer-card__thumb,
-#panel-accessories .layer-card__thumb {
+#panel-details .layer-card__thumb,
+#panel-internal .layer-card__thumb {
   width: 40px;
   height: 40px;
 }
