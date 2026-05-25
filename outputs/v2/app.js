@@ -1417,7 +1417,7 @@ function renderLayersMain() {
           </div>
         </button>
         <div class="layer-card__actions">
-          <button class="icon-btn" data-open-picker-settings="${id}" title="Style"><span class="material-symbols-outlined">palette</span></button>
+          <button class="icon-btn" data-open-picker-settings="${layer.id}" title="Style"><span class="material-symbols-outlined">palette</span></button>
           <button class="icon-btn icon-btn--danger" data-delete-layer="${layer.id}" title="Delete"><span class="material-symbols-outlined">delete</span></button>
           <button class="icon-btn" data-toggle-layer="${layer.id}" aria-expanded="${isExpanded}">
             <span class="material-symbols-outlined">${isExpanded ? 'expand_less' : 'expand_more'}</span>
