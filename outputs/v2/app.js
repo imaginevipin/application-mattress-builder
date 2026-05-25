@@ -146,6 +146,7 @@ let layerUid    = 0;
 let imageUid    = 0;
 let cameraUid   = 0;
 let toastTimeout = null;
+let appVersion = 1;
 
 
 // ── State helpers ─────────────────────────────────────────
@@ -181,6 +182,7 @@ function createDefaultState() {
   const defaultCamera = createCamera('Current Camera', null, true);
   return {
     section: 'mattress',
+    legacyMode: 'external',
 
     // Mattress
     mattressTab: 'size',
@@ -379,18 +381,47 @@ function syncViewport() {
 // ── Section navigation ────────────────────────────────────
 
 function setSection(section) {
-  state.section = section;
+  // Remap legacy section names (used by v1/v3 nav) to current panel IDs
+  let resolvedSection = section;
+  if (appVersion !== 2) {
+    if (section === 'top')          { state.externalTab = 'top';    resolvedSection = 'external'; }
+    else if (section === 'wall')    { state.externalTab = 'wall';   resolvedSection = 'external'; }
+    else if (section === 'bottom')  { state.externalTab = 'bottom'; resolvedSection = 'external'; }
+    else if (section === 'accessories') { resolvedSection = 'details'; }
+    else if (section === 'layers')  { resolvedSection = 'internal'; }
+  }
+
+  state.section = resolvedSection;
+
+  // Highlight nav items — match on original section name so legacy nav highlights correctly
   document.querySelectorAll('.nav-item').forEach(btn => {
     const active = btn.dataset.section === section;
     btn.classList.toggle('is-active', active);
     btn.setAttribute('aria-current', active ? 'page' : 'false');
   });
+
   document.querySelectorAll('.panel').forEach(p => { p.hidden = true; });
-  const panel = document.getElementById(`panel-${section}`);
+  const panel = document.getElementById(`panel-${resolvedSection}`);
   if (panel) panel.hidden = false;
-  const vMode = ['internal', 'layout', 'camera'].includes(section) ? 'internal' : 'external';
+
+  const vMode = ['internal', 'layout', 'camera'].includes(resolvedSection) ? 'internal' : 'external';
   if (window.viewportSetMode) window.viewportSetMode(vMode);
-  renderPanel(section);
+  renderPanel(resolvedSection);
+}
+
+function setMode(mode) {
+  state.legacyMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('is-active', btn.dataset.mode === mode);
+    btn.setAttribute('aria-pressed', String(btn.dataset.mode === mode));
+  });
+  const navExt = document.getElementById('navExternal');
+  const navInt = document.getElementById('navInternal');
+  if (navExt) navExt.classList.toggle('nav-group--hidden', mode !== 'external');
+  if (navInt) navInt.classList.toggle('nav-group--hidden', mode !== 'internal');
+  const section = mode === 'external' ? 'mattress' : 'layers';
+  setSection(section);
+  updateViewportLabel();
 }
 
 function renderPanel(section) {
@@ -1949,10 +1980,24 @@ function initApp() {
 }
 
 function syncModeAndNav() {
-  // Mode toggle removed — nav is now a unified single group
+  if (appVersion === 2) return;
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    const active = btn.dataset.mode === state.legacyMode;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-pressed', String(active));
+  });
+  const navExt = document.getElementById('navExternal');
+  const navInt = document.getElementById('navInternal');
+  if (navExt) navExt.classList.toggle('nav-group--hidden', state.legacyMode !== 'external');
+  if (navInt) navInt.classList.toggle('nav-group--hidden', state.legacyMode !== 'internal');
 }
 
 function wireGlobalEvents() {
+
+  // Mode toggle (legacy v1/v3)
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => setMode(btn.dataset.mode));
+  });
 
   // Nav items
   document.querySelectorAll('.nav-item').forEach(btn => {
@@ -2614,11 +2659,34 @@ function initAssistant() {
 
   function switchVersion(v) {
     activeVersion = v;
+    appVersion = v;
+
+    // Nav swap
+    const navMainEl = document.getElementById('navMain');
+    const navLegacyEl = document.getElementById('navLegacy');
+    if (navMainEl) navMainEl.classList.toggle('nav-group--hidden', v !== 2);
+    if (navLegacyEl) navLegacyEl.classList.toggle('nav-group--hidden', v === 2);
+
+    // Topbar elements
+    const helpBtnEl = document.getElementById('helpBtn');
+    const modeToggleEl = document.getElementById('modeToggle');
+    if (helpBtnEl) helpBtnEl.hidden = (v === 2);
+    if (modeToggleEl) modeToggleEl.hidden = (v === 2);
+
+    // Section reset
+    if (v === 2) {
+      setSection('mattress');
+    } else {
+      setMode('external');
+    }
+
+    // Request panel management
     fab.style.display = (v === 2 || v === 3) ? 'none' : '';
     if (v === 1 && panel.classList.contains('is-open')) closePanel();
     if (v !== 2) closeRequestPanel();
     if (v !== 3) closeV3Panel();
     myRequestsBtn.textContent = v === 2 ? 'My Requests' : 'Request Props';
+
     versionPills.forEach(p => {
       const active = Number(p.dataset.version) === v;
       p.classList.toggle('is-active', active);

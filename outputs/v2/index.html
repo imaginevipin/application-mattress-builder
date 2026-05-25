@@ -59,6 +59,16 @@
         </div>
       </div>
 
+      <button class="btn-file help-btn" id="helpBtn">
+        Help
+        <span class="material-symbols-outlined btn-file__arrow">expand_more</span>
+      </button>
+
+      <div class="mode-toggle" id="modeToggle" role="group" aria-label="Configuration mode">
+        <button class="mode-btn is-active" data-mode="external" aria-pressed="true">External</button>
+        <button class="mode-btn" data-mode="internal" aria-pressed="false">Internal</button>
+      </div>
+
     </div>
 
     <div class="topbar-center">
@@ -79,7 +89,7 @@
     <!-- Icon Strip ──────────────────────────────────────── -->
     <nav class="icon-strip" aria-label="Section navigation">
 
-      <div class="nav-group" id="navMain">
+      <div class="nav-group nav-group--hidden" id="navMain">
         <button class="nav-item is-active" data-section="mattress" aria-current="page">
           <span class="material-symbols-outlined">king_bed</span>
           <span class="nav-label">Mattress</span>
@@ -108,6 +118,52 @@
           <span class="material-symbols-outlined">photo_library</span>
           <span class="nav-label">Images</span>
         </button>
+      </div>
+
+      <div class="nav-group" id="navLegacy">
+
+        <div id="navExternal">
+          <button class="nav-item is-active" data-section="mattress" aria-current="page">
+            <span class="material-symbols-outlined">king_bed</span>
+            <span class="nav-label">Mattress</span>
+          </button>
+          <button class="nav-item" data-section="top" aria-current="false">
+            <span class="material-symbols-outlined">border_top</span>
+            <span class="nav-label">Top</span>
+          </button>
+          <button class="nav-item" data-section="wall" aria-current="false">
+            <span class="material-symbols-outlined">border_outer</span>
+            <span class="nav-label">Wall</span>
+          </button>
+          <button class="nav-item" data-section="bottom" aria-current="false">
+            <span class="material-symbols-outlined">border_bottom</span>
+            <span class="nav-label">Bottom</span>
+          </button>
+          <button class="nav-item" data-section="accessories" aria-current="false">
+            <span class="material-symbols-outlined">category</span>
+            <span class="nav-label">Accessories</span>
+          </button>
+          <button class="nav-item" data-section="images" aria-current="false">
+            <span class="material-symbols-outlined">photo_library</span>
+            <span class="nav-label">Images</span>
+          </button>
+        </div>
+
+        <div class="nav-group--hidden" id="navInternal">
+          <button class="nav-item" data-section="layers" aria-current="false">
+            <span class="material-symbols-outlined">layers</span>
+            <span class="nav-label">Layers</span>
+          </button>
+          <button class="nav-item" data-section="layout" aria-current="false">
+            <span class="material-symbols-outlined">tune</span>
+            <span class="nav-label">Layout</span>
+          </button>
+          <button class="nav-item" data-section="images" aria-current="false">
+            <span class="material-symbols-outlined">photo_library</span>
+            <span class="nav-label">Images</span>
+          </button>
+        </div>
+
       </div>
 
     </nav>

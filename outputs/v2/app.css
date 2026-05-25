@@ -628,6 +628,19 @@ input:focus-visible, select:focus-visible { outline: none; }
 .layer-height-label { font-size: var(--text-small-size); color: var(--text-default-placeholder); font-weight: 500; flex: 1; }
 .layer-height-input { width: 72px; text-align: center; }
 
+/* Internal layer card body — match dark card background */
+#panel-internal .layer-card__body .form-input {
+  background: #666666;
+  border-color: #787878;
+  color: #ffffff;
+}
+#panel-internal .layer-card__body .form-range {
+  background: #505050;
+}
+#panel-internal .layer-card__body .layer-height-label {
+  color: #aaaaaa;
+}
+
 /* Add text links below layer stack */
 .add-links {
   display: flex;
