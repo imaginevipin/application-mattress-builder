@@ -1008,14 +1008,9 @@ function renderWallMain() {
     ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
     : '';
 
-  const thumbCss = state.wallQuiltingAdded ? state.wallQuiltingPatternCss : 'ptn-buttons';
-  const displayValue = state.wallQuiltingAdded
-    ? getPatternName(state.wallQuiltingPatternId)
-    : getWallTuftName();
-
   stack.innerHTML = makeLayerCard({
-    id: 'wallBase', thumbCss,
-    label: 'Mattress Wall', value: displayValue,
+    id: 'wallBase', thumbCss: '',
+    label: 'Mattress Wall', value: 'External surface',
     showDelete: false, expanded: state.wallExpanded,
     bodyHtml: `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`,
   });
@@ -1028,6 +1023,7 @@ function bindWallMainEvents() {
     if (!btn.closest('#panel-wall')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.openPicker;
+      if (id === 'wallBase') return;
       if (id === 'wallQuilting') state.wallPickerCtx = 'quilting';
       state.wallSubView = 'picker';
       renderWallPanel();

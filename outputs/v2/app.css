@@ -2165,6 +2165,11 @@ body {
   min-height: 0;
 }
 
+/* Parent container cards (wallBase) have no picker — hide palette icon */
+#wrap-wallBase > .layer-card [data-open-picker-settings] {
+  display: none;
+}
+
 .layer-card {
   min-height: 40px;
   padding: 8px 10px;
