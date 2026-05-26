@@ -1095,21 +1095,27 @@ input:focus-visible, select:focus-visible { outline: none; }
 
 .form-field { display: flex; flex-direction: column; gap: var(--s-100); }
 
-.acc-checkbox-group { display: flex; flex-direction: column; gap: var(--s-200); }
-.acc-checkbox {
-  display: flex;
+.acc-action-group { display: flex; gap: var(--s-200); }
+.acc-action-btn {
+  flex: 1;
+  display: inline-flex;
   align-items: center;
-  gap: var(--s-200);
-  font-size: var(--text-small-size);
+  justify-content: center;
+  gap: var(--s-100);
+  padding: var(--s-200) var(--s-300);
+  border: var(--bw) solid var(--border-default-secondary);
+  border-radius: var(--br-100);
+  background: transparent;
   color: var(--text-default-body);
+  font-size: var(--text-small-size);
+  font-weight: 500;
+  font-family: var(--font);
   cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
-.acc-checkbox input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-  accent-color: var(--surface-primary-default);
-  cursor: pointer;
-}
+.acc-action-btn .material-symbols-outlined { font-size: 16px; }
+.acc-action-btn:hover { border-color: var(--border-default); color: var(--text-default-heading); }
+.acc-action-btn.is-active { border-color: var(--border-primary-default); color: var(--text-primary-default); background: var(--surface-primary-default-subtle); }
 
 .reset-link {
   display: flex;

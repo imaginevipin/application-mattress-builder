@@ -243,15 +243,17 @@ function createDefaultState() {
     tapeStyleCss: 'tape-flat',
     tapeScaleX: 0, tapeScaleY: 0, tapeScaleZ: 0,
     tapePosition: 0.25,
+    tapeExpanded: true,
     labelSubView: 'main',
     labelPickerQuery: '',
     labelAdded: false,
     labelTypeId: 'sm-rect',
     labelTypeCss: 'lbl-sm-rect',
-    labelSide: 'front',
+    labelSide: 'left',
     labelScaleX: 0, labelScaleY: 0, labelScaleZ: 0,
     labelPosX: 0, labelPosY: 0, labelPosZ: 0,
     labelAdjacent: false, labelMirror: false,
+    labelExpanded: true,
     handleSubView: 'main',
     handlePickerQuery: '',
     handleAdded: false,
@@ -261,6 +263,7 @@ function createDefaultState() {
     handleScaleX: 0, handleScaleY: 0, handleScaleZ: 0,
     handlePosX: 0, handlePosY: 0, handlePosZ: 0,
     handleAdjacent: false, handleMirror: false,
+    handleExpanded: true,
 
     // Images
     imagesTab: 'preview',
@@ -1225,7 +1228,7 @@ function renderTapeTab() {
       stack.innerHTML = makeLayerCard({
         id: 'tapeCard', thumbCss: state.tapeStyleCss,
         label: 'Tape', value: style.name,
-        showDelete: true, expanded: false,
+        showDelete: true, expanded: state.tapeExpanded,
         bodyHtml: layerCardBodyHTML(`
           <div class="acc-props">
             <div class="acc-prop-group"><span class="acc-prop-label">Scale</span>
@@ -1242,7 +1245,15 @@ function renderTapeTab() {
       });
       const delBtn = stack.querySelector('[data-delete-card="tapeCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.tapeAdded = false; renderTapeTab(); });
+      const toggleBtn = stack.querySelector('[data-toggle-card="tapeCard"]');
+      if (toggleBtn) toggleBtn.addEventListener('click', () => { state.tapeExpanded = !state.tapeExpanded; renderTapeTab(); });
       bindSlider('#panel-details', 'tapePosition', v => { state.tapePosition = v; });
+      ['tapeScaleX','tapeScaleY','tapeScaleZ'].forEach(k => {
+        const el = stack.querySelector(`#${k}`);
+        if (el) el.addEventListener('input', e => { state[k] = +e.target.value; });
+      });
+      const resetBtn = stack.querySelector('#tapeResetScale');
+      if (resetBtn) resetBtn.addEventListener('click', () => { state.tapeScaleX = 0; state.tapeScaleY = 0; state.tapeScaleZ = 0; renderTapeTab(); });
     }
   } else {
     renderAccPickerGrid('tapePickerGrid', TAPE_STYLES, state.tapePickerQuery, state.tapeStyleId, (id, css) => {
@@ -1269,12 +1280,12 @@ function renderLabelTab() {
       stack.innerHTML = makeLayerCard({
         id: 'labelCard', thumbCss: state.labelTypeCss,
         label: 'Label', value: lbl.name,
-        showDelete: true, expanded: false,
+        showDelete: true, expanded: state.labelExpanded,
         bodyHtml: layerCardBodyHTML(`
           <div class="acc-props">
             <div class="acc-prop-group"><span class="acc-prop-label">Side</span>
               <select class="form-select" id="labelSideSelect">
-                ${['front','back','left','right'].map(s => `<option value="${s}"${state.labelSide===s?' selected':''}>${capitalize(s)}</option>`).join('')}
+                ${['Left','Right','Front','Back'].map(s => `<option value="${s.toLowerCase()}"${state.labelSide===s.toLowerCase()?' selected':''}>${s}</option>`).join('')}
               </select>
             </div>
             <div class="acc-prop-group"><span class="acc-prop-label">Scale</span>
@@ -1283,17 +1294,31 @@ function renderLabelTab() {
             <div class="acc-prop-group"><span class="acc-prop-label">Position</span>
               <div class="xyz-inputs">${xyzInput('labelPosX','X',state.labelPosX)}${xyzInput('labelPosY','Y',state.labelPosY)}${xyzInput('labelPosZ','Z',state.labelPosZ)}</div>
             </div>
-            <div class="acc-checkbox-group">
-              <label class="acc-checkbox"><input type="checkbox" id="labelAdjacent"${state.labelAdjacent?' checked':''}>Adjacent Object</label>
-              <label class="acc-checkbox"><input type="checkbox" id="labelMirror"${state.labelMirror?' checked':''}>Mirror Object</label>
+            <div class="acc-action-group">
+              <button class="acc-action-btn${state.labelAdjacent?' is-active':''}" id="labelAdjacentBtn">
+                <span class="material-symbols-outlined">grid_view</span>Adjacent Object
+              </button>
+              <button class="acc-action-btn${state.labelMirror?' is-active':''}" id="labelMirrorBtn">
+                <span class="material-symbols-outlined">flip</span>Mirror Object
+              </button>
             </div>
           </div>
         `),
       });
       const delBtn = stack.querySelector('[data-delete-card="labelCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.labelAdded = false; renderLabelTab(); });
-      bindCheckbox('#panel-details', 'labelAdjacent', v => { state.labelAdjacent = v; });
-      bindCheckbox('#panel-details', 'labelMirror',   v => { state.labelMirror   = v; });
+      const toggleBtn = stack.querySelector('[data-toggle-card="labelCard"]');
+      if (toggleBtn) toggleBtn.addEventListener('click', () => { state.labelExpanded = !state.labelExpanded; renderLabelTab(); });
+      const sideSelect = stack.querySelector('#labelSideSelect');
+      if (sideSelect) sideSelect.addEventListener('change', e => { state.labelSide = e.target.value; });
+      ['labelScaleX','labelScaleY','labelScaleZ','labelPosX','labelPosY','labelPosZ'].forEach(k => {
+        const el = stack.querySelector(`#${k}`);
+        if (el) el.addEventListener('input', e => { state[k] = +e.target.value; });
+      });
+      const adjBtn = stack.querySelector('#labelAdjacentBtn');
+      if (adjBtn) adjBtn.addEventListener('click', () => { state.labelAdjacent = !state.labelAdjacent; renderLabelTab(); });
+      const mirBtn = stack.querySelector('#labelMirrorBtn');
+      if (mirBtn) mirBtn.addEventListener('click', () => { state.labelMirror = !state.labelMirror; renderLabelTab(); });
     }
   } else {
     renderAccPickerGrid('labelPickerGrid', LABEL_TYPES, state.labelPickerQuery, state.labelTypeId, (id, css) => {
@@ -1320,12 +1345,12 @@ function renderHandleTab() {
       stack.innerHTML = makeLayerCard({
         id: 'handleCard', thumbCss: state.handleTypeCss,
         label: 'Handle', value: hdl.name,
-        showDelete: true, expanded: false,
+        showDelete: true, expanded: state.handleExpanded,
         bodyHtml: layerCardBodyHTML(`
           <div class="acc-props">
             <div class="acc-prop-group"><span class="acc-prop-label">Side</span>
               <select class="form-select" id="handleSideSelect">
-                ${['front','back','left','right'].map(s => `<option value="${s}"${state.handleSide===s?' selected':''}>${capitalize(s)}</option>`).join('')}
+                ${['Front','Back','Left','Right'].map(s => `<option value="${s.toLowerCase()}"${state.handleSide===s.toLowerCase()?' selected':''}>${s}</option>`).join('')}
               </select>
             </div>
             <div class="acc-prop-group"><span class="acc-prop-label">Scale</span>
@@ -1334,17 +1359,31 @@ function renderHandleTab() {
             <div class="acc-prop-group"><span class="acc-prop-label">Position</span>
               <div class="xyz-inputs">${xyzInput('handlePosX','X',state.handlePosX)}${xyzInput('handlePosY','Y',state.handlePosY)}${xyzInput('handlePosZ','Z',state.handlePosZ)}</div>
             </div>
-            <div class="acc-checkbox-group">
-              <label class="acc-checkbox"><input type="checkbox" id="handleAdjacent"${state.handleAdjacent?' checked':''}>Adjacent Object</label>
-              <label class="acc-checkbox"><input type="checkbox" id="handleMirror"${state.handleMirror?' checked':''}>Mirror Object</label>
+            <div class="acc-action-group">
+              <button class="acc-action-btn${state.handleAdjacent?' is-active':''}" id="handleAdjacentBtn">
+                <span class="material-symbols-outlined">grid_view</span>Adjacent Object
+              </button>
+              <button class="acc-action-btn${state.handleMirror?' is-active':''}" id="handleMirrorBtn">
+                <span class="material-symbols-outlined">flip</span>Mirror Object
+              </button>
             </div>
           </div>
         `),
       });
       const delBtn = stack.querySelector('[data-delete-card="handleCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.handleAdded = false; renderHandleTab(); });
-      bindCheckbox('#panel-details', 'handleAdjacent', v => { state.handleAdjacent = v; });
-      bindCheckbox('#panel-details', 'handleMirror',   v => { state.handleMirror   = v; });
+      const toggleBtn = stack.querySelector('[data-toggle-card="handleCard"]');
+      if (toggleBtn) toggleBtn.addEventListener('click', () => { state.handleExpanded = !state.handleExpanded; renderHandleTab(); });
+      const sideSelect = stack.querySelector('#handleSideSelect');
+      if (sideSelect) sideSelect.addEventListener('change', e => { state.handleSide = e.target.value; });
+      ['handleScaleX','handleScaleY','handleScaleZ','handlePosX','handlePosY','handlePosZ'].forEach(k => {
+        const el = stack.querySelector(`#${k}`);
+        if (el) el.addEventListener('input', e => { state[k] = +e.target.value; });
+      });
+      const adjBtn = stack.querySelector('#handleAdjacentBtn');
+      if (adjBtn) adjBtn.addEventListener('click', () => { state.handleAdjacent = !state.handleAdjacent; renderHandleTab(); });
+      const mirBtn = stack.querySelector('#handleMirrorBtn');
+      if (mirBtn) mirBtn.addEventListener('click', () => { state.handleMirror = !state.handleMirror; renderHandleTab(); });
     }
   } else {
     renderAccPickerGrid('handlePickerGrid', HANDLE_TYPES, state.handlePickerQuery, state.handleTypeId, (id, css) => {
