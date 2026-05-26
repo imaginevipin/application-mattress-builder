@@ -1113,14 +1113,16 @@ function renderBottomMain() {
   const typeRow = document.getElementById('bottomTypeRow');
   const bt = BOTTOM_TYPES.find(t => t.id === state.bottomTypeId) || BOTTOM_TYPES[2];
   if (typeRow) {
-    typeRow.innerHTML = `<button class="bottom-type-btn" id="bottomTypeBtn">
-      <div class="layer-card__thumb ${bt.css} bottom-type-thumb"></div>
-      <div class="bottom-type-info">
-        <span class="bottom-type-label">Size</span>
-        <span class="bottom-type-value">${bt.name}</span>
-      </div>
-      <span class="material-symbols-outlined bottom-type-chevron">chevron_right</span>
-    </button>`;
+    typeRow.innerHTML = `<div class="layer-card-wrap">
+      <button class="bottom-type-btn" id="bottomTypeBtn">
+        <div class="layer-card__thumb ${bt.css} bottom-type-thumb"></div>
+        <div class="bottom-type-info">
+          <span class="bottom-type-label">Size</span>
+          <span class="bottom-type-value">${bt.name}</span>
+        </div>
+        <span class="material-symbols-outlined bottom-type-chevron">chevron_right</span>
+      </button>
+    </div>`;
     document.getElementById('bottomTypeBtn').addEventListener('click', () => {
       state.bottomPickerCtx = 'type';
       state.bottomSubView = 'picker';

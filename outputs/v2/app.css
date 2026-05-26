@@ -972,11 +972,11 @@ input:focus-visible, select:focus-visible { outline: none; }
   align-items: center;
   gap: var(--s-300);
   width: 100%;
-  padding: var(--s-200) var(--s-300);
-  border-bottom: var(--bw) solid var(--border-default-secondary);
+  padding: var(--s-300);
+  min-height: 56px;
   transition: background 0.12s;
 }
-.bottom-type-btn:hover { background: var(--surface-default-secondary); }
+.bottom-type-btn:hover { background: rgba(255,255,255,0.08); }
 .bottom-type-thumb { flex-shrink: 0; width: 36px; height: 36px; border-radius: var(--br-100); }
 .bottom-type-info { flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left; }
 .bottom-type-label { font-size: 10px; color: var(--text-default-placeholder); font-weight: 400; }
@@ -2464,15 +2464,6 @@ body {
 
 /* ── Bottom panel Figma overrides ───────────────────────── */
 
-#bottomTypeRow .bottom-type-btn {
-  padding: 8px 16px;
-  border-bottom: 1px solid #242424;
-  background: var(--figma-panel);
-}
-#bottomTypeRow .bottom-type-btn:hover { background: #3a3a3a; }
-#bottomTypeRow .bottom-type-label { color: #999999; font-size: 11px; }
-#bottomTypeRow .bottom-type-value { color: #f4f4f4; font-size: 13px; }
-#bottomTypeRow .bottom-type-chevron { color: #999999; }
 
 /* Bottom panel now uses the unified .compact-* system — overrides removed for parity with Top/Wall panels and the Figma design. */
 #panel-bottom .form-range { height: 3px; }
