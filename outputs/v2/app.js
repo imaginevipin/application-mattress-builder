@@ -557,6 +557,40 @@ function sliderRowHTML(label, id, min, max, step, val) {
   </div>`;
 }
 
+// ── Compact panel body builders (ALWAYS use these for property panels) ────────
+// Rule: all layer card property bodies must use compact-body + these helpers.
+// Never use acc-props / xyz-inputs / form-input / layerCardBodyHTML for props.
+
+function xyzCompactRow(label, idPrefix, x, y, z) {
+  return `<div class="compact-row">
+    <span class="compact-label">${label}</span>
+    <div class="compact-fields">
+      <div class="compact-field"><span class="compact-field-lbl">X</span><input class="compact-input" id="${idPrefix}X" type="number" value="${x}"></div>
+      <div class="compact-field"><span class="compact-field-lbl">Y</span><input class="compact-input" id="${idPrefix}Y" type="number" value="${y}"></div>
+      <div class="compact-field"><span class="compact-field-lbl">Z</span><input class="compact-input" id="${idPrefix}Z" type="number" value="${z}"></div>
+    </div>
+  </div>`;
+}
+
+function sliderCompactRow(label, id, min, max, step, val) {
+  return `<div class="compact-depth-block">
+    <div class="compact-row">
+      <span class="compact-label">${label}</span>
+      <input class="compact-input compact-depth-num" id="${id}Num" type="number" min="${min}" max="${max}" step="${step}" value="${val}">
+    </div>
+    <input class="form-range" id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${val}">
+  </div>`;
+}
+
+function selectCompactRow(label, id, options, value) {
+  return `<div class="compact-row">
+    <span class="compact-label">${label}</span>
+    <select class="form-select compact-select" id="${id}">
+      ${options.map(o => `<option value="${o.toLowerCase()}"${value===o.toLowerCase()?' selected':''}>${o}</option>`).join('')}
+    </select>
+  </div>`;
+}
+
 function quiltingBodyHTML(idPrefix, vals) {
   return `<div class="compact-body">
     <div class="compact-row">
@@ -1229,25 +1263,20 @@ function renderTapeTab() {
         id: 'tapeCard', thumbCss: state.tapeStyleCss,
         label: 'Tape', value: style.name,
         showDelete: true, expanded: state.tapeExpanded,
-        bodyHtml: layerCardBodyHTML(`
-          <div class="acc-props">
-            <div class="acc-prop-group"><span class="acc-prop-label">Scale</span>
-              <div class="xyz-inputs">
-                ${xyzInput('tapeScaleX','X',state.tapeScaleX)}
-                ${xyzInput('tapeScaleY','Y',state.tapeScaleY)}
-                ${xyzInput('tapeScaleZ','Z',state.tapeScaleZ)}
-              </div>
-            </div>
-            ${propGroupHTML('Position', sliderRowHTML('Position', 'tapePosition', 0, 1, 0.01, state.tapePosition))}
-            <button class="reset-link" id="tapeResetScale"><span class="material-symbols-outlined">restart_alt</span>Reset Scale</button>
-          </div>
-        `),
+        bodyHtml: `<div class="compact-body">
+          ${xyzCompactRow('Scale', 'tapeScale', state.tapeScaleX, state.tapeScaleY, state.tapeScaleZ)}
+          ${sliderCompactRow('Position', 'tapePosition', 0, 1, 0.01, state.tapePosition)}
+          <button class="reset-link" id="tapeResetScale"><span class="material-symbols-outlined">restart_alt</span>Reset Scale</button>
+        </div>`,
       });
       const delBtn = stack.querySelector('[data-delete-card="tapeCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.tapeAdded = false; renderTapeTab(); });
       const toggleBtn = stack.querySelector('[data-toggle-card="tapeCard"]');
       if (toggleBtn) toggleBtn.addEventListener('click', () => { state.tapeExpanded = !state.tapeExpanded; renderTapeTab(); });
-      bindSlider('#panel-details', 'tapePosition', v => { state.tapePosition = v; });
+      const posSlider = stack.querySelector('#tapePosition');
+      const posNum    = stack.querySelector('#tapePositionNum');
+      if (posSlider) posSlider.addEventListener('input', () => { state.tapePosition = +posSlider.value; if (posNum) posNum.value = posSlider.value; });
+      if (posNum)    posNum.addEventListener('input',    () => { state.tapePosition = +posNum.value;    if (posSlider) posSlider.value = posNum.value; });
       ['tapeScaleX','tapeScaleY','tapeScaleZ'].forEach(k => {
         const el = stack.querySelector(`#${k}`);
         if (el) el.addEventListener('input', e => { state[k] = +e.target.value; });
@@ -1281,29 +1310,19 @@ function renderLabelTab() {
         id: 'labelCard', thumbCss: state.labelTypeCss,
         label: 'Label', value: lbl.name,
         showDelete: true, expanded: state.labelExpanded,
-        bodyHtml: layerCardBodyHTML(`
-          <div class="acc-props">
-            <div class="acc-prop-group"><span class="acc-prop-label">Side</span>
-              <select class="form-select" id="labelSideSelect">
-                ${['Left','Right','Front','Back'].map(s => `<option value="${s.toLowerCase()}"${state.labelSide===s.toLowerCase()?' selected':''}>${s}</option>`).join('')}
-              </select>
-            </div>
-            <div class="acc-prop-group"><span class="acc-prop-label">Scale</span>
-              <div class="xyz-inputs">${xyzInput('labelScaleX','X',state.labelScaleX)}${xyzInput('labelScaleY','Y',state.labelScaleY)}${xyzInput('labelScaleZ','Z',state.labelScaleZ)}</div>
-            </div>
-            <div class="acc-prop-group"><span class="acc-prop-label">Position</span>
-              <div class="xyz-inputs">${xyzInput('labelPosX','X',state.labelPosX)}${xyzInput('labelPosY','Y',state.labelPosY)}${xyzInput('labelPosZ','Z',state.labelPosZ)}</div>
-            </div>
-            <div class="acc-action-group">
-              <button class="acc-action-btn${state.labelAdjacent?' is-active':''}" id="labelAdjacentBtn">
-                <span class="material-symbols-outlined">grid_view</span>Adjacent Object
-              </button>
-              <button class="acc-action-btn${state.labelMirror?' is-active':''}" id="labelMirrorBtn">
-                <span class="material-symbols-outlined">flip</span>Mirror Object
-              </button>
-            </div>
+        bodyHtml: `<div class="compact-body">
+          ${selectCompactRow('Side', 'labelSideSelect', ['Left','Right','Front','Back'], state.labelSide)}
+          ${xyzCompactRow('Scale', 'labelScale', state.labelScaleX, state.labelScaleY, state.labelScaleZ)}
+          ${xyzCompactRow('Position', 'labelPos', state.labelPosX, state.labelPosY, state.labelPosZ)}
+          <div class="acc-action-group compact-action-group">
+            <button class="acc-action-btn${state.labelAdjacent?' is-active':''}" id="labelAdjacentBtn">
+              <span class="material-symbols-outlined">grid_view</span>Adjacent Object
+            </button>
+            <button class="acc-action-btn${state.labelMirror?' is-active':''}" id="labelMirrorBtn">
+              <span class="material-symbols-outlined">flip</span>Mirror Object
+            </button>
           </div>
-        `),
+        </div>`,
       });
       const delBtn = stack.querySelector('[data-delete-card="labelCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.labelAdded = false; renderLabelTab(); });
@@ -1346,29 +1365,19 @@ function renderHandleTab() {
         id: 'handleCard', thumbCss: state.handleTypeCss,
         label: 'Handle', value: hdl.name,
         showDelete: true, expanded: state.handleExpanded,
-        bodyHtml: layerCardBodyHTML(`
-          <div class="acc-props">
-            <div class="acc-prop-group"><span class="acc-prop-label">Side</span>
-              <select class="form-select" id="handleSideSelect">
-                ${['Front','Back','Left','Right'].map(s => `<option value="${s.toLowerCase()}"${state.handleSide===s.toLowerCase()?' selected':''}>${s}</option>`).join('')}
-              </select>
-            </div>
-            <div class="acc-prop-group"><span class="acc-prop-label">Scale</span>
-              <div class="xyz-inputs">${xyzInput('handleScaleX','X',state.handleScaleX)}${xyzInput('handleScaleY','Y',state.handleScaleY)}${xyzInput('handleScaleZ','Z',state.handleScaleZ)}</div>
-            </div>
-            <div class="acc-prop-group"><span class="acc-prop-label">Position</span>
-              <div class="xyz-inputs">${xyzInput('handlePosX','X',state.handlePosX)}${xyzInput('handlePosY','Y',state.handlePosY)}${xyzInput('handlePosZ','Z',state.handlePosZ)}</div>
-            </div>
-            <div class="acc-action-group">
-              <button class="acc-action-btn${state.handleAdjacent?' is-active':''}" id="handleAdjacentBtn">
-                <span class="material-symbols-outlined">grid_view</span>Adjacent Object
-              </button>
-              <button class="acc-action-btn${state.handleMirror?' is-active':''}" id="handleMirrorBtn">
-                <span class="material-symbols-outlined">flip</span>Mirror Object
-              </button>
-            </div>
+        bodyHtml: `<div class="compact-body">
+          ${selectCompactRow('Side', 'handleSideSelect', ['Front','Back','Left','Right'], state.handleSide)}
+          ${xyzCompactRow('Scale', 'handleScale', state.handleScaleX, state.handleScaleY, state.handleScaleZ)}
+          ${xyzCompactRow('Position', 'handlePos', state.handlePosX, state.handlePosY, state.handlePosZ)}
+          <div class="acc-action-group compact-action-group">
+            <button class="acc-action-btn${state.handleAdjacent?' is-active':''}" id="handleAdjacentBtn">
+              <span class="material-symbols-outlined">grid_view</span>Adjacent Object
+            </button>
+            <button class="acc-action-btn${state.handleMirror?' is-active':''}" id="handleMirrorBtn">
+              <span class="material-symbols-outlined">flip</span>Mirror Object
+            </button>
           </div>
-        `),
+        </div>`,
       });
       const delBtn = stack.querySelector('[data-delete-card="handleCard"]');
       if (delBtn) delBtn.addEventListener('click', () => { state.handleAdded = false; renderHandleTab(); });

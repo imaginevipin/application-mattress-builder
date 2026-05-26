@@ -1058,6 +1058,9 @@ input:focus-visible, select:focus-visible { outline: none; }
 .compact-depth-num { width: 52px; flex-shrink: 0; margin-left: auto; }
 .compact-depth-block .form-range { width: 100%; }
 
+.compact-select { flex: 1; min-width: 0; padding: 5px var(--s-300); font-size: 12px; font-family: var(--font); }
+.compact-action-group { padding-top: var(--s-200); border-top: var(--bw) solid var(--border-default-secondary); }
+
 
 /* ─────────────────────────────────────────────────────────
    ACCESSORIES TABS
