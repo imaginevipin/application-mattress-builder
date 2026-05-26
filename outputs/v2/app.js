@@ -2719,9 +2719,9 @@ function initAssistant() {
     const modeToggleEl = document.getElementById('modeToggle');
     if (modeToggleEl) modeToggleEl.hidden = (v === 2);
 
-    // Hide Top/Wall/Bottom tab strip inside panel-external in v3 — nav items already handle switching
+    // Hide Top/Wall/Bottom tab strip in v1 and v3 — nav items handle switching; only v2 needs the strip
     const externalTabStrip = document.getElementById('externalTabStrip');
-    if (externalTabStrip) externalTabStrip.hidden = (v === 3);
+    if (externalTabStrip) externalTabStrip.hidden = (v !== 2);
 
     // Section reset
     if (v === 2) {
