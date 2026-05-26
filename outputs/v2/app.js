@@ -992,7 +992,11 @@ function renderWallMain() {
       id: 'wallQuilting', thumbCss: state.wallQuiltingPatternCss,
       label: 'Mattress Wall', value: getPatternName(state.wallQuiltingPatternId),
       showDelete: true, expanded: state.wallQuiltingExpanded,
-      bodyHtml: quiltingBodyHTML('wallQuilting', state) + addTuftsHtml,
+      bodyHtml: quiltingBodyHTML('wallQuilting', {
+        W: state.wallQuiltingW, H: state.wallQuiltingH,
+        PosX: state.wallQuiltingPosX, PosY: state.wallQuiltingPosY,
+        Rotation: state.wallQuiltingRotation, Depth: state.wallQuiltingDepth,
+      }) + addTuftsHtml,
     });
   }
 
