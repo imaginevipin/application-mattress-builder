@@ -2093,8 +2093,10 @@ body {
 #handleCardStack {
   flex: 0 0 auto;
   overflow: visible;
-  padding-top: 13px;
+  padding-top: 0;
 }
+
+#bottomMain { padding-top: 8px; }
 
 .layer-card-wrap {
   margin: 0 16px 8px;
