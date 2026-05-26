@@ -114,6 +114,11 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **Drag implementation:** `mousedown` on `.layer-card__drag-handle` sets `card.draggable = true`; any other mousedown sets it to false. This prevents accidental drags from card clicks.
 - **Alternatives considered:** Keep 4-button row, use a separate modal for layer settings
 
+### 2026-05-26 | Vercel deployment removed — no longer using Vercel
+- **Decision:** Deleted the Mattress Builder project from Vercel. Removed `vercel.json` from the repo.
+- **Reason:** Project is no longer being deployed via Vercel.
+- **Alternatives considered:** N/A
+
 ### 2026-05-26 | Accessories panel properties wired and unified to compact-body system
 - **Decision:** All three accessories tabs (Tape, Label, Handle) use the same `compact-body` / `compact-row` / `compact-input` system as the quilting/tufts panels. Cards open expanded by default.
 - **Reason:** Initial implementation used a custom `acc-props` / `xyz-inputs` / `form-input` system that produced large dark-black input boxes inconsistent with the rest of the app. Unified to the single established compact pattern.
