@@ -2668,9 +2668,7 @@ function initAssistant() {
     if (navLegacyEl) navLegacyEl.classList.toggle('nav-group--hidden', v === 2);
 
     // Topbar elements
-    const helpBtnEl = document.getElementById('helpBtn');
     const modeToggleEl = document.getElementById('modeToggle');
-    if (helpBtnEl) helpBtnEl.hidden = (v === 2);
     if (modeToggleEl) modeToggleEl.hidden = (v === 2);
 
     // Section reset

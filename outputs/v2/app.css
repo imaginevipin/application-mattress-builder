@@ -104,8 +104,8 @@ input:focus-visible, select:focus-visible { outline: none; }
 .brand-mark { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .brand-mark__img { display: block; width: 28px; height: 28px; object-fit: contain; }
 
-/* File / Help buttons */
-.btn-file, .help-btn {
+/* File button */
+.btn-file {
   display: inline-flex;
   align-items: center;
   gap: var(--s-100);
@@ -118,7 +118,7 @@ input:focus-visible, select:focus-visible { outline: none; }
   line-height: var(--text-small-lh);
   transition: border-color 0.15s, color 0.15s;
 }
-.btn-file:hover, .help-btn:hover { border-color: var(--border-default); color: var(--text-default-heading); }
+.btn-file:hover { border-color: var(--border-default); color: var(--text-default-heading); }
 .btn-file__arrow { font-size: 18px; }
 
 /* File menu dropdown */
@@ -1627,8 +1627,7 @@ body {
   height: 30px;
 }
 
-.btn-file,
-.help-btn {
+.btn-file {
   min-height: 36px;
   padding: 0 6px;
   border: none;
