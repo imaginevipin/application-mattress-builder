@@ -867,22 +867,23 @@
 <!-- ── Library Modal ──────────────────────────────────── -->
 <div class="app-modal" id="libraryModal" hidden>
   <div class="app-modal__backdrop" data-close-modal="library"></div>
-  <div class="app-modal__dialog app-modal__dialog--light">
-    <button class="app-modal__close app-modal__close--light" id="libraryCloseBtn" aria-label="Close">
+  <div class="app-modal__dialog app-modal__dialog--dark">
+    <button class="app-modal__close" id="libraryCloseBtn" aria-label="Close">
       <span class="material-symbols-outlined">close</span>
     </button>
     <div class="library-modal">
       <h2 class="library-modal__title">Add mattress to your library</h2>
-      <div class="library-modal__preview-wrap">
-        <img class="library-modal__preview" id="libraryPreviewImage" alt="Mattress preview">
+      <div class="library-modal__preview-wrap" id="libraryPreviewWrap">
+        <span class="material-symbols-outlined library-modal__preview-icon">image</span>
+        <span class="library-modal__preview-hint">Mattress preview</span>
       </div>
       <div class="form-field">
-        <label class="form-field-label library-modal__label" for="libraryMattressName">Mattress name</label>
-        <input class="form-input library-modal__input" id="libraryMattressName" type="text" placeholder="Enter mattress name">
+        <label class="form-field-label" for="libraryMattressName">Mattress name</label>
+        <input class="form-input" id="libraryMattressName" type="text" placeholder="Enter mattress name">
       </div>
       <div class="library-modal__footer">
         <p class="library-modal__availability">
-          <span class="material-symbols-outlined">help</span>
+          <span class="material-symbols-outlined">help_outline</span>
           <span class="library-modal__availability-label">Models Available</span>
           <span class="library-modal__availability-count" id="libraryAvailableCount">397</span>
         </p>

@@ -1389,15 +1389,24 @@ input:focus-visible, select:focus-visible { outline: none; }
 
 /* Library Modal */
 .library-modal { padding: var(--s-800) var(--s-600); display: flex; flex-direction: column; gap: var(--s-500); min-width: 360px; }
-.library-modal__title { font-size: var(--text-h5-size); font-weight: 600; color: #1a1a1a; }
-.library-modal__preview-wrap { background: #f0f0f0; border-radius: var(--br-200); height: 160px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.library-modal__preview { width: 100%; height: 100%; object-fit: contain; }
-.library-modal__label { color: #333; }
-.library-modal__input { background: #f6f6f6; border: 1px solid #e5e5e5; color: #1a1a1a; }
+.library-modal__title { font-size: var(--text-h5-size); font-weight: 600; color: var(--text-default-heading); }
+.library-modal__preview-wrap {
+  background: var(--surface-default-secondary);
+  border: var(--bw) solid var(--border-default-secondary);
+  border-radius: var(--br-200);
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-200);
+}
+.library-modal__preview-icon { font-size: 32px; color: var(--text-default-placeholder); }
+.library-modal__preview-hint { font-size: var(--text-small-size); color: var(--text-default-placeholder); }
 .library-modal__footer { display: flex; align-items: center; justify-content: space-between; }
-.library-modal__availability { display: flex; align-items: center; gap: var(--s-100); font-size: var(--text-small-size); color: #666; }
+.library-modal__availability { display: flex; align-items: center; gap: var(--s-100); font-size: var(--text-small-size); color: var(--text-default-placeholder); }
 .library-modal__availability .material-symbols-outlined { font-size: 16px; }
-.library-modal__availability-count { font-weight: 600; color: #333; }
+.library-modal__availability-count { font-weight: 600; color: var(--text-default-heading); }
 .library-modal__save { width: auto; padding: var(--s-300) var(--s-600); }
 
 
