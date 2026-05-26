@@ -2078,6 +2078,12 @@ body {
   background: var(--figma-panel);
 }
 
+#topMain,
+#wallMain,
+#bottomMain {
+  padding-top: 8px;
+}
+
 #topLayerStack,
 #layersStack {
   flex: 1;

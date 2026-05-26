@@ -211,6 +211,7 @@ function createDefaultState() {
     wallQuiltingW: 50, wallQuiltingH: 50,
     wallQuiltingPosX: 0, wallQuiltingPosY: 0,
     wallQuiltingRotation: 0, wallQuiltingDepth: 25,
+    wallExpanded: true,
     wallTuftsAdded: false,
     wallTuftTypeIndex: 0,
     wallTuftsExpanded: false,
@@ -976,25 +977,23 @@ function renderWallMain() {
   const hasItems = state.wallQuiltingAdded || state.wallTuftsAdded;
   document.getElementById('wallEmptyState').hidden = hasItems;
   document.getElementById('wallLayerStack').hidden  = !hasItems;
-  document.getElementById('wallAddLinks').hidden    = !hasItems;
+  document.getElementById('wallAddLinks').hidden    = true;
 
   if (!hasItems) return;
 
   const stack = document.getElementById('wallLayerStack');
-  const addLinks = document.getElementById('wallAddLinks');
-  let cards = '';
 
+  let subCardsHtml = '';
   if (state.wallQuiltingAdded) {
-    cards += makeLayerCard({
+    subCardsHtml += makeLayerCard({
       id: 'wallQuilting', thumbCss: state.wallQuiltingPatternCss,
-      label: 'Mattress Wall', value: getPatternName(state.wallQuiltingPatternId),
+      label: 'Wall Quilting', value: getPatternName(state.wallQuiltingPatternId),
       showDelete: true, expanded: state.wallQuiltingExpanded,
       bodyHtml: quiltingBodyHTML('wallQuilting', state),
     });
   }
-
   if (state.wallTuftsAdded) {
-    cards += makeLayerCard({
+    subCardsHtml += makeLayerCard({
       id: 'wallTufts', thumbCss: 'ptn-buttons',
       label: 'Tufts', value: getWallTuftName(),
       showDelete: true, expanded: state.wallTuftsExpanded,
@@ -1002,11 +1001,24 @@ function renderWallMain() {
     });
   }
 
-  stack.innerHTML = cards;
+  const linkButtons = [];
+  if (!state.wallQuiltingAdded) linkButtons.push(`<button class="add-link" id="wallAddQuilting">+ Wall Quilting</button>`);
+  if (!state.wallTuftsAdded) linkButtons.push(`<button class="add-link" id="wallAddTufts">+ Tufts</button>`);
+  const addLinksHtml = linkButtons.length
+    ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
+    : '';
 
-  const links = [];
-  if (!state.wallTuftsAdded) links.push(`<button class="add-link" id="wallAddTufts">+ Add Tufts</button>`);
-  addLinks.innerHTML = links.join('');
+  const thumbCss = state.wallQuiltingAdded ? state.wallQuiltingPatternCss : 'ptn-buttons';
+  const displayValue = state.wallQuiltingAdded
+    ? getPatternName(state.wallQuiltingPatternId)
+    : getWallTuftName();
+
+  stack.innerHTML = makeLayerCard({
+    id: 'wallBase', thumbCss,
+    label: 'Mattress Wall', value: displayValue,
+    showDelete: false, expanded: state.wallExpanded,
+    bodyHtml: `<div class="layer-card__nested-body">${subCardsHtml}${addLinksHtml}</div>`,
+  });
 
   bindWallMainEvents();
 }
@@ -1025,6 +1037,7 @@ function bindWallMainEvents() {
     if (!btn.closest('#panel-wall')) return;
     btn.addEventListener('click', () => {
       const id = btn.dataset.toggleCard;
+      if (id === 'wallBase')     state.wallExpanded         = !state.wallExpanded;
       if (id === 'wallQuilting') state.wallQuiltingExpanded = !state.wallQuiltingExpanded;
       if (id === 'wallTufts')    state.wallTuftsExpanded    = !state.wallTuftsExpanded;
       renderWallMain();
@@ -1036,9 +1049,11 @@ function bindWallMainEvents() {
       const id = btn.dataset.deleteCard;
       if (id === 'wallQuilting') { state.wallQuiltingAdded = false; state.wallQuiltingExpanded = false; }
       if (id === 'wallTufts')    { state.wallTuftsAdded    = false; state.wallTuftsExpanded    = false; }
+      if (!state.wallQuiltingAdded && !state.wallTuftsAdded) state.wallExpanded = true;
       renderWallMain();
     });
   });
+  bindAddLink('wallAddQuilting', () => { state.wallQuiltingAdded = true; renderWallMain(); });
   bindAddLink('wallAddTufts', () => { state.wallTuftsAdded = true; renderWallMain(); });
   document.querySelectorAll('.rot-pill').forEach(btn => {
     if (!btn.closest('#panel-wall')) return;
