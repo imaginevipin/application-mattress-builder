@@ -114,6 +114,22 @@ Each entry: **Date | Decision | Reason | Alternatives considered**
 - **Drag implementation:** `mousedown` on `.layer-card__drag-handle` sets `card.draggable = true`; any other mousedown sets it to false. This prevents accidental drags from card clicks.
 - **Alternatives considered:** Keep 4-button row, use a separate modal for layer settings
 
+### 2026-05-26 | Accessories panel properties wired and unified to compact-body system
+- **Decision:** All three accessories tabs (Tape, Label, Handle) use the same `compact-body` / `compact-row` / `compact-input` system as the quilting/tufts panels. Cards open expanded by default.
+- **Reason:** Initial implementation used a custom `acc-props` / `xyz-inputs` / `form-input` system that produced large dark-black input boxes inconsistent with the rest of the app. Unified to the single established compact pattern.
+- **Enforced via:** Three new reusable helpers (`xyzCompactRow`, `sliderCompactRow`, `selectCompactRow`) added to `app.js`. Rule locked in `CLAUDE.md` under "Panel Body Pattern (MANDATORY)" — bans `acc-props`, `xyz-inputs`, `layerCardBodyHTML` for property panels.
+- **Alternatives considered:** Keeping a separate `acc-props` system for accessories (rejected — inconsistency)
+
+### 2026-05-26 | Adjacent Object / Mirror Object changed from checkboxes to toggle action buttons
+- **Decision:** Label and Handle tabs render Adjacent Object and Mirror Object as bordered toggle buttons (`acc-action-btn`) with Material icons (`grid_view`, `flip`), not native checkboxes. State is still boolean and persists.
+- **Reason:** Design reference showed styled bordered buttons, not browser-native checkboxes. Active state uses the papaya subtle surface to indicate engaged state.
+- **Alternatives considered:** Styled checkbox labels (kept as checkboxes functionally — rejected for visual inconsistency with design)
+
+### 2026-05-26 | Muted color for destructive/utility actions — no primary color on Reset Scale
+- **Decision:** Reset Scale button uses `--text-default-placeholder` at rest, lifting to `--text-default-body` on hover. No primary (papaya) color.
+- **Reason:** Primary orange is reserved for active selection states and key CTAs. Using it on a secondary utility action dilutes its meaning and adds visual noise.
+- **Rule:** Keep primary color usage minimal — only active/selected states and primary CTAs.
+
 ### 2026-04-07 | Interactive 3D viewport — hover highlight + click to open panel
 - **Decision:** Hovering over a mattress part in the 3D viewport shows an orange emissive glow; clicking opens the corresponding sidebar panel
 - **Reason:** The 3D model was view-only; making it interactive gives users a direct spatial shortcut to any panel without needing to locate the correct sidebar icon
