@@ -1124,14 +1124,14 @@ input:focus-visible, select:focus-visible { outline: none; }
   display: flex;
   align-items: center;
   gap: var(--s-100);
-  color: var(--text-primary-default);
+  color: var(--text-default-placeholder);
   font-size: var(--text-small-size);
   font-weight: 500;
   align-self: flex-end;
   cursor: pointer;
   transition: color 0.12s;
 }
-.reset-link:hover { color: var(--text-primary-default-hover); }
+.reset-link:hover { color: var(--text-default-body); }
 .reset-link .material-symbols-outlined { font-size: 16px; }
 
 .form-select {
