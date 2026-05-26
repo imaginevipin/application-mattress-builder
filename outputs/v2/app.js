@@ -2719,6 +2719,10 @@ function initAssistant() {
     const modeToggleEl = document.getElementById('modeToggle');
     if (modeToggleEl) modeToggleEl.hidden = (v === 2);
 
+    // Hide Top/Wall/Bottom tab strip inside panel-external in v3 — nav items already handle switching
+    const externalTabStrip = document.getElementById('externalTabStrip');
+    if (externalTabStrip) externalTabStrip.hidden = (v === 3);
+
     // Section reset
     if (v === 2) {
       setSection('mattress');
