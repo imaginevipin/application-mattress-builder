@@ -754,9 +754,9 @@ function renderTopMain() {
     }
 
     const linkButtons = [];
-    if (!layer.quiltingAdded) linkButtons.push(`<button class="add-link" data-top-add="quilting" data-idx="${idx}">+ Add Top Quilting</button>`);
-    if (!layer.gussetAdded) linkButtons.push(`<button class="add-link" data-top-add="gusset" data-idx="${idx}">+ Add Gusset Quilting</button>`);
-    if (!layer.tuftsAdded) linkButtons.push(`<button class="add-link" data-top-add="tufts" data-idx="${idx}">+ Add Tufts</button>`);
+    if (!layer.quiltingAdded) linkButtons.push(`<button class="add-link" data-top-add="quilting" data-idx="${idx}">+ Top Quilting</button>`);
+    if (!layer.gussetAdded) linkButtons.push(`<button class="add-link" data-top-add="gusset" data-idx="${idx}">+ Gusset Quilting</button>`);
+    if (!layer.tuftsAdded) linkButtons.push(`<button class="add-link" data-top-add="tufts" data-idx="${idx}">+ Tufts</button>`);
     const addLinksHtml = linkButtons.length
       ? `<div class="add-links--in-card">${linkButtons.join('')}</div>`
       : '';
