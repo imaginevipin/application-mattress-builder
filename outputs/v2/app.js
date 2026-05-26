@@ -2731,7 +2731,7 @@ function initAssistant() {
     if (v === 1 && panel.classList.contains('is-open')) closePanel();
     if (v !== 2) closeRequestPanel();
     if (v !== 3) closeV3Panel();
-    myRequestsBtn.textContent = v === 2 ? 'My Requests' : 'Request';
+    myRequestsBtn.textContent = v === 2 ? 'My Requests' : v === 3 ? 'Request' : 'Request Props';
 
     versionPills.forEach(p => {
       const active = Number(p.dataset.version) === v;
